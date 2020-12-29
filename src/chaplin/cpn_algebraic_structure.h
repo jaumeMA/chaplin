@@ -13,13 +13,4 @@ private:
 
 };
 
-template<typename Set, typename SumOperator, typename ProdOperator>
-using ring = algebraic_structure<Set,SumOperator,ProdOperator>;
-
-template<typename Set, typename SumOperator, typename ProdOperator, typename InverseOperator>
-using field = algebraic_structure<Set,SumOperator,ProdOperator,InverseOperator>;
-
-template<typename Set, typename SumOperator, typename ProdOperator, typename InverseOperator, typename ModuleOperator>
-using module = algebraic_structure<Set,SumOperator,ProdOperator,InverseOperator,ModuleOperator>;
-
 }
