@@ -6,6 +6,7 @@
 #include "ddk_iterable_state.h"
 #include "ddk_iterable_action_state.h"
 #include "ddk_lendable.h"
+#include "ddk_iterable_template_helper.h"
 
 #define IS_CO_ITERATOR(_CO_ITERATOR) \
 template<typename TT> \
@@ -56,7 +57,7 @@ private:
 	co_forward_iterator(Iterable& i_iterable, typename std::enable_if<is_co_iterator<Iterable>::value==false>::type* = nullptr);
 	iter::go_forward_action&& acquire_iterable_value(reference i_value);
 
-	ddk::function<reference(const iter::shift_action&,const function<iter::const_forward_action(reference)>&)> m_function;
+	ddk::function<reference(const iter::shift_action&, const detail::relative_function_impl<co_forward_iterator<T>,iter::go_forward_action&&,reference>&)> m_function;
 	iter::iterable_state m_currState;
 	detail::this_fiber_t m_caller;
 	iter::go_forward_action m_currAction = iter::go_no_place;
@@ -173,10 +174,6 @@ struct co_iterator_type_correspondence<T, std::random_access_iterator_tag>
 };
 
 }
-
-template<typename Iterable>
-typename std::iterator_traits<typename Iterable::iterator>::iterator_category iterable_tag_resolver(const Iterable&);
-
 }
 
 #include "ddk_co_iterator.inl"

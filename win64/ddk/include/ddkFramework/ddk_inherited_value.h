@@ -1,9 +1,13 @@
 #pragma once
 
 #include "ddk_shared_pointer_wrapper.h"
+#include "ddk_dynamic_visitor.h"
 #include "ddk_system_allocator.h"
 #include "ddk_rtti_defs.h"
 #include "ddk_any_value.h"
+#include "ddk_concepts.h"
+#include "ddk_smart_pointer_concepts.h"
+#include "ddk_type_concepts.h"
 
 namespace ddk
 {
@@ -29,6 +33,8 @@ public:
 	inherited_value(const inherited_value& other) = default;
 	inherited_value(inherited_value&& other) = default;
 	template<typename TT>
+	inherited_value(const shared_pointer_wrapper<TT>& i_value);
+	template<typename TT>
 	inherited_value(const inherited_value<TT,Allocator>& other);
 	template<typename TT>
 	inherited_value(inherited_value<TT,Allocator>&& other);
@@ -49,11 +55,12 @@ public:
 	template<typename Visitor>
 	inline bool may_visit() const;
 	template<typename Visitor>
-	any_value visit(Visitor&& i_visitor) const;
+	void visit(Visitor&& i_visitor) const;
 
 private:
-	template<typename ... Args>
-	inherited_value(Args&& ... i_args);
+	TEMPLATE(typename ... Args)
+	REQUIRES(IS_CONSTRUCTIBLE(T,Args...))
+	explicit inherited_value(Args&& ... i_args);
 
 	TypeInfo m_typeInfo;
 	shared_pointer_wrapper<T> m_value;
@@ -63,3 +70,4 @@ private:
 }
 
 #include "ddk_inherited_value.inl"
+#include "ddk_dynamic_multivisitor.h"
