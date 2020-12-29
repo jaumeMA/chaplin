@@ -50,7 +50,7 @@ elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 	# Configure ddk (bundled library)
 	add_library(ddk SHARED IMPORTED)
 	set_target_properties(ddk PROPERTIES
-		INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_DIR}/ddk/include"
+		INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_DIR}/ddk/include;${EXTERNAL_DIR}/ddk/include/ddkFramework;${EXTERNAL_DIR}/ddk/include/ddkUtils"
 		IMPORTED_IMPLIB_RELEASE "${EXTERNAL_DIR}/ddk/lib/ddkFramework/ddkFramework.lib"
 		IMPORTED_IMPLIB_DEBUG "${EXTERNAL_DIR}/ddk/lib/ddkFramework/ddkFramework_d.lib"
 		MAP_IMPORTED_CONFIG_RELEASE_DEBUG Release)

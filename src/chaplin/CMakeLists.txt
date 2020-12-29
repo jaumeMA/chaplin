@@ -13,6 +13,8 @@ set(PUBLIC_MODULE_HEADERS ${HEADERS} PARENT_SCOPE)
 
 target_link_libraries(chaplin
 	${LOCAL_MODULE_DEPENDENCIES}
-	ddk)
+	ddk
+	pthread
+	log4cxx)
 
 set_target_properties(chaplin PROPERTIES FOLDER "Chaplin")

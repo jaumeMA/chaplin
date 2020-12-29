@@ -7,13 +7,13 @@
 namespace cpn
 {
 
-template<typename ... Sets>
-using prod_set = ddk::tuple<Sets...>;
+template<typename ... sets>
+using prod_set = ddk::tuple<sets...>;
 
-template<typename Set, size_t ... Dims>
-using pow_set = ddk::high_order_array<Set,Dims...>;
+template<typename set, size_t ... dims>
+using pow_set = ddk::high_order_array<set,dims...>;
 
-template<typename ... Sets>
-using sum_set = ddk::variant<Sets...>;
+template<typename ... sets>
+using sum_set = ddk::variant<sets...>;
 
 }
