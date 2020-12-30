@@ -19,6 +19,6 @@ public:
 	virtual double resolve(unsigned char i_accuracy) const = 0;
 };
 
-using inherited_symbolic_number = ddk::inherited_value<symbolic_number_interface>;
+using inherited_symbolic_number = ddk::inherited_value<const symbolic_number_interface>;
 
 }

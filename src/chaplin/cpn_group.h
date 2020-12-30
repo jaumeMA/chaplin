@@ -38,7 +38,7 @@ struct pow_group_traits
 template<typename ... group_traits>
 struct sum_group_traits
 {
-	typedef sum_set<typename group_traits::set_traits ...> sum_set_traits_t;
+	typedef sum_set<group<typename group_traits::set_traits,group_traits> ...> sum_set_traits_t;
 
 	struct sum_group_operation
 	{

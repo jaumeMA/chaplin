@@ -12,6 +12,7 @@ public:
 	symbolic_number(const inherited_symbolic_number& i_number);
 
 	double resolve(unsigned char i_accuracy) const;
+	inherited_symbolic_number get_impl() const;
 
 private:
 	inherited_symbolic_number m_impl;

@@ -17,7 +17,7 @@ public:
 	}
 
 	int numerator() const;
-	int denomnator() const;
+	int denominator() const;
 	double resolve(unsigned char i_accuracy) const;
 
 private:
@@ -28,6 +28,8 @@ struct irrational_set
 {
 public:
 	irrational_set(const symbolic_number& i_number);
+
+	symbolic_number get_number() const;
 
 private:
 	symbolic_number m_number;
