@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ddk_visitable_type_interface.h"
+#include "ddk_visitable_type.h"
 #include "ddk_inherited_value.h"
 #include "ddk_shared_from_this.h"
 

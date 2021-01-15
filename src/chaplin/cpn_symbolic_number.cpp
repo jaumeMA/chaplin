@@ -7,13 +7,15 @@ symbolic_number::symbolic_number(const inherited_symbolic_number& i_number)
 : m_impl(i_number)
 {
 }
+symbolic_number& symbolic_number::operator=(const inherited_symbolic_number& i_impl)
+{
+    m_impl = i_impl;
+
+    return *this;
+}
 double symbolic_number::resolve(unsigned char i_accuracy) const
 {
 	return m_impl->resolve(i_accuracy);
-}
-inherited_symbolic_number symbolic_number::get_impl() const
-{
-	return m_impl;
 }
 
 }

@@ -3,7 +3,7 @@ include(CompilerFlags.cmake)
 
 project(chaplin)
 
-add_library(chaplin STATIC ${SOURCES} ${HEADERS})
+add_library(chaplin STATIC ${SOURCES} ${HEADERS} ${HEADERS_INL})
 
 #no dependencies
 set(LOCAL_MODULE_DEPENDENCIES)

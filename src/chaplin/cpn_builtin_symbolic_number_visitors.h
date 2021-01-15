@@ -7,10 +7,9 @@
 namespace cpn
 {
 
-class neg_symbolic_number_visitor
+class neg_symbolic_number_visitor : public ddk::dynamic_visitor<symbolic_number_interface>
 {
 public:
-	typedef symbolic_number_interface type_interface;
 	typedef inherited_symbolic_number return_type;
 
 	return_type operator()(const rational_symbolic_number& i_lhs) const;
@@ -18,9 +17,11 @@ public:
 	return_type operator()(const log_symbolic_number& i_lhs) const;
 	return_type operator()(const sum_symbolic_number& i_lhs) const;
 	return_type operator()(const prod_symbolic_number& i_lhs) const;
+	template<typename T>
+	return_type operator()(T&&) const;
 };
 
-class add_symbolic_number_visitor
+class add_symbolic_number_visitor : public ddk::dynamic_visitor<symbolic_number_interface>
 {
 public:
 	typedef symbolic_number_interface type_interface;
@@ -40,7 +41,7 @@ public:
 	return_type operator()(const T& i_lhs, const TT& i_rhs,...) const;
 };
 
-class prod_symbolic_number_visitor
+class prod_symbolic_number_visitor : public ddk::dynamic_visitor<symbolic_number_interface>
 {
 public:
 	typedef symbolic_number_interface type_interface;

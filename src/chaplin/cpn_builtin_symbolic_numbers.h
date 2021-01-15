@@ -2,7 +2,6 @@
 
 #include "cpn_symbolic_number_interface.h"
 #include "ddk_inherited_value.h"
-#include "ddk_visitable_type.h"
 #include <forward_list>
 
 namespace cpn

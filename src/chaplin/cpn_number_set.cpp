@@ -20,6 +20,10 @@ irrational_set::irrational_set(const symbolic_number& i_number)
 : m_number(i_number)
 {
 }
+irrational_set::irrational_set(inherited_symbolic_number&& i_number)
+: m_number(std::move(i_number))
+{
+}
 symbolic_number irrational_set::get_number() const
 {
 	return m_number;

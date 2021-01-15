@@ -28,6 +28,7 @@ struct irrational_set
 {
 public:
 	irrational_set(const symbolic_number& i_number);
+    irrational_set(inherited_symbolic_number&& i_number);
 
 	symbolic_number get_number() const;
 
