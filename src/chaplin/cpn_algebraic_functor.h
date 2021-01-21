@@ -13,16 +13,14 @@ struct forgetful_functor<algebraic_structure<Set,Operators...>,Operations...>
 };
 
 template<typename Structure>
-using forget_add = forgetful_functor<Structure,typename Structure::add_operation>;
+using forget_add = typename forgetful_functor<Structure,typename Structure::add_operation>::type;
 template<typename Structure>
-using forget_add_inverse = forgetful_functor<Structure,typename Structure::add_inverse_operation>;
+using forget_add_inverse = typename forgetful_functor<Structure,typename Structure::add_inverse_operation>::type;
 template<typename Structure>
-using forget_addition = forgetful_functor<Structure,typename Structure::add_operation,typename Structure::add_inverse_operation>;
+using forget_mult = typename forgetful_functor<Structure,typename Structure::mult_operation>::type;
 template<typename Structure>
-using forget_mult = forgetful_functor<Structure,typename Structure::mult_operation>;
+using forget_div = typename forgetful_functor<Structure,typename Structure::div_operation>::type;
 template<typename Structure>
-using forget_div = forgetful_functor<Structure,typename Structure::div_operation>;
-template<typename Structure>
-using forget_mod = forgetful_functor<Structure,typename Structure::mod_operation>;
+using forget_mod = typename forgetful_functor<Structure,typename Structure::mod_operation>::type;
 
 }

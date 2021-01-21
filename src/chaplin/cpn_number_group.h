@@ -9,9 +9,7 @@ namespace cpn
 
 struct rational_addition
 {
-    PUBLISH_OPERATION_PROPERTIES(rational_addition,commutative,associative,distributive);
-
-	typedef rational_addition add_operation;
+    PUBLISH_OPERATION_PROPERTIES(rational_addition,add_operation,commutative,associative,distributive);
 
 	static constexpr rational_set identity = {0,1};
 
@@ -37,9 +35,7 @@ using rational_group = rational_semi_group::template equip_with<rational_additio
 
 struct irrational_addition
 {
-    PUBLISH_OPERATION_PROPERTIES(irrational_addition,commutative,associative,distributive);
-
-    typedef irrational_addition add_operation;
+    PUBLISH_OPERATION_PROPERTIES(irrational_addition,add_operation,commutative,associative,distributive);
 
 	friend inline irrational_set operator+(const rational_set& i_lhs,const irrational_set& i_rhs)
 	{

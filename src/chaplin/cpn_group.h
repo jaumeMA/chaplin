@@ -18,10 +18,9 @@ using group = algebraic_structure<Set,AddOperation,AddInverseOperation>;
 template<typename Group, size_t ... Dims>
 struct pow_add_operation
 {
-    PUBLISH_OPERATION_PROPERTIES(pow_add_operation,typename Group::operators_pack);
+    PUBLISH_OPERATION_PROPERTIES(pow_add_operation,add_operation,typename Group::operators_pack);
 
 	typedef pow_set<Group,Dims...> pow_set_traits_t;
-	typedef pow_add_operation add_operation;
 
 	static const pow_set_traits_t identity;
 	friend inline pow_set_traits_t operator+(const pow_set_traits_t& i_lhs,const pow_set_traits_t& i_rhs)
@@ -35,7 +34,7 @@ struct pow_add_operation
 };
 
 template<typename SemiGroup, size_t ... Dims>
-using pow_semi_group = semi_group<pow_set<SemiGroup,Dims...>,pow_add_operation<SemiGroup,Dims...>>;
+using pow_semi_group = semi_group<pow_set<forget_add<SemiGroup>,Dims...>,pow_add_operation<SemiGroup,Dims...>>;
 
 template<typename Group, size_t ... Dims>
 struct pow_add_inverse_operation
@@ -54,15 +53,14 @@ struct pow_add_inverse_operation
 };
 
 template<typename Group, size_t ... Dims>
-using pow_group = typename pow_semi_group<Group,Dims...>::template equip_with<pow_add_inverse_operation<Group,Dims...>>;
+using pow_group = typename pow_semi_group<forget_add_inverse<Group>,Dims...>::template equip_with<pow_add_inverse_operation<Group,Dims...>>;
 
 template<typename ... Groups>
 struct sum_add_operation
 {
-    PUBLISH_OPERATION_PROPERTIES(sum_add_operation,ddk::mpl::type_pack_intersection<typename Groups::operators_pack...>);
+    PUBLISH_OPERATION_PROPERTIES(sum_add_operation,add_operation,ddk::mpl::type_pack_intersection<typename Groups::operators_pack...>);
 
 	typedef sum_set<Groups...> sum_set_traits_t;
-	typedef sum_add_operation add_operation;
 
 	struct add_operation_visitor : public ddk::static_visitor<sum_set_traits_t>
 	{
@@ -81,7 +79,7 @@ struct sum_add_operation
 };
 
 template<typename ... SemiGroups>
-using sum_semi_group = semi_group<sum_set<SemiGroups...>,sum_add_operation<SemiGroups...>>;
+using sum_semi_group = semi_group<sum_set<forget_add<SemiGroups>...>,sum_add_operation<SemiGroups...>>;
 
 template<typename ... Groups>
 struct sum_add_inverse_operation
@@ -105,6 +103,6 @@ struct sum_add_inverse_operation
 };
 
 template<typename ... Groups>
-using sum_group = typename sum_semi_group<Groups...>::template equip_with<sum_add_inverse_operation<Groups...>>;
+using sum_group = typename sum_semi_group<forget_add_inverse<Groups>...>::template equip_with<sum_add_inverse_operation<Groups...>>;
 
 }

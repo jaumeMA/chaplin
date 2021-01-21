@@ -14,10 +14,9 @@ using ring = algebraic_structure<Set,AddOperation,MultOperation>;
 template<typename Ring, size_t ... Dims>
 struct pow_mult_operation
 {
-    PUBLISH_OPERATION_PROPERTIES(pow_mult_operation,typename Ring::operators_pack);
+    PUBLISH_OPERATION_PROPERTIES(pow_mult_operation,mult_operation,typename Ring::operators_pack);
 
 	typedef pow_set<Ring,Dims...> pow_set_traits_t;
-	typedef pow_mult_operation mult_operation;
 
 	static const pow_set_traits_t identity;
 	friend inline pow_set_traits_t operator*(const pow_set_traits_t& i_lhs,const pow_set_traits_t& i_rhs)
@@ -31,18 +30,17 @@ struct pow_mult_operation
 };
 
 template<typename Ring, size_t ... Dims>
-using pow_semi_ring = typename pow_semi_group<Ring,Dims...>::template equip_with<pow_mult_operation<Ring,Dims...>>;
+using pow_semi_ring = typename pow_semi_group<forget_add_inverse<forget_mult<Ring>>,Dims...>::template equip_with<pow_mult_operation<Ring,Dims...>>;
 
 template<typename Ring, size_t ... Dims>
-using pow_ring = typename pow_group<Ring,Dims...>::template equip_with<pow_mult_operation<Ring,Dims...>>;
+using pow_ring = typename pow_group<forget_mult<Ring>,Dims...>::template equip_with<pow_mult_operation<Ring,Dims...>>;
 
 template<typename ... Rings>
 struct sum_mult_operation
 {
-    PUBLISH_OPERATION_PROPERTIES(sum_mult_operation,ddk::mpl::type_pack_intersection<typename Rings::operators_pack...>);
+    PUBLISH_OPERATION_PROPERTIES(sum_mult_operation,mult_operation,ddk::mpl::type_pack_intersection<typename Rings::operators_pack...>);
 
     typedef sum_set<Rings...> sum_set_traits_t;
-	typedef sum_mult_operation mult_operation;
 
 	struct mult_operation_visitor : public ddk::static_visitor<sum_set_traits_t>
 	{
@@ -60,10 +58,10 @@ struct sum_mult_operation
 	}
 };
 
-template<typename ... Rings>
-using sum_semi_ring = typename sum_semi_group<Rings...>::template equip_with<sum_mult_operation<Rings...>>;
+template<typename ... SemiRings>
+using sum_semi_ring = typename sum_semi_group<forget_mult<SemiRings>...>::template equip_with<sum_mult_operation<SemiRings...>>;
 
 template<typename ... Rings>
-using sum_ring = typename sum_group<Rings...>::template equip_with<sum_mult_operation<Rings...>>;
+using sum_ring = typename sum_group<forget_mult<Rings>...>::template equip_with<sum_mult_operation<Rings...>>;
 
 }

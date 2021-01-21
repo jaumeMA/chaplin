@@ -14,11 +14,10 @@ using module = algebraic_structure<set,AddOperation,ModuleOperation>;
 template<typename Module,size_t ... Dims>
 struct pow_mod_operation
 {
-    PUBLISH_OPERATION_PROPERTIES(pow_mod_operation,typename Module::operators_pack);
+    PUBLISH_OPERATION_PROPERTIES(pow_mod_operation,mod_operation,typename Module::operators_pack);
 
 	typedef pow_set<Module,Dims...> pow_set_traits_t;
     typedef typename Module::ring_type ring_type;
-	typedef pow_mod_operation mod_operation;
 
 	static const ring_type identity;
 	friend inline pow_set_traits_t operator^(const ring_type& i_lhs, const pow_set_traits_t& i_rhs)
@@ -40,16 +39,15 @@ struct pow_mod_operation
 };
 
 template<typename Module, size_t ... Dims>
-using pow_module = typename pow_group<Module,Dims...>::template equip_with<pow_mod_operation<Module,Dims...>>;
+using pow_module = typename pow_group<forget_mod<Module>,Dims...>::template equip_with<pow_mod_operation<Module,Dims...>>;
 
 template<typename ... Modules>
 struct sum_mod_operation
 {
-    PUBLISH_OPERATION_PROPERTIES(sum_mod_operation,ddk::mpl::type_pack_intersection<typename Modules::operators_pack...>);
+    PUBLISH_OPERATION_PROPERTIES(sum_mod_operation,mod_operation,ddk::mpl::type_pack_intersection<typename Modules::operators_pack...>);
 
 	typedef sum_set<Modules ...> sum_set_traits_t;
     typedef sum_ring<typename Modules::ring_type ...> ring_type;
-	typedef sum_mod_operation mod_operation;
 
 	struct module_prod_operation : public ddk::static_visitor<sum_set_traits_t>
 	{
@@ -71,7 +69,7 @@ struct sum_mod_operation
 };
 
 template<typename ... Modules>
-using sum_module = typename sum_group<Modules...>::template equip_with<sum_mod_operation<Modules...>>;
+using sum_module = typename sum_group<forget_mod<Modules>...>::template equip_with<sum_mod_operation<Modules...>>;
 
 }
 

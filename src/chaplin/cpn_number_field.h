@@ -9,9 +9,7 @@ namespace cpn
 
 struct rational_division
 {
-    PUBLISH_OPERATION_PROPERTIES(rational_division,commutative,associative,distributive);
-
-	typedef rational_division div_operation;
+    PUBLISH_OPERATION_PROPERTIES(rational_division,div_operation,commutative,associative,distributive);
 
 	friend inline rational_set operator/(const rational_set& i_lhs,const rational_set& i_rhs)
 	{
@@ -23,9 +21,7 @@ using rational_field = rational_ring::equip_with<rational_division>;
 
 struct irrational_division
 {
-    PUBLISH_OPERATION_PROPERTIES(irrational_division,commutative,associative,distributive);
-
-    typedef irrational_multiplication div_operation;
+    PUBLISH_OPERATION_PROPERTIES(irrational_division,div_operation,commutative,associative,distributive);
 
 	friend inline irrational_set operator/(const rational_set& i_lhs,const irrational_set& i_rhs)
 	{

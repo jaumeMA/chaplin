@@ -20,9 +20,8 @@ inline irrational_set mixed_module_operation(const irrational_set& i_lhs, const 
 
 struct rational_module_operation
 {
-    PUBLISH_OPERATION_PROPERTIES(rational_module_operation,commutative,associative,distributive);
+    PUBLISH_OPERATION_PROPERTIES(rational_module_operation,mod_operation,commutative,associative,distributive);
 
-	typedef rational_module_operation module_operation;
     typedef rational_ring ring_type;
 
 	static constexpr rational_set identity = {1,1};
@@ -49,9 +48,8 @@ using rational_module = rational_group::equip_with<rational_module_operation>;
 
 struct irrational_module_operation
 {
-    PUBLISH_OPERATION_PROPERTIES(irrational_module_operation,commutative,associative,distributive);
+    PUBLISH_OPERATION_PROPERTIES(irrational_module_operation,mod_operation,commutative,associative,distributive);
 
-    typedef irrational_module_operation module_operation;
     typedef irrational_ring ring_type;
 
 	friend inline irrational_set operator^(const irrational_set& i_lhs,const irrational_set& i_rhs)

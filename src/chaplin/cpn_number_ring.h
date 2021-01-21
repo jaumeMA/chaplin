@@ -9,9 +9,7 @@ namespace cpn
 
 struct rational_multiplication
 {
-    PUBLISH_OPERATION_PROPERTIES(rational_multiplication,commutative,associative,distributive);
-
-	typedef rational_multiplication mult_operation;
+    PUBLISH_OPERATION_PROPERTIES(rational_multiplication,mult_operation,commutative,associative,distributive);
 
 	static constexpr rational_set identity = {1,1};
 
@@ -21,14 +19,12 @@ struct rational_multiplication
 	}
 };
 
-using rational_semi_ring = rational_semi_group::equip_with<rational_multiplication>;
-using rational_ring = rational_group::equip_with<rational_multiplication>;
+using rational_semi_ring = rational_semi_group::template equip_with<rational_multiplication>;
+using rational_ring = rational_group::template equip_with<rational_multiplication>;
 
 struct irrational_multiplication
 {
-    PUBLISH_OPERATION_PROPERTIES(irrational_multiplication,commutative,associative,distributive);
-
-    typedef irrational_multiplication mult_operation;
+    PUBLISH_OPERATION_PROPERTIES(irrational_multiplication,mult_operation,commutative,associative,distributive);
 
 	friend inline irrational_set operator*(const rational_set& i_lhs,const irrational_set& i_rhs)
 	{
@@ -50,10 +46,10 @@ struct irrational_multiplication
 	}
 };
 
-using irrational_semi_ring = irrational_semi_group::equip_with<irrational_multiplication>;
-using irrational_ring = irrational_group::equip_with<irrational_multiplication>;
+using irrational_semi_ring = irrational_semi_group::template equip_with<irrational_multiplication>;
+using irrational_ring = irrational_group::template equip_with<irrational_multiplication>;
 
-using real_semi_ring = sum_ring<rational_semi_ring,irrational_semi_ring>;
+using real_semi_ring = sum_semi_ring<rational_semi_ring,irrational_semi_ring>;
 using real_ring = sum_ring<rational_ring,irrational_ring>;
 
 template<size_t ... Dims>
