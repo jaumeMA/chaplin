@@ -9,41 +9,62 @@
 namespace cpn
 {
 
-template<typename set,typename group_traits>
-using group = algebraic_structure<set,group_traits>;
+template<typename Set,typename AddOperation>
+using semi_group = algebraic_structure<Set,AddOperation>;
 
-template<typename groups, size_t ... Dims>
-struct pow_group_traits : virtual public pow_set<group<typename groups::set_traits,typename groups::group_traits>,Dims...>
+template<typename Set,typename AddOperation, typename AddInverseOperation>
+using group = algebraic_structure<Set,AddOperation,AddInverseOperation>;
+
+template<typename Group, size_t ... Dims>
+struct pow_add_operation
 {
-	typedef pow_set<group<typename groups::set_traits,typename groups::group_traits>,Dims...> pow_set_traits_t;
-	typedef pow_group_traits<groups,Dims...> group_traits;
+    PUBLISH_OPERATION_PROPERTIES(pow_add_operation,typename Group::operators_pack);
+
+	typedef pow_set<Group,Dims...> pow_set_traits_t;
+	typedef pow_add_operation add_operation;
 
 	static const pow_set_traits_t identity;
-	friend inline pow_set_traits_t operator+(const group_traits& i_lhs,const group_traits& i_rhs)
+	friend inline pow_set_traits_t operator+(const pow_set_traits_t& i_lhs,const pow_set_traits_t& i_rhs)
 	{
 		pow_set_traits_t res;
 
-		res <<= ddk::trans::iterable_sum(static_cast<const pow_set_traits_t&>(i_lhs),static_cast<const pow_set_traits_t&>(i_rhs));
-
-		return res;
-	}
-	friend inline pow_set_traits_t operator-(const group_traits& i_rhs)
-	{
-		pow_set_traits_t res;
-
-		res <<= ddk::trans::iterable_neg(static_cast<const pow_set_traits_t&>(i_rhs));
+		res <<= ddk::trans::iterable_sum(i_lhs,i_rhs);
 
 		return res;
 	}
 };
 
-template<typename ... groups>
-struct sum_group_traits : virtual public sum_set<group<typename groups::set_traits,typename groups::group_traits> ...>
-{
-	typedef sum_set<group<typename groups::set_traits,typename groups::group_traits> ...> sum_set_traits_t;
-	typedef sum_group_traits<groups...> group_traits;
+template<typename SemiGroup, size_t ... Dims>
+using pow_semi_group = semi_group<pow_set<SemiGroup,Dims...>,pow_add_operation<SemiGroup,Dims...>>;
 
-	struct sum_group_operation : public ddk::static_visitor<sum_set_traits_t>
+template<typename Group, size_t ... Dims>
+struct pow_add_inverse_operation
+{
+	typedef pow_set<Group,Dims...> pow_set_traits_t;
+	typedef pow_add_inverse_operation<Group,Dims...> add_inverse_operation;
+
+	friend inline pow_set_traits_t operator-(const pow_set_traits_t& i_rhs)
+	{
+		pow_set_traits_t res;
+
+		res <<= ddk::trans::iterable_neg(i_rhs);
+
+		return res;
+	}
+};
+
+template<typename Group, size_t ... Dims>
+using pow_group = typename pow_semi_group<Group,Dims...>::template equip_with<pow_add_inverse_operation<Group,Dims...>>;
+
+template<typename ... Groups>
+struct sum_add_operation
+{
+    PUBLISH_OPERATION_PROPERTIES(sum_add_operation,ddk::mpl::type_pack_intersection<typename Groups::operators_pack...>);
+
+	typedef sum_set<Groups...> sum_set_traits_t;
+	typedef sum_add_operation add_operation;
+
+	struct add_operation_visitor : public ddk::static_visitor<sum_set_traits_t>
 	{
 		template<typename T1, typename T2>
 		sum_set_traits_t operator()(T1&& i_lhs, T2&& i_rhs) const
@@ -51,7 +72,24 @@ struct sum_group_traits : virtual public sum_set<group<typename groups::set_trai
 			return i_lhs + i_rhs;
 		}
 	};
-	struct neg_group_operation : public ddk::static_visitor<sum_set_traits_t>
+
+	static const sum_set_traits_t identity;
+	friend inline sum_set_traits_t operator+(const sum_set_traits_t& i_lhs,const sum_set_traits_t& i_rhs)
+	{
+		return ddk::visit(add_operation_visitor{},i_lhs,i_rhs);
+	}
+};
+
+template<typename ... SemiGroups>
+using sum_semi_group = semi_group<sum_set<SemiGroups...>,sum_add_operation<SemiGroups...>>;
+
+template<typename ... Groups>
+struct sum_add_inverse_operation
+{
+	typedef sum_set<Groups...> sum_set_traits_t;
+	typedef sum_add_inverse_operation<Groups...> add_inverse_operation;
+
+	struct inverse_operation_visitor : public ddk::static_visitor<sum_set_traits_t>
 	{
 		template<typename T1,typename T2>
 		sum_set_traits_t operator()(T1&& i_lhs,T2&& i_rhs) const
@@ -60,15 +98,13 @@ struct sum_group_traits : virtual public sum_set<group<typename groups::set_trai
 		}
 	};
 
-	static const sum_set_traits_t identity;
-	friend inline sum_set_traits_t operator+(const group_traits& i_lhs,const group_traits& i_rhs)
+	friend inline sum_set_traits_t operator-(const sum_set_traits_t& i_rhs)
 	{
-		return ddk::visit(sum_group_operation{},static_cast<sum_set_traits_t>(i_lhs),static_cast<sum_set_traits_t>(i_rhs));
-	}
-	friend inline sum_set_traits_t operator-(const group_traits& i_rhs)
-	{
-		return ddk::visit(neg_group_operation{},static_cast<sum_set_traits_t>(i_rhs));
+		return ddk::visit(inverse_operation_visitor{},i_rhs);
 	}
 };
+
+template<typename ... Groups>
+using sum_group = typename sum_semi_group<Groups...>::template equip_with<sum_add_inverse_operation<Groups...>>;
 
 }

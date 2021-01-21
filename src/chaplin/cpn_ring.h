@@ -8,33 +8,43 @@
 namespace cpn
 {
 
-template<typename set, typename group_traits,typename ring_traits>
-using ring = algebraic_structure<set,group_traits,ring_traits>;
+template<typename Set, typename AddOperation,typename MultOperation>
+using ring = algebraic_structure<Set,AddOperation,MultOperation>;
 
-template<typename rings, size_t ... Dims>
-struct pow_ring_traits : virtual public pow_set<ring<typename rings::set_traits,typename rings::group_traits, typename rings::ring_traits>,Dims...>
+template<typename Ring, size_t ... Dims>
+struct pow_mult_operation
 {
-	typedef pow_set<ring<typename rings::set_traits,typename rings::group_traits, typename rings::ring_traits>,Dims...> pow_set_traits_t;
-    typedef pow_ring_traits<rings,Dims...> ring_traits;
+    PUBLISH_OPERATION_PROPERTIES(pow_mult_operation,typename Ring::operators_pack);
+
+	typedef pow_set<Ring,Dims...> pow_set_traits_t;
+	typedef pow_mult_operation mult_operation;
 
 	static const pow_set_traits_t identity;
-	friend inline pow_set_traits_t operator*(const ring_traits& i_lhs,const ring_traits& i_rhs)
+	friend inline pow_set_traits_t operator*(const pow_set_traits_t& i_lhs,const pow_set_traits_t& i_rhs)
 	{
 		pow_set_traits_t res;
 
-		res <<= ddk::trans::iterable_prod(static_cast<const pow_set_traits_t&>(i_lhs),static_cast<const pow_set_traits_t&>(i_rhs));
+		res <<= ddk::trans::iterable_prod(i_lhs,i_rhs);
 
 		return res;
 	}
 };
 
-template<typename ... rings>
-struct sum_ring_traits : virtual public sum_set<ring<typename rings::set_traits,typename rings::group_traits,typename rings::ring_traits> ...>
-{
-    typedef sum_set<ring<typename rings::set_traits,typename rings::group_traits,typename rings::ring_traits> ...> sum_set_traits_t;
-    typedef sum_ring_traits<rings...> ring_traits;
+template<typename Ring, size_t ... Dims>
+using pow_semi_ring = typename pow_semi_group<Ring,Dims...>::template equip_with<pow_mult_operation<Ring,Dims...>>;
 
-	struct ring_prod_operation : public ddk::static_visitor<sum_set_traits_t>
+template<typename Ring, size_t ... Dims>
+using pow_ring = typename pow_group<Ring,Dims...>::template equip_with<pow_mult_operation<Ring,Dims...>>;
+
+template<typename ... Rings>
+struct sum_mult_operation
+{
+    PUBLISH_OPERATION_PROPERTIES(sum_mult_operation,ddk::mpl::type_pack_intersection<typename Rings::operators_pack...>);
+
+    typedef sum_set<Rings...> sum_set_traits_t;
+	typedef sum_mult_operation mult_operation;
+
+	struct mult_operation_visitor : public ddk::static_visitor<sum_set_traits_t>
 	{
 		template<typename T1,typename T2>
 		sum_set_traits_t operator()(T1&& i_lhs,T2&& i_rhs) const
@@ -44,10 +54,16 @@ struct sum_ring_traits : virtual public sum_set<ring<typename rings::set_traits,
 	};
 
 	static const sum_set_traits_t identity;
-	friend inline sum_set_traits_t operator*(const ring_traits& i_lhs,const ring_traits& i_rhs)
+	friend inline sum_set_traits_t operator*(const sum_set_traits_t& i_lhs,const sum_set_traits_t& i_rhs)
 	{
-		return ddk::visit(ring_prod_operation{},static_cast<sum_set_traits_t>(i_lhs),static_cast<sum_set_traits_t>(i_rhs));
+		return ddk::visit(mult_operation_visitor{},i_lhs,i_rhs);
 	}
 };
+
+template<typename ... Rings>
+using sum_semi_ring = typename sum_semi_group<Rings...>::template equip_with<sum_mult_operation<Rings...>>;
+
+template<typename ... Rings>
+using sum_ring = typename sum_group<Rings...>::template equip_with<sum_mult_operation<Rings...>>;
 
 }

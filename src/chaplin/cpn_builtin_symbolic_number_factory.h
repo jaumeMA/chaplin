@@ -8,18 +8,18 @@
 namespace cpn
 {
 
-ddk::inherited_value<rational_symbolic_number> integer(int i_number);
-ddk::inherited_value<rational_symbolic_number> rational(int i_numerator, unsigned int i_denominator);
-ddk::inherited_value<root_symbolic_number> root(unsigned int i_number, int i_degree, bool i_sign = true);
-ddk::inherited_value<log_symbolic_number> log(unsigned int i_number,int i_logBase = 10, bool i_sign = true);
+ddk::inherited_value<const integer_symbolic_number> integer(int i_number);
+ddk::inherited_value<const rational_symbolic_number> rational(inherited_symbolic_number i_numerator, inherited_symbolic_number i_denominator, bool i_sign = true);
+ddk::inherited_value<const root_symbolic_number> root(inherited_symbolic_number i_number, inherited_symbolic_number i_degree, bool i_sign = true);
+ddk::inherited_value<const log_symbolic_number> log(inherited_symbolic_number i_number, inherited_symbolic_number i_base = ddk::make_inherited_value<const integer_symbolic_number>(10), bool i_sign = true);
 template<typename ... Summands>
-inline ddk::inherited_value<sum_symbolic_number> symbolic_sum(bool i_sign, Summands&& ... i_summands);
+inline ddk::inherited_value<const sum_symbolic_number> symbolic_sum(bool i_sign, Summands&& ... i_summands);
 template<typename Iterator>
-inline ddk::inherited_value<sum_symbolic_number> symbolic_sum(Iterator itBegin,Iterator itEnd,bool i_sign = true);
+inline ddk::inherited_value<const sum_symbolic_number> symbolic_sum(Iterator itBegin,Iterator itEnd,bool i_sign = true);
 template<typename ... Prods>
-inline ddk::inherited_value<prod_symbolic_number> symbolic_prod(bool i_sign, Prods&& ... i_prods);
+inline ddk::inherited_value<const prod_symbolic_number> symbolic_prod(bool i_sign, Prods&& ... i_prods);
 template<typename Iterator>
-inline ddk::inherited_value<prod_symbolic_number> symbolic_prod(Iterator itBegin, Iterator itEnd,bool i_sign = true);
+inline ddk::inherited_value<const prod_symbolic_number> symbolic_prod(Iterator itBegin, Iterator itEnd,bool i_sign = true);
 
 }
 

@@ -1,17 +1,11 @@
 #pragma once
 
-#define DECLARE_OPERATION_PROPERTIES(Operation,...) \
-    typedef cpn::operation_props<Operation,__VA_ARGS__> __props;
+#define PUBLISH_OPERATION_PROPERTIES(Operation,...) \
+    template<typename TT> \
+    friend inline typename ddk::mpl::static_if<ddk::mpl::is_among_type_pack<TT,__VA_ARGS__>,std::true_type,std::false_type>::type resolve_operation_property(const Operation&);
 
 namespace cpn
 {
-
-template<typename Operation, typename ... T>
-struct operation_props
-{
-    template<typename TT>
-    friend inline ddk::mpl::is_among_types<TT,T...>::value resolve_operation_property(const Operation&);
-};
 
 struct associative;
 struct distributive;

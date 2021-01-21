@@ -7,11 +7,11 @@
 namespace cpn
 {
 
-struct rational_ring_traits
+struct rational_multiplication
 {
-    DECLARE_OPERATION_PROPERTIES(rational_ring_traits,commutative,associative,distributive);
+    PUBLISH_OPERATION_PROPERTIES(rational_multiplication,commutative,associative,distributive);
 
-	typedef rational_ring_traits ring_traits;
+	typedef rational_multiplication mult_operation;
 
 	static constexpr rational_set identity = {1,1};
 
@@ -21,25 +21,26 @@ struct rational_ring_traits
 	}
 };
 
-using rational_ring = ring<rational_set,rational_group_traits,rational_ring_traits>;
+using rational_semi_ring = rational_semi_group::equip_with<rational_multiplication>;
+using rational_ring = rational_group::equip_with<rational_multiplication>;
 
-struct irrational_ring_traits
+struct irrational_multiplication
 {
-    DECLARE_OPERATION_PROPERTIES(irrational_ring_traits,commutative,associative,distributive);
+    PUBLISH_OPERATION_PROPERTIES(irrational_multiplication,commutative,associative,distributive);
 
-    typedef irrational_ring_traits ring_traits;
+    typedef irrational_multiplication mult_operation;
 
 	friend inline irrational_set operator*(const rational_set& i_lhs,const irrational_set& i_rhs)
 	{
 		prod_symbolic_number_visitor prodVisitor;
 
-		return ddk::visit(ddk::specialize(prodVisitor,rational_symbolic_number(i_lhs.numerator(),i_lhs.denominator())),share(i_rhs.get_number()));
+		return ddk::visit(ddk::specialize(prodVisitor,rational_symbolic_number(integer(i_lhs.numerator()),integer(i_lhs.denominator()))),share(i_rhs.get_number()));
 	}
 	friend inline irrational_set operator*(const irrational_set& i_lhs, const rational_set& i_rhs)
 	{
 		prod_symbolic_number_visitor prodVisitor;
 
-		return ddk::visit(ddk::specialize(prodVisitor,rational_symbolic_number(i_rhs.numerator(),i_rhs.denominator())),share(i_lhs.get_number()));
+		return ddk::visit(ddk::specialize(prodVisitor,rational_symbolic_number(integer(i_rhs.numerator()),integer(i_rhs.denominator()))),share(i_lhs.get_number()));
 	}
 	friend inline irrational_set operator*(const irrational_set& i_lhs,const irrational_set& i_rhs)
 	{
@@ -49,12 +50,14 @@ struct irrational_ring_traits
 	}
 };
 
-using irrational_ring = ring<irrational_set,irrational_group_traits,irrational_ring_traits>;
+using irrational_semi_ring = irrational_semi_group::equip_with<irrational_multiplication>;
+using irrational_ring = irrational_group::equip_with<irrational_multiplication>;
 
-using real_ring = ring<real_set,sum_group_traits<rational_group,irrational_group>,sum_ring_traits<rational_ring,irrational_ring>>;
+using real_semi_ring = sum_ring<rational_semi_ring,irrational_semi_ring>;
+using real_ring = sum_ring<rational_ring,irrational_ring>;
 
 template<size_t ... Dims>
-using real_ring_n = ring<pow_set<real_set,Dims...>,pow_group_traits<real_ring,Dims...>,pow_ring_traits<real_ring,Dims...>>;
+using real_ring_n = pow_ring<real_ring,Dims...>;
 
 typedef real_ring_n<1> real_ring_1;
 typedef real_ring_n<2> real_ring_2;
