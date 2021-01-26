@@ -15,6 +15,7 @@ public:
     : m_value(i_num,i_den)
 	{
 	}
+	constexpr rational_set(const rational_set&) = default;
 
 	int numerator() const;
 	unsigned int denominator() const;

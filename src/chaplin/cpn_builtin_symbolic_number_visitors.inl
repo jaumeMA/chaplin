@@ -4,6 +4,13 @@
 namespace cpn
 {
 
+TEMPLATE(typename T, typename TT)
+REQUIRED(IS_BASE_OF(symbolic_number_interface,T),IS_BASE_OF(symbolic_number_interface,TT))
+bool comparison_symbolic_number_visitor::operator()(const T& i_lhs, const TT& i_rhs,...) const
+{
+    return false;
+}
+
 TEMPLATE(typename T)
 REQUIRED(IS_BASE_OF(T,symbolic_number_interface),IS_NOT_SAME_CLASS(T,sum_symbolic_number))
 inherited_symbolic_number add_symbolic_number_visitor::operator()(const T& i_lhs,const sum_symbolic_number& i_rhs) const
@@ -57,7 +64,7 @@ inherited_symbolic_number add_symbolic_number_visitor::operator()(const sum_symb
 	return ddk::make_inherited_value<sum_symbolic_number>(newSummands);
 }
 TEMPLATE(typename T,typename TT)
-REQUIRED(IS_BASE_OF(symbolic_number_interface,T),IS_NOT_SAME_CLASS(T,sum_symbolic_number),IS_NOT_SAME_CLASS(TT,sum_symbolic_number))
+REQUIRED(IS_BASE_OF(symbolic_number_interface,T),IS_BASE_OF(symbolic_number_interface,TT),IS_NOT_SAME_CLASS(T,sum_symbolic_number),IS_NOT_SAME_CLASS(TT,sum_symbolic_number))
 inherited_symbolic_number add_symbolic_number_visitor::operator()(const T& i_lhs,const TT& i_rhs,...) const
 {
 	return (this->m_speculative) ? ddk::inherited_value<sum_symbolic_number>() : ddk::make_inherited_value<sum_symbolic_number>(share(i_lhs),share(i_rhs));
@@ -116,14 +123,14 @@ inherited_symbolic_number prod_symbolic_number_visitor::operator()(const prod_sy
 	return ddk::make_inherited_value<prod_symbolic_number>(newProds);
 }
 TEMPLATE(typename T,typename TT)
-REQUIRED(IS_BASE_OF(symbolic_number_interface,T),IS_NOT_SAME_CLASS(T,prod_symbolic_number),IS_NOT_SAME_CLASS(TT,prod_symbolic_number))
+REQUIRED(IS_BASE_OF(symbolic_number_interface,T),IS_BASE_OF(symbolic_number_interface,TT),IS_NOT_SAME_CLASS(T,prod_symbolic_number),IS_NOT_SAME_CLASS(TT,prod_symbolic_number))
 inherited_symbolic_number prod_symbolic_number_visitor::operator()(const T& i_lhs,const TT& i_rhs,...) const
 {
 	return (this->m_speculative) ? ddk::inherited_value<prod_symbolic_number>() : ddk::make_inherited_value<prod_symbolic_number>(share(i_lhs),share(i_rhs));
 }
 
 TEMPLATE(typename T,typename TT)
-REQUIRED(IS_BASE_OF(symbolic_number_interface,T))
+REQUIRED(IS_BASE_OF(symbolic_number_interface,T),IS_BASE_OF(symbolic_number_interface,TT))
 inherited_symbolic_number div_symbolic_number_visitor::operator()(const T& i_lhs,const TT& i_rhs,...) const
 {
 	return ddk::make_inherited_value<rational_symbolic_number>(share(i_lhs),share(i_rhs));

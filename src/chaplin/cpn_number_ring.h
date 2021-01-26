@@ -12,6 +12,7 @@ struct rational_multiplication
     PUBLISH_OPERATION_PROPERTIES(rational_multiplication,mult_operation,commutative,associative,distributive);
 
 	static constexpr rational_set identity = {1,1};
+	static constexpr rational_set annihilator = {0,1};
 
 	friend inline rational_set operator*(const rational_set& i_lhs,const rational_set& i_rhs)
 	{
@@ -25,6 +26,9 @@ using rational_ring = rational_group::template equip_with<rational_multiplicatio
 struct irrational_multiplication
 {
     PUBLISH_OPERATION_PROPERTIES(irrational_multiplication,mult_operation,commutative,associative,distributive);
+
+	static rational_set identity;
+	static rational_set annihilator;
 
 	friend inline irrational_set operator*(const rational_set& i_lhs,const irrational_set& i_rhs)
 	{

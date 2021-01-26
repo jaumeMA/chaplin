@@ -17,8 +17,8 @@
 #define IS_MODULE(_TYPE) \
     IS_ALGEBRAIC_STRUCTURE(_TYPE,module)
 
-#define IS_SUPERSTRUCTURE_OF(_SUPER_TYPE,_SUB_TYPE) \
-    typename std::enable_if<_SUPER_TYPE::operators_pack::template contains(std::declval<typename _SUB_TYPE::operators_pack>())>::type
+#define IS_SUPERSTRUCTURE_OF(_SUPER_TYPE_OPERATORS,_SUB_TYPE_OPERATORS) \
+    typename std::enable_if<decltype(_SUPER_TYPE_OPERATORS::template contains(std::declval<_SUB_TYPE_OPERATORS>()))::value>::type
 
 #define HOLDS_TYPE_OPERATION_PROPERTY(_TYPE,_OPERATION,_PROPERTY) \
     decltype(resolve_operation_property<_PROPERTY>(std::declval<typename _TYPE::_OPERATION>()))::value

@@ -11,6 +11,9 @@ namespace cpn
 template<typename set, typename AddOperation, typename ModuleOperation>
 using module = algebraic_structure<set,AddOperation,ModuleOperation>;
 
+template<typename Module>
+using module_ring = typename Module::ring_type;
+
 template<typename Module,size_t ... Dims>
 struct pow_mod_operation
 {
@@ -20,6 +23,14 @@ struct pow_mod_operation
     typedef typename Module::ring_type ring_type;
 
 	static const ring_type identity;
+    static inline constexpr size_t rank()
+    {
+        return ddk::mpl::get_num_ranks<Dims...>();
+    }
+    static inline constexpr ddk::high_order_array<size_t,ddk::mpl::get_num_ranks<Dims...>()> dimension()
+    {
+        return { Dims ...};
+    }
 	friend inline pow_set_traits_t operator^(const ring_type& i_lhs, const pow_set_traits_t& i_rhs)
 	{
 		pow_set_traits_t res;
@@ -58,6 +69,10 @@ struct sum_mod_operation
 	};
 
 	static const sum_set_traits_t identity;
+    static inline constexpr size_t rank()
+    {
+        return ddk::mpl::get_num_types<Modules...>();
+    }
 	friend inline sum_set_traits_t operator^(const ring_type& i_lhs,const sum_set_traits_t& i_rhs)
 	{
 		return ddk::visit(module_prod_operation{},i_lhs,i_rhs);

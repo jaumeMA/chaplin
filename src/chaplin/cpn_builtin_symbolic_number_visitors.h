@@ -18,8 +18,9 @@ public:
 	bool operator()(const root_symbolic_number& i_lhs,const root_symbolic_number& i_rhs) const;
 	bool operator()(const sum_symbolic_number& i_lhs,const sum_symbolic_number& i_rhs) const;
 	bool operator()(const prod_symbolic_number& i_lhs,const prod_symbolic_number& i_rhs) const;
-    template<typename T1, typename T2>
-    bool operator()(T1&& i_lhs, T2&& i_rhs);
+    TEMPLATE(typename T, typename TT)
+	REQUIRES(IS_BASE_OF(symbolic_number_interface,T),IS_BASE_OF(symbolic_number_interface,TT))
+    bool operator()(const T& i_lhs, const TT& i_rhs,...) const;
 };
 
 class neg_symbolic_number_visitor : public ddk::dynamic_visitor<symbolic_number_interface>
@@ -33,8 +34,6 @@ public:
 	return_type operator()(const log_symbolic_number& i_lhs) const;
 	return_type operator()(const sum_symbolic_number& i_lhs) const;
 	return_type operator()(const prod_symbolic_number& i_lhs) const;
-	template<typename T>
-	return_type operator()(T&&) const;
 };
 
 class add_symbolic_number_visitor : public ddk::dynamic_visitor<symbolic_number_interface>
@@ -53,7 +52,7 @@ public:
 	REQUIRES(IS_BASE_OF(symbolic_number_interface,T),IS_NOT_SAME_CLASS(T,sum_symbolic_number))
 	return_type operator()(const sum_symbolic_number& i_lhs, const T& i_rhs) const;
 	TEMPLATE(typename T,typename TT)
-	REQUIRES(IS_BASE_OF(symbolic_number_interface,T),IS_NOT_SAME_CLASS(T,sum_symbolic_number),IS_NOT_SAME_CLASS(TT,sum_symbolic_number))
+	REQUIRES(IS_BASE_OF(symbolic_number_interface,T),IS_BASE_OF(symbolic_number_interface,TT),IS_NOT_SAME_CLASS(T,sum_symbolic_number),IS_NOT_SAME_CLASS(TT,sum_symbolic_number))
 	return_type operator()(const T& i_lhs, const TT& i_rhs,...) const;
 
 private:
@@ -76,7 +75,7 @@ public:
 	REQUIRES(IS_BASE_OF(symbolic_number_interface,T),IS_NOT_SAME_CLASS(T,prod_symbolic_number))
 	return_type operator()(const prod_symbolic_number& i_lhs,const T& i_rhs) const;
 	TEMPLATE(typename T,typename TT)
-	REQUIRES(IS_BASE_OF(symbolic_number_interface,T),IS_NOT_SAME_CLASS(T,prod_symbolic_number),IS_NOT_SAME_CLASS(TT,prod_symbolic_number))
+	REQUIRES(IS_BASE_OF(symbolic_number_interface,T),IS_BASE_OF(symbolic_number_interface,TT),IS_NOT_SAME_CLASS(T,prod_symbolic_number),IS_NOT_SAME_CLASS(TT,prod_symbolic_number))
 	return_type operator()(const T& i_lhs,const TT& i_rhs,...) const;
 
 private:
@@ -93,7 +92,7 @@ public:
 	return_type operator()(const root_symbolic_number& i_lhs,const root_symbolic_number& i_rhs) const;
 	return_type operator()(const prod_symbolic_number& i_lhs,const prod_symbolic_number& i_rhs) const;
 	TEMPLATE(typename T,typename TT)
-	REQUIRES(IS_BASE_OF(symbolic_number_interface,T))
+	REQUIRES(IS_BASE_OF(symbolic_number_interface,T),IS_BASE_OF(symbolic_number_interface,TT))
 	return_type operator()(const T& i_lhs,const TT& i_rhs,...) const;
 };
 

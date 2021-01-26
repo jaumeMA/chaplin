@@ -9,7 +9,10 @@ namespace cpn
 {
 
 template<typename Set, typename AddOperation,typename MultOperation>
-using ring = algebraic_structure<Set,AddOperation,MultOperation>;
+using semi_ring = algebraic_structure<Set,AddOperation,MultOperation>;
+
+template<typename Set, typename AddOperation, typename AddInverseOperation,typename MultOperation>
+using ring = algebraic_structure<Set,AddOperation,AddInverseOperation,MultOperation>;
 
 template<typename Ring, size_t ... Dims>
 struct pow_mult_operation
@@ -19,6 +22,12 @@ struct pow_mult_operation
 	typedef pow_set<Ring,Dims...> pow_set_traits_t;
 
 	static const pow_set_traits_t identity;
+	static const pow_set_traits_t annihilator;
+
+    static inline ddk::high_order_array<size_t,ddk::mpl::get_num_ranks<Dims...>()> dimension()
+    {
+        return { Dims... };
+    }
 	friend inline pow_set_traits_t operator*(const pow_set_traits_t& i_lhs,const pow_set_traits_t& i_rhs)
 	{
 		pow_set_traits_t res;
@@ -29,8 +38,8 @@ struct pow_mult_operation
 	}
 };
 
-template<typename Ring, size_t ... Dims>
-using pow_semi_ring = typename pow_semi_group<forget_add_inverse<forget_mult<Ring>>,Dims...>::template equip_with<pow_mult_operation<Ring,Dims...>>;
+template<typename SemiRing, size_t ... Dims>
+using pow_semi_ring = typename pow_semi_group<forget_mult<SemiRing>,Dims...>::template equip_with<pow_mult_operation<SemiRing,Dims...>>;
 
 template<typename Ring, size_t ... Dims>
 using pow_ring = typename pow_group<forget_mult<Ring>,Dims...>::template equip_with<pow_mult_operation<Ring,Dims...>>;
@@ -52,6 +61,7 @@ struct sum_mult_operation
 	};
 
 	static const sum_set_traits_t identity;
+	static const sum_set_traits_t annihilator;
 	friend inline sum_set_traits_t operator*(const sum_set_traits_t& i_lhs,const sum_set_traits_t& i_rhs)
 	{
 		return ddk::visit(mult_operation_visitor{},i_lhs,i_rhs);

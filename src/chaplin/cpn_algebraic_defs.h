@@ -11,6 +11,9 @@ namespace cpn
 struct associative;
 struct distributive;
 struct commutative;
+struct linear;
+struct conjugate;
+struct positive_definite;
 
 template<typename T>
 std::false_type resolve_operation_property(T&&, ...);

@@ -23,6 +23,10 @@ struct pow_add_operation
 	typedef pow_set<Group,Dims...> pow_set_traits_t;
 
 	static const pow_set_traits_t identity;
+    static inline ddk::high_order_array<size_t,ddk::mpl::get_num_ranks<Dims...>()> dimension()
+    {
+        return { Dims... };
+    }
 	friend inline pow_set_traits_t operator+(const pow_set_traits_t& i_lhs,const pow_set_traits_t& i_rhs)
 	{
 		pow_set_traits_t res;

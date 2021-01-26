@@ -13,8 +13,8 @@ namespace cpn
 namespace detail
 {
 
-inline irrational_set mixed_module_operation(const rational_set& i_lhs,const irrational_set& i_rhs);
-inline irrational_set mixed_module_operation(const irrational_set& i_lhs, const rational_set& i_rhs);
+irrational_set mixed_module_operation(const rational_set& i_lhs,const irrational_set& i_rhs);
+irrational_set mixed_module_operation(const irrational_set& i_lhs, const rational_set& i_rhs);
 
 }
 
@@ -24,7 +24,7 @@ struct rational_module_operation
 
     typedef rational_ring ring_type;
 
-	static constexpr rational_set identity = {1,1};
+	static constexpr ring_type identity = ring_type(rational_ring::mult_operation::identity);
 
 	friend inline rational_set operator^(const rational_set& i_lhs,const rational_set& i_rhs)
 	{
@@ -51,6 +51,8 @@ struct irrational_module_operation
     PUBLISH_OPERATION_PROPERTIES(irrational_module_operation,mod_operation,commutative,associative,distributive);
 
     typedef irrational_ring ring_type;
+
+	static const ring_type identity;
 
 	friend inline irrational_set operator^(const irrational_set& i_lhs,const irrational_set& i_rhs)
 	{
