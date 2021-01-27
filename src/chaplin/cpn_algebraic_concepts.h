@@ -16,6 +16,10 @@
     IS_ALGEBRAIC_STRUCTURE(_TYPE,ring)
 #define IS_MODULE(_TYPE) \
     IS_ALGEBRAIC_STRUCTURE(_TYPE,module)
+#define IS_FREE_MODULE(_TYPE) \
+    IS_ALGEBRAIC_STRUCTURE(_TYPE,free_module)
+#define IS_VECTOR_SPACE(_TYPE) \
+    IS_ALGEBRAIC_STRUCTURE(_TYPE,vector_space)
 
 #define IS_SUPERSTRUCTURE_OF(_SUPER_TYPE_OPERATORS,_SUB_TYPE_OPERATORS) \
     typename std::enable_if<decltype(_SUPER_TYPE_OPERATORS::template contains(std::declval<_SUB_TYPE_OPERATORS>()))::value>::type

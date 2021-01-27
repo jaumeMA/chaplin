@@ -21,10 +21,11 @@ struct vector_mult_operation
     PUBLISH_OPERATION_PROPERTIES(vector_mult_operation,vector_prod_operation,linear,conjugate,positive_definite);
 
     typedef typename FreeModule::ring_type ring_type;
+    typedef InnerProdMatrix inner_prod_matrix_t;
 
     friend inline ring_type operator*(const FreeModule& i_lhs, const FreeModule& i_rhs)
     {
-        static const InnerProdMatrix s_prodMatrix;
+        static const inner_prod_matrix_t s_prodMatrix;
 
         ring_type res;
 
@@ -49,6 +50,9 @@ struct vector_mult_operation
 
 template<typename FreeModule, typename InnerProdMatrix = detail::identity_prod_matrix<typename FreeModule::ring_type,FreeModule::rank()>>
 using vector_space = typename FreeModule::template equip_with<vector_mult_operation<FreeModule,InnerProdMatrix>>;
+
+template<typename VectorSpace>
+using vector_sub_space = typename forget_vector_prod<free_sub_module<VectorSpace>>::template equip_withequip_with<vector_mult_operation<forget_vector_prod<free_sub_module<VectorSpace>>,typename VectorSpace::inner_prod_matrix_t>>;
 
 }
 

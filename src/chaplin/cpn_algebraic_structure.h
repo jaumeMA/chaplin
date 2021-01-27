@@ -23,7 +23,9 @@ public:
     typedef Set set_traits;
 	using Set::Set;
 
-    explicit constexpr algebraic_structure_impl(const Set&);
+    TEMPLATE(typename SSet)
+    REQUIRES(IS_SAME_CLASS(ddk::mpl::remove_qualifiers<SSet>,Set))
+    constexpr algebraic_structure_impl(SSet&& other);
     TEMPLATE(typename SSet, typename ... OOperators)
     REQUIRES(IS_CONSTRUCTIBLE(Set,SSet),IS_SUPERSTRUCTURE_OF(ddk::mpl::type_pack<OOperators...>,operators_pack))
     constexpr algebraic_structure_impl(const algebraic_structure_impl<SSet,ddk::mpl::type_pack<OOperators...>>& other);

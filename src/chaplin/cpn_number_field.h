@@ -19,23 +19,19 @@ struct rational_division
 
 using rational_field = rational_ring::equip_with<rational_division>;
 
-struct irrational_division
+template<size_t ... Dims>
+using rational_field_n = pow_field<rational_field,Dims...>;
+
+typedef rational_field_n<1> rational_field_1;
+typedef rational_field_n<2> rational_field_2;
+typedef rational_field_n<3> rational_field_3;
+typedef rational_field_n<4> rational_field_4;
+
+struct real_division
 {
-    PUBLISH_OPERATION_PROPERTIES(irrational_division,div_operation,commutative,associative,distributive);
+    PUBLISH_OPERATION_PROPERTIES(real_division,div_operation,commutative,associative,distributive);
 
-	friend inline irrational_set operator/(const rational_set& i_lhs,const irrational_set& i_rhs)
-	{
-		const div_symbolic_number_visitor divVisitor;
-
-		return ddk::visit(ddk::specialize(divVisitor,rational_symbolic_number(integer(i_lhs.numerator()),integer(i_lhs.denominator()))),share(i_rhs.get_number()));
-	}
-	friend inline irrational_set operator/(const irrational_set& i_lhs, const rational_set& i_rhs)
-	{
-		const div_symbolic_number_visitor divVisitor;
-
-		return ddk::visit(ddk::specialize(divVisitor,rational_symbolic_number(integer(i_rhs.numerator()),integer(i_rhs.denominator()))),share(i_lhs.get_number()));
-	}
-	friend inline irrational_set operator/(const irrational_set& i_lhs,const irrational_set& i_rhs)
+	friend inline real_set operator/(const real_set& i_lhs,const real_set& i_rhs)
 	{
 		const div_symbolic_number_visitor divVisitor;
 
@@ -43,10 +39,7 @@ struct irrational_division
 	}
 };
 
-using irrational_field = irrational_ring::equip_with<irrational_division>;
-
-using real_field = sum_field<rational_field,irrational_field>;
-using real = real_field;
+using real_field = real_ring::equip_with<real_division>;
 
 template<size_t ... Dims>
 using real_field_n = pow_field<real_field,Dims...>;
@@ -55,5 +48,15 @@ typedef real_field_n<1> real_field_1;
 typedef real_field_n<2> real_field_2;
 typedef real_field_n<3> real_field_3;
 typedef real_field_n<4> real_field_4;
+
+using real = real_field;
+
+template<size_t ... Dims>
+using real_n = pow_field<real,Dims...>;
+
+typedef real_n<1> real_1;
+typedef real_n<2> real_2;
+typedef real_n<3> real_3;
+typedef real_n<4> real_4;
 
 }

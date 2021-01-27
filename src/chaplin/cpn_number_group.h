@@ -7,6 +7,48 @@
 namespace cpn
 {
 
+struct integer_addition
+{
+    PUBLISH_OPERATION_PROPERTIES(integer_addition,add_operation,commutative,associative,distributive);
+
+	static constexpr integer_set identity = 0;
+
+	friend inline integer_set operator+(const integer_set& i_lhs,const integer_set& i_rhs)
+	{
+		return i_lhs.number() + i_rhs.number();
+	}
+};
+
+using integer_semi_group = semi_group<integer_set,integer_addition>;
+
+template<size_t ... Dims>
+using integer_semi_group_n = pow_semi_group<integer_semi_group,Dims...>;
+
+typedef integer_semi_group_n<1> integer_semi_group_1;
+typedef integer_semi_group_n<2> integer_semi_group_2;
+typedef integer_semi_group_n<3> integer_semi_group_3;
+typedef integer_semi_group_n<4> integer_semi_group_4;
+
+struct integer_addition_inverse
+{
+    PUBLISH_OPERATION_PROPERTIES(integer_addition_inverse,add_inverse_operation);
+
+	friend inline integer_set operator-(const integer_set& i_rhs)
+	{
+		return -i_rhs.number();
+	}
+};
+
+using integer_group = integer_semi_group::template equip_with<integer_addition_inverse>;
+
+template<size_t ... Dims>
+using integer_group_n = pow_group<integer_group,Dims...>;
+
+typedef integer_group_n<1> integer_group_1;
+typedef integer_group_n<2> integer_group_2;
+typedef integer_group_n<3> integer_group_3;
+typedef integer_group_n<4> integer_group_4;
+
 struct rational_addition
 {
     PUBLISH_OPERATION_PROPERTIES(rational_addition,add_operation,commutative,associative,distributive);
@@ -21,6 +63,14 @@ struct rational_addition
 
 using rational_semi_group = semi_group<rational_set,rational_addition>;
 
+template<size_t ... Dims>
+using rational_semi_group_n = pow_semi_group<rational_semi_group,Dims...>;
+
+typedef rational_semi_group_n<1> rational_semi_group_1;
+typedef rational_semi_group_n<2> rational_semi_group_2;
+typedef rational_semi_group_n<3> rational_semi_group_3;
+typedef rational_semi_group_n<4> rational_semi_group_4;
+
 struct rational_addition_inverse
 {
 	typedef rational_addition_inverse add_inverse_operation;
@@ -33,23 +83,19 @@ struct rational_addition_inverse
 
 using rational_group = rational_semi_group::template equip_with<rational_addition_inverse>;
 
-struct irrational_addition
+template<size_t ... Dims>
+using rational_group_n = pow_group<rational_group,Dims...>;
+
+typedef rational_group_n<1> rational_group_1;
+typedef rational_group_n<2> rational_group_2;
+typedef rational_group_n<3> rational_group_3;
+typedef rational_group_n<4> rational_group_4;
+
+struct real_addition
 {
-    PUBLISH_OPERATION_PROPERTIES(irrational_addition,add_operation,commutative,associative,distributive);
+    PUBLISH_OPERATION_PROPERTIES(real_addition,add_operation,commutative,associative,distributive);
 
-	friend inline irrational_set operator+(const rational_set& i_lhs,const irrational_set& i_rhs)
-	{
-		add_symbolic_number_visitor addVisitor;
-
-		return ddk::visit(ddk::specialize(addVisitor,rational_symbolic_number(integer(i_lhs.numerator()),integer(i_lhs.denominator()))),share(i_rhs.get_number()));
-	}
-	friend inline irrational_set operator+(const irrational_set& i_lhs, const rational_set& i_rhs)
-	{
-		add_symbolic_number_visitor addVisitor;
-
-		return ddk::visit(ddk::specialize(addVisitor,rational_symbolic_number(integer(i_rhs.numerator()),integer(i_rhs.denominator()))),share(i_lhs.get_number()));
-	}
-	friend inline irrational_set operator+(const irrational_set& i_lhs,const irrational_set& i_rhs)
+	friend inline real_set operator+(const real_set& i_lhs,const real_set& i_rhs)
 	{
 		add_symbolic_number_visitor addVisitor;
 
@@ -57,24 +103,7 @@ struct irrational_addition
 	}
 };
 
-using irrational_semi_group = semi_group<irrational_set,irrational_addition>;
-
-struct irrational_addition_inverse
-{
-    typedef irrational_addition_inverse add_inverse_operation;
-
-	friend inline irrational_set operator-(const irrational_set& i_lhs)
-	{
-		neg_symbolic_number_visitor negVisitor;
-
-		return ddk::visit(negVisitor,share(i_lhs.get_number()));
-	}
-};
-
-using irrational_group = irrational_semi_group::template equip_with<irrational_addition_inverse>;
-
-using real_semi_group = sum_semi_group<rational_semi_group,irrational_semi_group>;
-using real_group = sum_group<rational_group,irrational_group>;
+using real_semi_group = semi_group<real_set,real_addition>;
 
 template<size_t ... Dims>
 using real_semi_group_n = pow_semi_group<real_semi_group,Dims...>;
@@ -83,6 +112,20 @@ typedef real_semi_group_n<1> real_semi_group_1;
 typedef real_semi_group_n<2> real_semi_group_2;
 typedef real_semi_group_n<3> real_semi_group_3;
 typedef real_semi_group_n<4> real_semi_group_4;
+
+struct real_addition_inverse
+{
+    PUBLISH_OPERATION_PROPERTIES(real_addition_inverse,add_inverse_operation);
+
+	friend inline real_set operator-(const real_set& i_lhs)
+	{
+		neg_symbolic_number_visitor negVisitor;
+
+		return ddk::visit(negVisitor,share(i_lhs.get_number()));
+	}
+};
+
+using real_group = real_semi_group::template equip_with<real_addition_inverse>;
 
 template<size_t ... Dims>
 using real_group_n = pow_group<real_group,Dims...>;

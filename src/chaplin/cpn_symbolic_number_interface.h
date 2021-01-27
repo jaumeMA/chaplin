@@ -2,14 +2,23 @@
 
 #include "ddk_visitable_type.h"
 #include "ddk_inherited_value.h"
-#include "ddk_shared_from_this.h"
+#include "ddk_distribute_from_this.h"
 
 namespace cpn
 {
 
-class symbolic_number_interface : public ddk::share_from_this<symbolic_number_interface>
+class symbolic_number_interface : public ddk::distribute_from_this<symbolic_number_interface>
 {
 	DECLARE_TYPE_VISITABLE_BASE(symbolic_number_interface);
+
+    friend inline auto share(symbolic_number_interface& i_value)
+    {
+        return i_value.ref_from_this();
+    }
+    friend inline auto share(const symbolic_number_interface& i_value)
+    {
+        return i_value.ref_from_this();
+    }
 
 public:
 	virtual ~symbolic_number_interface() = default;

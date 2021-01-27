@@ -22,5 +22,9 @@ template<typename Structure>
 using forget_div = typename forgetful_functor<Structure,typename Structure::div_operation>::type;
 template<typename Structure>
 using forget_mod = typename forgetful_functor<Structure,typename Structure::mod_operation>::type;
+template<typename Structure>
+using forget_basis = typename forgetful_functor<Structure,typename Structure::basis_operation>::type;
+template<typename Structure>
+using forget_vector_prod = typename forgetful_functor<Structure,typename Structure::vector_prod_operation>::type;
 
 }

@@ -3,18 +3,32 @@
 #include <utility>
 #include "cpn_set.h"
 #include "cpn_symbolic_number.h"
+#include "cpn_algebraic_structure.h"
 
 namespace cpn
 {
+
+struct integer_set
+{
+public:
+	constexpr integer_set() = default;
+	constexpr integer_set(int i_num);
+	constexpr integer_set(const integer_set&) = default;
+
+	constexpr int number() const;
+	int resolve(unsigned char i_accuracy) const;
+    bool operator==(const integer_set& other) const;
+
+private:
+	int m_value = 0;
+};
 
 struct rational_set
 {
 public:
 	rational_set() = default;
-	constexpr rational_set(int i_num, unsigned int i_den)
-    : m_value(i_num,i_den)
-	{
-	}
+	constexpr rational_set(const integer_set& i_value);
+	constexpr rational_set(int i_num, unsigned int i_den);
 	constexpr rational_set(const rational_set&) = default;
 
 	int numerator() const;
@@ -26,19 +40,21 @@ private:
 	std::pair<int,unsigned int> m_value = {0,1};
 };
 
-struct irrational_set
+struct real_set
 {
 public:
-	irrational_set(const symbolic_number& i_number = integer(0));
-    irrational_set(inherited_symbolic_number&& i_number);
+    real_set(const rational_set& i_value = rational_set());
+	real_set(const symbolic_number& i_number);
+    real_set(inherited_symbolic_number&& i_number);
+    real_set(const real_set&) = default;
 
 	symbolic_number get_number() const;
-    bool operator==(const irrational_set& other) const;
+    bool operator==(const real_set& other) const;
 
 private:
 	symbolic_number m_number;
 };
 
-using real_set = sum_set<rational_set,irrational_set>;
-
 }
+
+#include "cpn_number_set.inl"

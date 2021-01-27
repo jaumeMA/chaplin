@@ -7,6 +7,39 @@
 namespace cpn
 {
 
+struct integer_multiplication
+{
+    PUBLISH_OPERATION_PROPERTIES(integer_multiplication,mult_operation,commutative,associative,distributive);
+
+	static constexpr integer_set identity = 1;
+	static constexpr integer_set annihilator = 0;
+
+	friend inline integer_set operator*(const integer_set& i_lhs,const integer_set& i_rhs)
+	{
+		return i_lhs.number() * i_rhs.number();
+	}
+};
+
+using integer_semi_ring = integer_semi_group::template equip_with<integer_multiplication>;
+
+template<size_t ... Dims>
+using integer_semi_ring_n = pow_semi_ring<integer_semi_ring,Dims...>;
+
+typedef integer_semi_ring_n<1> integer_semi_ring_1;
+typedef integer_semi_ring_n<2> integer_semi_ring_2;
+typedef integer_semi_ring_n<3> integer_semi_ring_3;
+typedef integer_semi_ring_n<4> integer_semi_ring_4;
+
+using integer_ring = integer_group::template equip_with<integer_multiplication>;
+
+template<size_t ... Dims>
+using integer_ring_n = pow_ring<integer_ring,Dims...>;
+
+typedef integer_ring_n<1> integer_ring_1;
+typedef integer_ring_n<2> integer_ring_2;
+typedef integer_ring_n<3> integer_ring_3;
+typedef integer_ring_n<4> integer_ring_4;
+
 struct rational_multiplication
 {
     PUBLISH_OPERATION_PROPERTIES(rational_multiplication,mult_operation,commutative,associative,distributive);
@@ -21,28 +54,33 @@ struct rational_multiplication
 };
 
 using rational_semi_ring = rational_semi_group::template equip_with<rational_multiplication>;
+
+template<size_t ... Dims>
+using rational_semi_ring_n = pow_semi_ring<rational_semi_ring,Dims...>;
+
+typedef rational_semi_ring_n<1> rational_semi_ring_1;
+typedef rational_semi_ring_n<2> rational_semi_ring_2;
+typedef rational_semi_ring_n<3> rational_semi_ring_3;
+typedef rational_semi_ring_n<4> rational_semi_ring_4;
+
 using rational_ring = rational_group::template equip_with<rational_multiplication>;
 
-struct irrational_multiplication
+template<size_t ... Dims>
+using rational_ring_n = pow_ring<rational_ring,Dims...>;
+
+typedef rational_ring_n<1> rational_ring_1;
+typedef rational_ring_n<2> rational_ring_2;
+typedef rational_ring_n<3> rational_ring_3;
+typedef rational_ring_n<4> rational_ring_4;
+
+struct real_multiplication
 {
-    PUBLISH_OPERATION_PROPERTIES(irrational_multiplication,mult_operation,commutative,associative,distributive);
+    PUBLISH_OPERATION_PROPERTIES(real_multiplication,mult_operation,commutative,associative,distributive);
 
-	static rational_set identity;
-	static rational_set annihilator;
+	static const real_set identity;
+	static const real_set annihilator;
 
-	friend inline irrational_set operator*(const rational_set& i_lhs,const irrational_set& i_rhs)
-	{
-		prod_symbolic_number_visitor prodVisitor;
-
-		return ddk::visit(ddk::specialize(prodVisitor,rational_symbolic_number(integer(i_lhs.numerator()),integer(i_lhs.denominator()))),share(i_rhs.get_number()));
-	}
-	friend inline irrational_set operator*(const irrational_set& i_lhs, const rational_set& i_rhs)
-	{
-		prod_symbolic_number_visitor prodVisitor;
-
-		return ddk::visit(ddk::specialize(prodVisitor,rational_symbolic_number(integer(i_rhs.numerator()),integer(i_rhs.denominator()))),share(i_lhs.get_number()));
-	}
-	friend inline irrational_set operator*(const irrational_set& i_lhs,const irrational_set& i_rhs)
+	friend inline real_set operator*(const real_set& i_lhs,const real_set& i_rhs)
 	{
 		prod_symbolic_number_visitor prodVisitor;
 
@@ -50,11 +88,17 @@ struct irrational_multiplication
 	}
 };
 
-using irrational_semi_ring = irrational_semi_group::template equip_with<irrational_multiplication>;
-using irrational_ring = irrational_group::template equip_with<irrational_multiplication>;
+using real_semi_ring = real_semi_group::template equip_with<real_multiplication>;
 
-using real_semi_ring = sum_semi_ring<rational_semi_ring,irrational_semi_ring>;
-using real_ring = sum_ring<rational_ring,irrational_ring>;
+template<size_t ... Dims>
+using real_semi_ring_n = pow_semi_ring<real_semi_ring,Dims...>;
+
+typedef real_semi_ring_n<1> real_semi_ring_1;
+typedef real_semi_ring_n<2> real_semi_ring_2;
+typedef real_semi_ring_n<3> real_semi_ring_3;
+typedef real_semi_ring_n<4> real_semi_ring_4;
+
+using real_ring = real_group::template equip_with<real_multiplication>;
 
 template<size_t ... Dims>
 using real_ring_n = pow_ring<real_ring,Dims...>;
