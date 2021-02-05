@@ -34,11 +34,7 @@ real_set::real_set(const symbolic_number& i_number)
 : m_number(i_number)
 {
 }
-real_set::real_set(inherited_symbolic_number&& i_number)
-: m_number(std::move(i_number))
-{
-}
-symbolic_number real_set::get_number() const
+symbolic_number real_set::number() const
 {
 	return m_number;
 }

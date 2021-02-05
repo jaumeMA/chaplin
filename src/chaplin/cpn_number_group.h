@@ -99,7 +99,7 @@ struct real_addition
 	{
 		add_symbolic_number_visitor addVisitor;
 
-		return ddk::visit(addVisitor,share(i_lhs.get_number()),share(i_rhs.get_number()));
+		return ddk::visit(addVisitor,share(i_lhs.number()),share(i_rhs.number()));
 	}
 };
 
@@ -121,7 +121,7 @@ struct real_addition_inverse
 	{
 		neg_symbolic_number_visitor negVisitor;
 
-		return ddk::visit(negVisitor,share(i_lhs.get_number()));
+		return ddk::visit(negVisitor,share(i_lhs.number()));
 	}
 };
 

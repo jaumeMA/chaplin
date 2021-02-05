@@ -4,6 +4,7 @@
 #include "cpn_number_module.h"
 #include "cpn_number_field.h"
 #include "cpn_number_vector_space.h"
+#include "cpn_linear_function.h"
 #include <utility>
 
 using namespace testing;

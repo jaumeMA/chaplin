@@ -84,7 +84,7 @@ struct real_multiplication
 	{
 		prod_symbolic_number_visitor prodVisitor;
 
-		return ddk::visit(prodVisitor,share(i_lhs.get_number()),share(i_rhs.get_number()));
+		return ddk::visit(prodVisitor,share(i_lhs.number()),share(i_rhs.number()));
 	}
 };
 

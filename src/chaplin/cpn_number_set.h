@@ -45,10 +45,12 @@ struct real_set
 public:
     real_set(const rational_set& i_value = rational_set());
 	real_set(const symbolic_number& i_number);
-    real_set(inherited_symbolic_number&& i_number);
+    TEMPLATE(typename T)
+    REQUIRES(IS_BASE_OF(symbolic_number_interface,T))
+    real_set(const ddk::inherited_value<const T>& i_number);
     real_set(const real_set&) = default;
 
-	symbolic_number get_number() const;
+	symbolic_number number() const;
     bool operator==(const real_set& other) const;
 
 private:

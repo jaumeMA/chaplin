@@ -21,8 +21,6 @@ class scalar_function<ImSet(DomSet)> : public function<scalar_function,ImSet,Dom
 
 public:
     using function_base_t::function_base_t;
-
-
 };
 
 }

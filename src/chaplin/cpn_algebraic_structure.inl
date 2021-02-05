@@ -6,7 +6,7 @@ namespace detail
 
 template<typename Set,typename ... Operators>
 TEMPLATE(typename SSet)
-REQUIRES(IS_SAME_CLASS(ddk::mpl::remove_qualifiers<SSet>,Set))
+REQUIRES(IS_CONSTRUCTIBLE(Set,SSet))
 constexpr algebraic_structure_impl<Set,ddk::mpl::type_pack<Operators...>>::algebraic_structure_impl(SSet&& other)
 : Set(other)
 {

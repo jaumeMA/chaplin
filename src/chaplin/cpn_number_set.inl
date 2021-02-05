@@ -20,4 +20,11 @@ constexpr rational_set::rational_set(int i_num, unsigned int i_den)
 {
 }
 
+TEMPLATE(typename T)
+REQUIRES(IS_BASE_OF(symbolic_number_interface,T))
+real_set::real_set(const ddk::inherited_value<const T>& i_number)
+: m_number(i_number)
+{
+}
+
 }

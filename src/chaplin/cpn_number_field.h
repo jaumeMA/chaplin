@@ -35,7 +35,7 @@ struct real_division
 	{
 		const div_symbolic_number_visitor divVisitor;
 
-		return ddk::visit(divVisitor,share(i_lhs.get_number()),share(i_rhs.get_number()));
+		return ddk::visit(divVisitor,share(i_lhs.number()),share(i_rhs.number()));
 	}
 };
 

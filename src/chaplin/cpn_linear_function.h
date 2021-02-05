@@ -4,6 +4,12 @@
 #include "cpn_vector_space.h"
 #include "cpn_function.h"
 
+#define DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(NAME,OP) \
+friend inline linear_function_impl operator OP(const linear_function& i_lhs, const linear_function& i_rhs) \
+{ \
+    return static_cast<const base_function&>(i_lhs) OP static_cast<const base_function&>(i_rhs); \
+}
+
 namespace cpn
 {
 
@@ -13,24 +19,33 @@ class linear_function;
 namespace detail
 {
 
-template<typename ImRing, typename DomVectorSpace, size_t ... Indexs>
-class linear_function_impl : public function<linear_function,ImRing,ddk::mpl::index_to_type<Indexs,typename DomVectorSpace::ring_type>...>
+template<typename ImFreeModule, typename DomFreeModule, size_t ... Indexs>
+class linear_function_impl : public function<linear_function,ImFreeModule,ddk::mpl::index_to_type<Indexs,typename DomFreeModule::ring_type>...>
 {
     static_assert(IS_RING(ImSet), "You shall provide Set as image");
-    static_assert(IS_VECTOR_SPACE(DomVectorSpace), "You shall provide Vector Space as dominion");
+    static_assert(IS_VECTOR_SPACE(DomFreeModule), "You shall provide Vector Space as dominion");
 
-    typedef function<linear_function,ImRing,ddk::mpl::index_to_type<Indexs,typename DomVectorSpace::ring_type>...> function_base_t;
+    typedef function<linear_function,ImFreeModule,ddk::mpl::index_to_type<Indexs,typename DomFreeModule::ring_type>...> function_base_t;
+
+    DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(sum,+)
+    DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(subs,-)
+    DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION_CONSTANT(prod,*)
 
 public:
-    using function_base_t::function_base_t;
+    linear_function_impl(const ddk::constant_function<ImFreeModule>& i_constValue);
+    template<size_t Component>
+    linear_function_impl(const ddk::projection_callable<Component>& i_component);
+
+	inline auto inline_eval(const DomFreeModule& i_value) const;
+    inline auto operator()(const DomFreeModule& i_value) const;
 };
 
 }
 
-template<typename ImRing, typename DomVectorSpace>
-class linear_function<ImRing(DomVectorSpace)> : detail::linear_function_impl<ImRing,DomVectorSpace,typename mpl::make_sequence<0,DomVectorSpace::rank()>::type>;
+template<typename ImFreeModule, typename DomFreeModule>
+class linear_function<ImFreeModule(DomFreeModule)> : detail::linear_function_impl<ImFreeModule,DomFreeModule,typename mpl::make_sequence<0,DomFreeModule::rank()>::type>;
 {
-    typedef detail::linear_function_impl<ImRing,DomVectorSpace,typename mpl::make_sequence<0,DomVectorSpace::rank()>::type> base_t;
+    typedef detail::linear_function_impl<ImFreeModule,DomFreeModule,typename mpl::make_sequence<0,DomFreeModule::rank()>::type> base_t;
 
 public:
     using base_t::base_t;
