@@ -8,11 +8,22 @@ namespace ddk
 template<typename>
 class unique_reference_wrapper;
 template<typename>
-class shared_reference_wrapper;
-template<typename>
 class lendable;
 
 #ifdef DDK_DEBUG
+
+template<typename>
+class lent_reference_wrapper;
+
+namespace detail
+{
+
+template<typename,typename>
+class shared_reference_wrapper_impl;
+template<typename TT>
+ddk::lent_reference_wrapper<TT> __make_lent_reference(TT* i_data,const tagged_pointer<lent_reference_counter>& i_refCounter);
+
+}
 
 template<typename T>
 class lent_reference_wrapper : public lent_pointer_wrapper<T>
@@ -25,10 +36,10 @@ class lent_reference_wrapper : public lent_pointer_wrapper<T>
 	friend lent_reference_wrapper<TT> promote_to_ref(const lent_pointer_wrapper<TT>&);
 	template<typename TT>
 	friend lent_reference_wrapper<TT> lend(const unique_reference_wrapper<TT>&);
+	template<typename TT, typename ReferenceCounter>
+	friend lent_reference_wrapper<TT> lend(const detail::shared_reference_wrapper_impl<TT,ReferenceCounter>&);
 	template<typename TT>
-	friend lent_reference_wrapper<TT> lend(const shared_reference_wrapper<TT>&);
-	template<typename TT>
-	friend lent_reference_wrapper<TT> __make_lent_reference(TT* i_data, const tagged_pointer<lent_reference_counter>& i_refCounter);
+	friend lent_reference_wrapper<TT> detail::__make_lent_reference(TT* i_data, const tagged_pointer<lent_reference_counter>& i_refCounter);
 
 	lent_reference_wrapper(T* i_data, const tagged_pointer<lent_reference_counter>& i_refCounter)
 	: lent_pointer_wrapper<T>(i_data,i_refCounter)
@@ -40,7 +51,16 @@ class lent_reference_wrapper : public lent_pointer_wrapper<T>
     using lent_pointer_wrapper<T>::operator=;
 
 public:
-    template<typename TT>
+	using typename lent_pointer_wrapper<T>::value_type;
+	using typename lent_pointer_wrapper<T>::const_value_type;
+	using typename lent_pointer_wrapper<T>::reference;
+	using typename lent_pointer_wrapper<T>::const_reference;
+	using typename lent_pointer_wrapper<T>::rreference;
+	using typename lent_pointer_wrapper<T>::pointer;
+	using typename lent_pointer_wrapper<T>::const_pointer;
+	typedef lent_reference_wrapper<const_value_type> const_type;
+
+	template<typename TT>
 	lent_reference_wrapper(const lent_reference_wrapper<TT>& other, typename std::enable_if<std::is_base_of<T,TT>::value>::type* = NULL)
 	: lent_pointer_wrapper<T>(other)
 	{

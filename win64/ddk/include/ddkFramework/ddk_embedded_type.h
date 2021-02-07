@@ -88,27 +88,25 @@ public:
 	{
 		return m_data;
 	}
-    template<typename Type>
-	inline static bool construct(void* address, Type&& val)
+	inline static bool construct(void* address, T& val)
 	{
-	  return new(address)embedded_type(std::forward<Type>(val)) != nullptr;
+	  return new(address)embedded_type(val) != nullptr;
 	}
 	inline static bool destroy(void* address)
 	{
 		//in references nothing needs to be done
 		return true;
 	}
-    template<typename Type>
-	inline static bool assign(void* address, Type&& val)
+	inline static bool assign(void* address, T& val)
 	{
 		//references must be reconstructed every time
-		return new(address)embedded_type(std::forward<Type>(val)) != nullptr;
+		return new(address)embedded_type(val) != nullptr;
 	}
 	inline static bool swap(void* addressA, internal_type& valA, void* addressB, internal_type& valB)
 	{
 		internal_type& tmp = valA;
 
-		return construct<internal_type&>(addressA, valB) && construct<internal_type&>(addressB, tmp);
+		return construct(addressA, valB) && construct(addressB, tmp);
 	}
 
 private:
@@ -186,8 +184,7 @@ public:
 	{
 		return m_data;
 	}
-    template<typename Type>
-	inline static bool construct(void* address, Type&& val)
+	inline static bool construct(void* address, T&& val)
 	{
 	  return new(address) embedded_type(std::move(val)) != nullptr;
 	}
@@ -196,18 +193,17 @@ public:
 		//in references nothing needs to be done
 		return true;
 	}
-    template<typename Type>
-	inline static bool assign(void* address, Type&& val)
+	inline static bool assign(void* address, T&& val)
 	{
 		//references must be reconstructed every time
 
-		return construct<Type>(address, std::forward<Type>(val));
+		return construct(address, std::move(val));
 	}
 	inline static bool swap(void* addressA, internal_type&& valA, void* addressB, internal_type&& valB)
 	{
 		internal_type&& tmp = std::move(valA);
 
-		return construct<internal_type&&>(addressA, std::move(valB)) && construct<internal_type&&>(addressB, std::move(tmp));
+		return construct(addressA, std::move(valB)) && construct(addressB, std::move(tmp));
 	}
 
 private:

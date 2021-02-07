@@ -1,6 +1,4 @@
 
-#include "ddk_shared_pointer_wrapper.h"
-
 namespace ddk
 {
 
@@ -17,7 +15,7 @@ weak_pointer_wrapper<T>::weak_pointer_wrapper(const weak_pointer_wrapper& other)
 }
 template<typename T>
 weak_pointer_wrapper<T>::weak_pointer_wrapper(weak_pointer_wrapper&& other)
-: m_data(null)
+: m_data(nullptr)
 , m_refCounter(std::move(other.m_refCounter))
 , m_deleter(nullptr)
 {
@@ -39,7 +37,7 @@ weak_pointer_wrapper<T>::weak_pointer_wrapper(const weak_pointer_wrapper<TT>& ot
 template<typename T>
 template<typename TT>
 weak_pointer_wrapper<T>::weak_pointer_wrapper(weak_pointer_wrapper<TT>&& other)
-: m_data(null)
+: m_data(nullptr)
 , m_refCounter(std::move(other.m_refCounter))
 , m_deleter(nullptr)
 {
@@ -47,7 +45,7 @@ weak_pointer_wrapper<T>::weak_pointer_wrapper(weak_pointer_wrapper<TT>&& other)
 	std::swap(m_deleter,other.m_deleter);
 }
 template<typename T>
-weak_pointer_wrapper<T>::weak_pointer_wrapper(T* i_data,const tagged_reference_counter& i_refCounter,const IReferenceWrapperDeleter* i_deleter)
+weak_pointer_wrapper<T>::weak_pointer_wrapper(T* i_data,const tagged_reference_counter& i_refCounter,const tagged_pointer_deleter& i_deleter)
 : m_data(i_data)
 , m_refCounter(i_refCounter)
 , m_deleter(i_deleter)
@@ -84,7 +82,7 @@ weak_pointer_wrapper<T>& weak_pointer_wrapper<T>::operator=(const weak_pointer_w
 
 		if(m_refCounter)
 		{
-			clearIfCounterVoid(m_refCounter->decrementWeakReference())
+			clearIfCounterVoid(m_refCounter->decrementWeakReference());
 		}
 
 		if((m_refCounter = other.m_refCounter))
@@ -129,14 +127,14 @@ weak_pointer_wrapper<T>& weak_pointer_wrapper<T>::operator=(const weak_pointer_w
 
 		if(m_refCounter)
 		{
-			clearIfCounterVoid(m_refCounter->decrementWeakReference())
+			clearIfCounterVoid(m_refCounter->decrementWeakReference());
 		}
 
 		if((m_refCounter = other.m_refCounter))
 		{
 			m_refCounter->incrementWeakReference();
 		}
-		
+
 		m_deleter = other.m_deleter;
 	}
 

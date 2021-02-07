@@ -14,11 +14,11 @@ namespace detail
 
 template<typename,typename,typename,typename...>
 struct multi_visitor;
-	
+
 template<typename Return, typename Callable, typename ... ResolvedTypes, typename Variant, typename ... Variants>
 struct multi_visitor<Return,Callable,tuple<ResolvedTypes...>,Variant,Variants...> : public static_visitor<function<Return(ResolvedTypes...)>>
 {
-	static_assert(mpl::fullfils_predicate<concepts::is_variant,Variants...>::value, "You shall provide variants as objects to visitto visit");
+	static_assert(mpl::holds_any_type<concepts::is_variant,Variants...>(), "You shall provide variants as objects to visitto visit");
 	static_assert(mpl::is_valid_functor<Callable>::value, "You shall provider a valid functor for receiving variant values");
 
 public:
@@ -50,9 +50,9 @@ private:
 
 }
 
-TEMPLATE(typename Return,typename Callable,typename ... Variants)
-REQUIRES(IS_CALLABLE(Callable),IS_VARIANT(Variants)...)
-inline Return visit(const Callable& i_callable,Variants&& ... i_variants);
+TEMPLATE(typename Callable,typename ... Variants)
+REQUIRES(IS_BASE_OF_STATIC_VISITOR(Callable),IS_VARIANT(Variants)...)
+inline typename std::remove_reference<Callable>::type::return_type visit(Callable&& i_callable,Variants&& ... i_variants);
 
 }
 

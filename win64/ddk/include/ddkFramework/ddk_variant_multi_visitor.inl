@@ -1,4 +1,6 @@
 
+#include "ddk_function.h"
+
 namespace ddk
 {
 namespace detail
@@ -26,8 +28,8 @@ template<typename Return, typename Callable, typename ... ResolvedTypes, typenam
 template<typename T>
 function<Return(ResolvedTypes...)> multi_visitor<Return,Callable,tuple<ResolvedTypes...>,Variant,Variants...>::visit(T&& i_value) const
 {
-	typedef typename mpl::make_sequence<0,mpl::get_num_types<ResolvedTypes...>::value>::type indexs_resolved;
-	typedef typename mpl::make_sequence<0,mpl::get_num_types<Variants...>::value>::type indexs_to_resolved;
+	typedef typename mpl::make_sequence<0,mpl::get_num_types<ResolvedTypes...>()>::type indexs_resolved;
+	typedef typename mpl::make_sequence<0,mpl::get_num_types<Variants...>()>::type indexs_to_resolved;
 
 	return visit(indexs_resolved{},indexs_to_resolved{},std::forward<T>(i_value));
 }
@@ -50,13 +52,16 @@ function<Return(ResolvedTypes...)> multi_visitor<Return,Callable,tuple<ResolvedT
 
 }
 
-TEMPLATE(typename Return,typename Callable,typename ... Variants)
-REQUIRED(IS_CALLABLE(Callable),IS_VARIANT(Variants)...)
-Return visit(const Callable& i_callable,Variants&& ... i_variants)
+TEMPLATE(typename Callable,typename ... Variants)
+REQUIRED(IS_BASE_OF_STATIC_VISITOR(Callable),IS_VARIANT(Variants)...)
+typename std::remove_reference<Callable>::type::return_type visit(Callable&& i_callable,Variants&& ... i_variants)
 {
-	detail::multi_visitor<Return,Callable,tuple<>,Variants...> multiVisitor(i_callable,std::forward<Variants>(i_variants)...);
+    typedef typename std::remove_reference<Callable>::type callable_t;
+    typedef typename callable_t::return_type return_type;
 
-	const function<Return()> resolvedFunction = multiVisitor.visit();
+	detail::multi_visitor<return_type,callable_t,tuple<>,typename mpl::static_if<std::is_lvalue_reference<Variants>::value,Variants,const Variants>::type...> multiVisitor(i_callable,std::forward<Variants>(i_variants)...);
+
+	const function<return_type()> resolvedFunction = multiVisitor.visit();
 
 	return eval(resolvedFunction);
 }

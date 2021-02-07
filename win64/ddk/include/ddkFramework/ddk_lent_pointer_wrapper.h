@@ -9,6 +9,17 @@ namespace ddk
 
 #ifdef DDK_DEBUG
 
+template<typename>
+class lent_pointer_wrapper;
+
+namespace detail
+{
+
+template<typename TT>
+ddk::lent_pointer_wrapper<TT> __make_lent_pointer(TT*,const tagged_pointer<lent_reference_counter>&);
+
+}
+
 #define THIS_OBJECT (*this)
 
 #define REGISTER_STACK_TRACE(_OBJECT) \
@@ -36,16 +47,37 @@ template<typename>
 class lent_reference_wrapper;
 template<typename>
 class unique_pointer_wrapper;
-template<typename>
-class shared_pointer_wrapper;
 
 template<typename T>
 class lent_pointer_wrapper
 {
+	friend inline T* get_raw_ptr(lent_pointer_wrapper i_ref)
+	{
+		return i_ref.m_data;
+	}
+	friend inline void set_raw_ptr(lent_pointer_wrapper& i_ref,T* i_value)
+	{
+		i_ref.m_data = i_value;
+	}
+	friend inline T* extract_raw_ptr(lent_pointer_wrapper& i_ref)
+	{
+		T* res = i_ref.m_data;
+
+		i_ref.m_data = nullptr;
+
+		return res;
+	}
+	friend inline void clear_ptr(lent_pointer_wrapper& i_ref)
+	{
+		i_ref.m_data = nullptr;
+	}
+
 	template<typename>
 	friend class lent_pointer_wrapper;
 	template<typename>
 	friend class lent_reference_wrapper;
+	template<typename TT>
+	friend void set_raw_ptr(lent_pointer_wrapper<TT>&,TT*);
 	template<typename TT>
 	friend lent_pointer_wrapper<TT> lend(const unique_pointer_wrapper<TT>& i_uniqueRef);
 	template<typename TTT, typename TT>
@@ -67,16 +99,20 @@ class lent_pointer_wrapper
 	template<typename TT>
 	friend lent_reference_wrapper<TT> promote_to_ref(const lent_pointer_wrapper<TT>&);
 	template<typename TT>
-	friend lent_pointer_wrapper<TT> __make_lent_pointer(TT*, const tagged_pointer<lent_reference_counter>&);
+	friend lent_pointer_wrapper<TT> detail::__make_lent_pointer(TT*, const tagged_pointer<lent_reference_counter>&);
 
 	lent_pointer_wrapper(T* i_data, const tagged_pointer<lent_reference_counter>& i_refCounter);
 
 public:
 	typedef tagged_pointer<lent_reference_counter> tagged_reference_counter;
 	typedef T value_type;
-	typedef T& reference;
-	typedef const T& const_reference;
-	typedef T&& rreference;
+	typedef typename std::add_const<T>::type const_value_type;
+	typedef value_type& reference;
+	typedef const_value_type& const_reference;
+	typedef value_type&& rreference;
+	typedef value_type* pointer;
+	typedef const_value_type* const_pointer;
+	typedef lent_pointer_wrapper<const_value_type> const_type;
 
 	lent_pointer_wrapper();
 	lent_pointer_wrapper(const std::nullptr_t&);
@@ -112,6 +148,9 @@ private:
 	T* m_data;
 	tagged_reference_counter m_refCounter;
 };
+
+template<typename T>
+using tagged_lent_pointer_wrapper = tagged_pointer<T>;
 
 #else
 

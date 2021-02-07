@@ -2,6 +2,7 @@
 
 #include "cpn_free_module.h"
 #include "cpn_vector_space.h"
+#include "cpn_number_module.h"
 
 namespace cpn
 {

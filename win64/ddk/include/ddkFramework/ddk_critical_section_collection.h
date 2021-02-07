@@ -1,10 +1,10 @@
 #pragma once
 
 #include "ddk_critical_section.h"
-#include "ddk_iaccess_provider.h"
-#include <tuple>
 #include "ddk_reference_counter.h"
 #include "ddk_template_helper.h"
+
+#include <tuple>
 
 namespace ddk
 {
@@ -204,7 +204,7 @@ class CriticalSectionCollector
 	template<typename...>
 	friend class AccessProviderCollector;
 
-	static const size_t s_numTypes = mpl::get_num_types<Types...>::value;
+	static const size_t s_numTypes = mpl::get_num_types<Types...>();
 	typedef std::tuple<typename detail::resolve_critical_access_type<ACCESS,Types>::type ...> tuple_t;
 
 public:
@@ -236,12 +236,12 @@ public:
 	template<typename Provider>
 	typename detail::resolve_critical_access_type<ACCESS,Provider>::type& get()
 	{
-		return std::get<mpl::nth_pos_of_type<Provider,Types...>::value>(m_criticalSections);
+		return std::get<mpl::nth_pos_of_type<Provider,Types...>>(m_criticalSections);
 	}
 	template<typename Provider>
 	const typename detail::resolve_critical_access_type<ACCESS,Provider>::type& get() const
 	{
-		return std::get<mpl::nth_pos_of_type<Provider,Types...>::value>(m_criticalSections);
+		return std::get<mpl::nth_pos_of_type<Provider,Types...>>(m_criticalSections);
 	}
 	template<size_t Index>
 	typename std::add_lvalue_reference<typename detail::resolve_critical_access_type<ACCESS,typename mpl::nth_type_of<Index,Types...>::type>::type>::type get()
@@ -285,7 +285,7 @@ private:
 template<typename ... Types>
 class AccessProviderCollector
 {
-	static const size_t s_numTypes = mpl::get_num_types<Types...>::value;
+	static const size_t s_numTypes = mpl::get_num_types<Types...>();
 
 public:
 	typedef AccessProviderCollector<Types...> collector_t;

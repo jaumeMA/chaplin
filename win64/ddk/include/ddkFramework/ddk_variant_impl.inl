@@ -5,7 +5,7 @@
 
 
 #define CREATE_INNER_VISITOR(_visitor,_types) \
-    typedef typename mpl::make_sequence<0,mpl::get_num_types<_types...>::value>::type _range_seq_t; \
+    typedef typename mpl::make_sequence<0,mpl::get_num_types<_types...>()>::type _range_seq_t; \
 	typedef decltype(_visitor) visitor_type; \
 	typedef typename visitor_type::return_type return_type; \
     typedef variant_visitor_invoker<return_type,_types...> _variant_visitor_t;
@@ -20,7 +20,7 @@ namespace detail
 
 template<typename ... Types>
 variant_impl<Types...>::variant_impl()
-: m_currentType(_numTypes)
+: m_currentType(s_numTypes)
 {
 }
 template<typename ... Types>
@@ -28,7 +28,7 @@ void variant_impl<Types...>::construct(const variant_impl<Types...>& other)
 {
 	m_currentType = other.m_currentType;
 
-	if (other.m_currentType < _numTypes)
+	if (other.m_currentType < s_numTypes)
 	{
 		constructor_visitor<data_type,Types...> ctr(m_storage);
 
@@ -41,14 +41,14 @@ void variant_impl<Types...>::construct(variant_impl<Types...>&& other)
 {
 	m_currentType = other.m_currentType;
 
-	if (other.m_currentType < _numTypes)
+	if (other.m_currentType < s_numTypes)
 	{
 		constructor_visitor<data_type,Types...> ctr(m_storage);
 
 		CREATE_INNER_VISITOR(ctr,Types);
 		CALL_INNER_VISITOR(ctr,std::move(other));
 
-		other.m_currentType = _numTypes;
+		other.m_currentType = s_numTypes;
 	}
 }
 template<typename ... Types>
@@ -57,7 +57,7 @@ void variant_impl<Types...>::construct(const variant_impl<TTypes...>& other)
 {
 	m_currentType = other.m_currentType;
 
-	if (other.m_currentType < _numTypes)
+	if (other.m_currentType < s_numTypes)
 	{
 		constructor_visitor<data_type,TTypes...> ctr(m_storage);
 
@@ -71,21 +71,21 @@ void variant_impl<Types...>::construct(variant_impl<TTypes...>&& other)
 {
 	m_currentType = other.m_currentType;
 
-	if (other.m_currentType < _numTypes)
+	if (other.m_currentType < s_numTypes)
 	{
 		constructor_visitor<data_type,TTypes...> ctr(m_storage);
 
 		CREATE_INNER_VISITOR(ctr,TTypes);
 		CALL_INNER_VISITOR(ctr,std::move(other));
 
-		other.m_currentType = _numTypes;
+		other.m_currentType = s_numTypes;
 	}
 }
 template<typename ... Types>
 template<size_t Index, typename TType>
 void variant_impl<Types...>::construct(TType&& other)
 {
-	static_assert(Index >= 0 && Index < _numTypes, "Not found type!");
+	static_assert(Index >= 0 && Index < s_numTypes, "Not found type!");
 
 	m_currentType = static_cast<unsigned char>(Index);
 
@@ -94,14 +94,14 @@ void variant_impl<Types...>::construct(TType&& other)
 template<typename ... Types>
 void variant_impl<Types...>::destroy()
 {
-	if (m_currentType < _numTypes)
+	if (m_currentType < s_numTypes)
 	{
 		destructor_visitor<data_type,Types...> dtr(m_storage);
 
 		CREATE_INNER_VISITOR(dtr,Types);
 		CALL_INNER_VISITOR(dtr,*this);
 
-		m_currentType = _numTypes;
+		m_currentType = s_numTypes;
 	}
 }
 template<typename ... Types>
@@ -112,7 +112,7 @@ variant_impl<Types...>::~variant_impl()
 template<typename ... Types>
 variant_impl<Types...>& variant_impl<Types...>::operator=(const variant_impl<Types...>& other)
 {
-	if (other.m_currentType < _numTypes)
+	if (other.m_currentType < s_numTypes)
 	{
 		if (m_currentType == other.m_currentType)
 		{
@@ -143,7 +143,7 @@ variant_impl<Types...>& variant_impl<Types...>::operator=(const variant_impl<Typ
 template<typename ... Types>
 variant_impl<Types...>& variant_impl<Types...>::operator=(variant_impl<Types...>&& other)
 {
-	if (other.m_currentType < _numTypes)
+	if (other.m_currentType < s_numTypes)
 	{
 		if (m_currentType == other.m_currentType)
 		{
@@ -177,7 +177,7 @@ template<typename ... Types>
 template<typename ... TTypes>
 variant_impl<Types...>& variant_impl<Types...>::operator=(const variant_impl<TTypes...>& other)
 {
-	if (other.m_currentType < _numTypes)
+	if (other.m_currentType < s_numTypes)
 	{
 		if (m_currentType == other.m_currentType)
 		{
@@ -209,7 +209,7 @@ template<typename ... Types>
 template<typename ... TTypes>
 variant_impl<Types...>& variant_impl<Types...>::operator=(variant_impl<TTypes...>&& other)
 {
-	if (other.m_currentType < _numTypes)
+	if (other.m_currentType < s_numTypes)
 	{
 		if (m_currentType == other.m_currentType)
 		{
@@ -243,7 +243,7 @@ template<typename ... Types>
 template<size_t Index, typename TType>
 variant_impl<Types...>& variant_impl<Types...>::assign(TType&& val)
 {
-	static_assert(Index >= 0 && Index < _numTypes, "Type out of bounds!");
+	static_assert(Index >= 0 && Index < s_numTypes, "Type out of bounds!");
 
 	if (Index != m_currentType)
 	{
@@ -253,7 +253,7 @@ variant_impl<Types...>& variant_impl<Types...>::assign(TType&& val)
 
 		m_currentType = static_cast<unsigned char>(Index);
 	}
-	else if (m_currentType < _numTypes)
+	else if (m_currentType < s_numTypes)
 	{
 		//just an assignment
 		assigner_visitor<data_type,Types...>::template assign<Index>(m_storage, std::forward<TType>(val));
@@ -268,7 +268,7 @@ bool variant_impl<Types...>::operator==(const variant_impl<Types...>& other) con
 
 	if (m_currentType == other.m_currentType)
 	{
-		if(m_currentType != _numTypes)
+		if(m_currentType != s_numTypes)
 		{
 			comparison_visitor<variant_impl<Types...>,Types...> comparator(*this);
 
@@ -370,7 +370,7 @@ template<typename ... Types>
 template<typename TType>
 TType variant_impl<Types...>::extract() &&
 {
-	m_currentType = _numTypes;
+	m_currentType = s_numTypes;
 
 	return m_storage.template extract<TType>().extract();
 }
@@ -378,9 +378,9 @@ template<typename ... Types>
 template<typename TType>
 bool variant_impl<Types...>::is() const
 {
-	static_assert(mpl::is_among_types<TType, Types...>::value, "Non present type in variant");
+	static_assert(mpl::is_among_types<TType, Types...>, "Non present type in variant");
 
-	static const size_t isPos = mpl::nth_pos_of_type<TType, Types...>::value;
+	static const size_t isPos = mpl::nth_pos_of_type<TType, Types...>;
 
 	return m_currentType == isPos;
 }
@@ -444,7 +444,7 @@ embedded_type<typename mpl::nth_type_of<Pos,Types...>::type> variant_impl<Types.
 {
 	typedef typename mpl::nth_type_of<Pos,Types...>::type embeddedType;
 
-	m_currentType = _numTypes;
+	m_currentType = s_numTypes;
 
 	return m_storage.template extract<embeddedType>();
 }
@@ -462,7 +462,7 @@ char variant_impl<Types...>::which() const
 template<typename ... Types>
 void variant_impl<Types...>::swap(variant_impl<Types...>& other)
 {
-	if (m_currentType < _numTypes && other.m_currentType < _numTypes)
+	if (m_currentType < s_numTypes && other.m_currentType < s_numTypes)
 	{
 		//as in copy construction case, just check types are the same or not
 		if (m_currentType == other.m_currentType)
@@ -490,14 +490,14 @@ void variant_impl<Types...>::swap(variant_impl<Types...>& other)
 			other = tmp;
 		}
 	}
-	else if (m_currentType < _numTypes)
+	else if (m_currentType < s_numTypes)
 	{
 		//construct us with other data
 		constructor_visitor<Types...> ctr(&(other.m_storage));
 		CREATE_INNER_VISITOR(ctr,Types);
 		CALL_INNER_VISITOR(ctr,*this);
 	}
-	else if (other.m_currentType < _numTypes)
+	else if (other.m_currentType < s_numTypes)
 	{
 		//construct other with our data
 		constructor_visitor<data_type,Types...> ctr(m_storage);
@@ -510,7 +510,7 @@ template<typename Visitor>
 typename std::remove_reference<Visitor>::type::return_type variant_impl<Types...>::visit(Visitor&& visitor)
 {
 	typedef typename std::remove_reference<typename std::remove_const<Visitor>::type>::type::return_type  return_type;
-	typedef typename mpl::make_sequence<0,mpl::get_num_types<Types...>::value>::type range_seq;
+	typedef typename mpl::make_sequence<0,mpl::get_num_types<Types...>()>::type range_seq;
 
 	return variant_visitor_invoker<return_type,Types...>::template outer_invoker(range_seq{},const_cast<Visitor&>(visitor),*this);
 }
@@ -519,7 +519,7 @@ template<typename Visitor>
 typename std::remove_reference<Visitor>::type::return_type variant_impl<Types...>::visit(Visitor&& visitor) const
 {
 	typedef typename std::remove_reference<typename std::remove_const<Visitor>::type>::type::return_type  return_type;
-	typedef typename mpl::make_sequence<0,mpl::get_num_types<Types...>::value>::type range_seq;
+	typedef typename mpl::make_sequence<0,mpl::get_num_types<Types...>()>::type range_seq;
 
 	return variant_visitor_invoker<return_type,Types...>::template outer_invoker(range_seq{},visitor,*this);
 }

@@ -23,7 +23,7 @@ struct pow_add_operation
 	typedef pow_set<Group,Dims...> pow_set_traits_t;
 
 	static const pow_set_traits_t identity;
-    static inline ddk::high_order_array<size_t,ddk::mpl::get_num_ranks<Dims...>()> dimension()
+    static inline ddk::high_order_array<size_t,ddk::mpl::num_ranks<Dims...>> dimension()
     {
         return { Dims... };
     }

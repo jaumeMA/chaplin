@@ -2,8 +2,7 @@
 
 #include "ddk_function.h"
 #include "ddk_concepts.h"
-#include "ddk_function_concepts.h"
-#include "ddk_inherited_value.h"
+#include "ddk_inherited_value_concepts.h"
 #include "ddk_any_value.h"
 
 namespace ddk
@@ -13,12 +12,13 @@ namespace detail
 
 template<typename,typename,typename>
 class dynamic_multi_visitor_base;
-	
+
 template<typename MultiVisitor,typename Visitor,typename Type>
 class dynamic_multi_visitor_base : public typed_dynamic_visitor<Type>
 {
 public:
 	typedef Type type;
+    typedef typename Visitor::type_interface type_interface;
 
 	dynamic_multi_visitor_base() = default;
 
@@ -35,7 +35,7 @@ class dynamic_multi_visitor;
 
 template<typename Visitor,typename ... Types,typename ... ResolvedTypes, typename Value, typename ... Values>
 class dynamic_multi_visitor<Visitor,mpl::type_pack<Types...>,mpl::type_pack<ResolvedTypes...>,Value,Values...>
-	: public dynamic_visitor<typename Value::type_interface>
+	: public dynamic_visitor<typename Visitor::type_interface>
 	, public detail::dynamic_multi_visitor_base<dynamic_multi_visitor<Visitor,mpl::type_pack<Types...>,mpl::type_pack<ResolvedTypes...>,Value,Values...>,Visitor,Types> ...
 {
 public:
@@ -73,12 +73,8 @@ private:
 };
 
 TEMPLATE(typename Visitor,typename ... Values)
-REQUIRES(IS_CALLABLE(Visitor),IS_BASE_OF(typename Visitor::type_interface,Values)...)
-inline typename Visitor::return_type visit(const Visitor& i_callable,const inherited_value<Values>& ... i_values);
-
-TEMPLATE(typename Visitor,typename ... Values)
-REQUIRES(IS_CALLABLE(Visitor),IS_BASE_OF(typename Visitor::type_interface,Values)...)
-inline typename Visitor::return_type visit(Visitor& i_callable,const inherited_value<Values>& ... i_values);
+REQUIRES(IS_BASE_OF_DYNAMIC_VISITOR(Visitor),IS_INHERITED_VALUE(Values)...)
+inline typename std::remove_reference<Visitor>::type::return_type visit(Visitor&& i_callable,const Values& ... i_values);
 
 }
 

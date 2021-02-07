@@ -23,6 +23,7 @@ class inherited_value
 	friend class inherited_value;
 
 public:
+    typedef T value_type;
 	typedef T* pointer;
 	typedef const T* const_pointer;
 	typedef T& reference;
@@ -33,7 +34,7 @@ public:
 	inherited_value(const inherited_value& other) = default;
 	inherited_value(inherited_value&& other) = default;
 	template<typename TT>
-	inherited_value(const shared_pointer_wrapper<TT>& i_value);
+	inherited_value(const distributed_pointer_wrapper<TT>& i_value);
 	template<typename TT>
 	inherited_value(const inherited_value<TT,Allocator>& other);
 	template<typename TT>
@@ -47,14 +48,14 @@ public:
 	template<typename TT>
 	inline bool is() const;
 	inline operator bool() const;
-	inline const TypeInfo& get_type_info() const;
+	inline const rtti::TypeInfo& get_type_info() const;
 	inline pointer operator->();
 	inline const_pointer operator->() const;
 	inline reference operator*();
 	inline const_reference operator*() const;
-	template<typename Visitor>
+	template<typename Interface, typename Visitor>
 	inline bool may_visit() const;
-	template<typename Visitor>
+	template<typename Interface, typename Visitor>
 	void visit(Visitor&& i_visitor) const;
 
 private:
@@ -62,12 +63,13 @@ private:
 	REQUIRES(IS_CONSTRUCTIBLE(T,Args...))
 	explicit inherited_value(Args&& ... i_args);
 
-	TypeInfo m_typeInfo;
-	shared_pointer_wrapper<T> m_value;
+	rtti::TypeInfo m_typeInfo;
+	distributed_pointer_wrapper<T> m_value;
 	Allocator m_allocator;
 };
 
 }
 
+#include "ddk_inherited_value_concepts.h"
 #include "ddk_inherited_value.inl"
 #include "ddk_dynamic_multivisitor.h"

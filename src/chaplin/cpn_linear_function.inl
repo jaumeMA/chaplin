@@ -1,40 +1,28 @@
 
 namespace cpn
 {
+namespace detail
+{
 
-template<typename ImRing, typename DomVectorSpace, size_t ... Indexs>
-TEMPLATE(typename T)
-REQUIRES(IS_CALLABLE_NOT_FUNCTION(T))
-linear_function_impl<ImRing,DomVectorSpace,Indexs...>::linear_function_impl(T&& i_functor)
-: function_base_t(ddk::make_composition(i_functor,ddk::make_function([](ddk::mpl::index_to_type<Indexs,const ring_type&> ... i_components) -> DomVectorSpace { return {i_components...}; )))
+template<typename ImFreeModule,typename DomFreeModule,size_t ... Indexs>
+linear_function_impl<ImFreeModule,DomFreeModule,ddk::mpl::sequence<Indexs...>>::linear_function_impl(const ddk::constant_callable<ImFreeModule>& i_constValue)
 {
 }
-template<typename ImRing, typename DomVectorSpace, size_t ... Indexs>
-template<typename T>
-linear_function_impl<ImRing,DomVectorSpace,Indexs...>::linear_function_impl(T *pRef, ImRing(T::*i_call)(const DomVectorSpace))
-: function_base_t(ddk::make_composition(i_call,ddk::make_function([](ddk::mpl::index_to_type<Indexs,const ring_type&> ... i_components) -> DomVectorSpace { return {i_components...}; )))
+template<typename ImFreeModule,typename DomFreeModule,size_t ... Indexs>
+template<size_t Component>
+linear_function_impl<ImFreeModule,DomFreeModule,ddk::mpl::sequence<Indexs...>>::linear_function_impl(const ddk::projection_callable<Component>& i_component)
 {
 }
-template<typename ImRing, typename DomVectorSpace, size_t ... Indexs>
-template<typename T>
-linear_function_impl<ImRing,DomVectorSpace,Indexs...>::linear_function_impl(const T *i_pRef, ImRing(T::*call)(const DomVectorSpace&)const)
-: function_base_t(ddk::make_composition(i_pRef,ddk::make_function([](ddk::mpl::index_to_type<Indexs,const ring_type&> ... i_components) -> DomVectorSpace { return {i_components...}; )))
-{
-}
-template<typename ImRing, typename DomVectorSpace, size_t ... Indexs>
-linear_function_impl<ImRing,DomVectorSpace,Indexs...>::linear_function_impl(ImRing(*i_call)(const DomVectorSpace&))
-: function_base_t(ddk::make_composition(i_call,ddk::make_function([](ddk::mpl::index_to_type<Indexs,const ring_type&> ... i_components) -> DomVectorSpace { return {i_components...}; )))
-{
-}
-template<typename ImRing, typename DomVectorSpace, size_t ... Indexs>
-auto linear_function_impl<ImRing,DomVectorSpace,Indexs...>::inline_eval(const DomVectorSpace& i_value) const;
+template<typename ImFreeModule, typename DomFreeModule, size_t ... Indexs>
+auto linear_function_impl<ImFreeModule,DomFreeModule,ddk::mpl::sequence<Indexs...>>::inline_eval(const DomFreeModule& i_value) const
 {
     return function_base_t::inline_eval(i_val.get(Indexs) ...);
 }
-template<typename ImRing, typename DomVectorSpace, size_t ... Indexs>
-auto linear_function_impl<ImRing,DomVectorSpace,Indexs...>::operator()(const DomVectorSpace& i_value) const
+template<typename ImFreeModule, typename DomFreeModule, size_t ... Indexs>
+auto linear_function_impl<ImFreeModule,DomFreeModule,ddk::mpl::sequence<Indexs...>>::operator()(const DomFreeModule& i_value) const
 {
     return function_base_t::inline_eval(i_val.get(Indexs) ...);
 }
 
+}
 }

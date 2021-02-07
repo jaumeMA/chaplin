@@ -23,7 +23,7 @@ struct constructor_visitor : public static_visitor<void>
         template<typename TType>
         static void construct(Storage& i_storage, TType&& val)
 		{
-			static_assert(mpl::is_among_constructible_types<Type, Types...>::value, "Constructing type non present in variant types!");
+			static_assert(mpl::is_among_constructible_types<Type, Types...>, "Constructing type non present in variant types!");
 
 			i_storage.template construct<Type>(std::forward<TType>(val));
 		}
@@ -36,7 +36,7 @@ struct constructor_visitor : public static_visitor<void>
     template<size_t PosType, typename Type>
     static detail::void_t construct(Storage& i_storage, Type&& val)
 	{
-		static_assert(PosType >= 0 && PosType < mpl::get_num_types<Types...>::value, "Type out of bounds!");
+		static_assert(PosType >= 0 && PosType < mpl::get_num_types<Types...>(), "Type out of bounds!");
 
 		typedef typename mpl::nth_type_of<PosType, Types...>::type TType;
 
@@ -47,7 +47,7 @@ struct constructor_visitor : public static_visitor<void>
     template<size_t PosType, typename Type>
     detail::void_t visit(Type&& i_value)
 	{
-		static_assert(mpl::is_among_constructible_types<Type, Types...>::value, "Not present type!");
+		static_assert(mpl::is_among_constructible_types<Type, Types...>, "Not present type!");
 
 		typedef typename mpl::nth_type_of<PosType,Types...>::type varType;
 
@@ -81,7 +81,7 @@ struct destructor_visitor : public static_visitor<void>
     template<size_t PosType>
     void destroy()
 	{
-		static_assert(PosType >= 0 && PosType < mpl::get_num_types<Types...>::value, "Type out of bounds!");
+		static_assert(PosType >= 0 && PosType < mpl::get_num_types<Types...>(), "Type out of bounds!");
 
 		typedef typename mpl::nth_type_of<PosType,Types...>::type varType;
 
@@ -103,7 +103,7 @@ struct assigner_visitor : public static_visitor<void>
         template<typename TType>
         static void assign(Storage& i_storage, TType&& val)
 		{
-			static_assert(mpl::is_among_constructible_types<Type, Types...>::value, "Assigning type non present in variant types!");
+			static_assert(mpl::is_among_constructible_types<Type, Types...>, "Assigning type non present in variant types!");
 
 			i_storage.template assign<Type>(std::forward<TType>(val));
 		}
@@ -123,7 +123,7 @@ struct assigner_visitor : public static_visitor<void>
     template<size_t PosType, typename Type>
     detail::void_t visit(Type&& i_value)
 	{
-		static_assert(mpl::is_among_constructible_types<Type, Types...>::value, "Not present type!");
+		static_assert(mpl::is_among_constructible_types<Type, Types...>, "Not present type!");
 
 		typedef typename mpl::nth_type_of<PosType,Types...>::type varType;
 
@@ -193,7 +193,7 @@ struct swaper_visitor : public static_visitor<void>
     template<size_t PosType, typename Type>
     detail::void_t visit(Type&& otherVal)
 	{
-		static_assert(mpl::is_among_constructible_types<Type, Types...>::value, "Not present type!");
+		static_assert(mpl::is_among_constructible_types<Type, Types...>, "Not present type!");
 
 		m_thisVariant.m_storage.template swap<Type>(m_otherVariant.m_storage);
 
@@ -223,10 +223,10 @@ struct comparison_visitor : public static_visitor<bool>
 		const val_retriever_visitor<varType,Types...> getter;
 
 		//this reference here is ok by reference collapsing
-		typedef typename mpl::create_range_rank<0,mpl::get_num_types<Types...>::value>::type range_seq_t;
+		typedef typename mpl::make_sequence<0,mpl::get_num_types<Types...>()>::type seq_t;
 		typedef variant_visitor_invoker<varType,Types...> variant_visitor_t;
 
-		return variant_visitor_t::template inner_invoker(range_seq_t{},getter,m_variant) == otherVal;
+		return variant_visitor_t::template inner_invoker(seq_t{},getter,m_variant) == otherVal;
 	}
 
 private:

@@ -13,7 +13,7 @@ struct rational_division
 
 	friend inline rational_set operator/(const rational_set& i_lhs,const rational_set& i_rhs)
 	{
-		return { i_lhs.numerator() * i_rhs.denominator(), i_lhs.denominator() * i_rhs.numerator() };
+		return { static_cast<int>(i_lhs.numerator() * i_rhs.denominator()), i_lhs.denominator() * i_rhs.numerator() };
 	}
 };
 

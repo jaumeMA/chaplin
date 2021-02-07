@@ -2,99 +2,83 @@
 namespace ddk
 {
 
-template<typename ... T>
-tuple_adaptor<T...>::tuple_adaptor(tuple<T...>& i_iterable,const ddk::iter::shift_action& i_initialAction)
+template<size_t ... Indexs, typename ... T>
+iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::iterable_adaptor(tuple<T...>& i_iterable,const ddk::shift_action& i_initialAction)
 : m_iterable(i_iterable)
 {
 	m_currIndex = i_initialAction.shifting();
-	
-	get(typename mpl::make_sequence<0,s_numTypes>::type{});
 }
-template<typename ... T>
-tuple_adaptor<T...>::~tuple_adaptor()
-{
-	m_currValue.template destroy<variant<typename embedded_type<T>::ref_type ...>>();
-}
-template<typename ... T>
-typename tuple_adaptor<T...>::reference tuple_adaptor<T...>::get_value() noexcept
-{
-	//return m_currValue.template get<variant<typename embedded_type<T>::ref_type ...>>();
-
-	return get(typename mpl::make_sequence<0,s_numTypes>::type{});
-}
-template<typename ... T>
-typename tuple_adaptor<T...>::const_reference tuple_adaptor<T...>::get_value() const noexcept
-{
-	//return m_currValue.template get<variant<typename embedded_type<T>::cref_type ...>>();
-
-	return get(typename mpl::make_sequence<0,s_numTypes>::type{});
-}
-template<typename ... T>
-ddk::optional<typename tuple_adaptor<T...>::reference> tuple_adaptor<T...>::next_value() noexcept
+template<size_t ... Indexs, typename ... T>
+template<typename Sink>
+bool iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::forward_next_value_in(Sink&& i_sink)
 {
 	if(m_currIndex < s_numTypes)
 	{
 		m_currIndex++;
 
-		return get(typename mpl::make_sequence<0,s_numTypes>::type{});
+		get(typename mpl::make_sequence<0,s_numTypes>::type{},std::forward<Sink>(i_sink));
 
-		//return m_currValue.template get<variant<typename embedded_type<T>::ref_type ...>>();
+		return true;
 	}
 	else
 	{
-		return none;
+		return false;
 	}
 }
-template<typename ... T>
-ddk::optional<typename tuple_adaptor<T...>::const_reference> tuple_adaptor<T...>::next_value() const noexcept
+template<size_t ... Indexs, typename ... T>
+template<typename Sink>
+bool iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::forward_next_value_in(Sink&& i_sink) const
 {
 	if(m_currIndex < s_numTypes)
 	{
 		m_currIndex++;
 
-		return get(typename mpl::make_sequence<0,s_numTypes>::type{});
+		get(typename mpl::make_sequence<0,s_numTypes>::type{},std::forward<Sink>(i_sink));
 
-		//return m_currValue.template get<variant<typename embedded_type<T>::cref_type ...>>();
+		return true;
 	}
 	else
 	{
-		return none;
+		return false;
 	}
 }
-template<typename ... T>
-ddk::optional<typename tuple_adaptor<T...>::reference> tuple_adaptor<T...>::prev_value() noexcept
+template<size_t ... Indexs, typename ... T>
+template<typename Sink>
+bool iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::forward_prev_value_in(Sink&& i_sink)
 {
 	if(m_currIndex >= 0)
 	{
 		m_currIndex--;
 
-		return get(typename mpl::make_sequence<0,s_numTypes>::type{});
+		get(typename mpl::make_sequence<0,s_numTypes>::type{},std::forward<Sink>(i_sink));
 
-		//return m_currValue.template get<variant<typename embedded_type<T>::ref_type ...>>();
+		return true;
 	}
 	else
 	{
-		return none;
+		return false;
 	}
 }
-template<typename ... T>
-ddk::optional<typename tuple_adaptor<T...>::const_reference> tuple_adaptor<T...>::prev_value() const noexcept
+template<size_t ... Indexs, typename ... T>
+template<typename Sink>
+bool iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::forward_prev_value_in(Sink&& i_sink) const
 {
 	if(m_currIndex >= 0)
 	{
 		m_currIndex--;
 
-		return get(typename mpl::make_sequence<0,s_numTypes>::type{});
+		get(typename mpl::make_sequence<0,s_numTypes>::type{},std::forward<Sink>(i_sink));
 
-		//return m_currValue.template get<variant<typename embedded_type<T>::cref_type ...>>();
+		return true;
 	}
 	else
 	{
-		return none;
+		return false;
 	}
 }
-template<typename ... T>
-ddk::optional<typename tuple_adaptor<T...>::reference> tuple_adaptor<T...>::shift_value(int i_shift) noexcept
+template<size_t ... Indexs, typename ... T>
+template<typename Sink>
+bool iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::forward_shift_value_in(int i_shift,Sink&& i_sink)
 {
 	size_t newIndex = m_currIndex + i_shift;
 
@@ -102,17 +86,18 @@ ddk::optional<typename tuple_adaptor<T...>::reference> tuple_adaptor<T...>::shif
 	{
 		m_currIndex = newIndex;
 
-		return get(typename mpl::make_sequence<0,s_numTypes>::type{});
+		get(typename mpl::make_sequence<0,s_numTypes>::type{},std::forward<Sink>(i_sink));
 
-		//return m_currValue.template get<variant<typename embedded_type<T>::ref_type ...>>();
+		return true;
 	}
 	else
 	{
-		return none;
+		return false;
 	}
 }
-template<typename ... T>
-ddk::optional<typename tuple_adaptor<T...>::const_reference> tuple_adaptor<T...>::shift_value(int i_shift) const noexcept
+template<size_t ... Indexs, typename ... T>
+template<typename Sink>
+bool iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::forward_shift_value_in(int i_shift,Sink&& i_sink) const
 {
 	size_t newIndex = m_currIndex + i_shift;
 
@@ -120,57 +105,206 @@ ddk::optional<typename tuple_adaptor<T...>::const_reference> tuple_adaptor<T...>
 	{
 		m_currIndex = newIndex;
 
-		return get(typename mpl::make_sequence<0,s_numTypes>::type{});
+		get(typename mpl::make_sequence<0,s_numTypes>::type{},std::forward<Sink>(i_sink));
 
-		//return m_currValue.template get<variant<typename embedded_type<T>::cref_type ...>>();
+		return true;
 	}
 	else
 	{
-		return none;
+		return false;
 	}
 }
-template<typename ... T>
-bool tuple_adaptor<T...>::valid() const noexcept
+template<size_t ... Indexs, typename ... T>
+bool iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::valid() const noexcept
 {
 	return 0 <= m_currIndex && m_currIndex < s_numTypes;
 }
-template<typename ... T>
-template<size_t ... Indexs>
-typename tuple_adaptor<T...>::reference tuple_adaptor<T...>::get(const mpl::sequence<Indexs...>&)
+template<size_t ... Indexs, typename ... T>
+template<typename Sink, size_t ... IIndexs>
+void iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::get(const mpl::sequence<IIndexs...>&, Sink&& i_sink)
 {
-	typedef reference(*funcType)(tuple<T...>&,cached_value_t&);
-	typedef tuple_adaptor<T...> tuple_adaptor_t;
+	typedef void(*funcType)(Sink,tuple<T...>&);
+	typedef iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>> tuple_adaptor_t;
 
 	static const funcType funcTable[] = { &tuple_adaptor_t::_get<Indexs> ... };
 
-	return (*funcTable[m_currIndex])(m_iterable,m_currValue);
+	(*funcTable[m_currIndex])(std::forward<Sink>(i_sink),m_iterable);
 }
-template<typename ... T>
-template<size_t ... Indexs>
-typename tuple_adaptor<T...>::const_reference tuple_adaptor<T...>::get(const mpl::sequence<Indexs...>&) const
+template<size_t ... Indexs, typename ... T>
+template<typename Sink, size_t ... IIndexs>
+void iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::get(const mpl::sequence<IIndexs...>&, Sink&& i_sink) const
 {
-	typedef const_reference(*funcType)(const tuple<T...>&,cached_value_t&);
-	typedef tuple_adaptor<T...> tuple_adaptor_t;
+	typedef void(*funcType)(Sink,const tuple<T...>&);
+	typedef iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>> tuple_adaptor_t;
 
 	static const funcType funcTable[] = { &tuple_adaptor_t::_get<Indexs> ... };
 
-	return (*funcTable[m_currIndex])(m_iterable,m_currValue);
+	(*funcTable[m_currIndex])(std::forward<Sink>(i_sink),m_iterable);
 }
-template<typename ... T>
-template<size_t Index>
-typename tuple_adaptor<T...>::reference tuple_adaptor<T...>::_get(tuple<T...>& i_iterable, cached_value_t& o_currValue)
+template<size_t ... Indexs, typename ... T>
+template<size_t Index,typename Sink>
+void iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::_get(Sink&& i_sink, tuple<T...>& i_iterable)
 {
-	o_currValue.template construct<variant<typename embedded_type<T>::ref_type ...>>(i_iterable.template get<Index>());
-
-	return { i_iterable.template get<Index>() };
+	i_sink(i_iterable.template get<Index>());
 }
-template<typename ... T>
-template<size_t Index>
-typename tuple_adaptor<T...>::const_reference tuple_adaptor<T...>::_get(const tuple<T...>& i_iterable, cached_value_t& o_currValue)
+template<size_t ... Indexs, typename ... T>
+template<size_t Index,typename Sink>
+void iterable_adaptor<detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::_get(Sink&& i_sink, const tuple<T...>& i_iterable)
 {
-	o_currValue.template construct<variant<typename embedded_type<T>::ref_type ...>>(i_iterable.template get<Index>());
+	i_sink(i_iterable.template get<Index>());
+}
 
-	return { i_iterable.template get<Index>() };
+
+template<size_t ... Indexs, typename ... T>
+iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::iterable_adaptor(const tuple<T...>& i_iterable,const ddk::shift_action& i_initialAction)
+: m_iterable(i_iterable)
+{
+	m_currIndex = i_initialAction.shifting();
+}
+template<size_t ... Indexs, typename ... T>
+template<typename Sink>
+bool iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::forward_next_value_in(Sink&& i_sink)
+{
+	if(m_currIndex < s_numTypes)
+	{
+		m_currIndex++;
+
+		get(typename mpl::make_sequence<0,s_numTypes>::type{},std::forward<Sink>(i_sink));
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+template<size_t ... Indexs, typename ... T>
+template<typename Sink>
+bool iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::forward_next_value_in(Sink&& i_sink) const
+{
+	if(m_currIndex < s_numTypes)
+	{
+		m_currIndex++;
+
+		get(typename mpl::make_sequence<0,s_numTypes>::type{},std::forward<Sink>(i_sink));
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+template<size_t ... Indexs, typename ... T>
+template<typename Sink>
+bool iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::forward_prev_value_in(Sink&& i_sink)
+{
+	if(m_currIndex >= 0)
+	{
+		m_currIndex--;
+
+		get(typename mpl::make_sequence<0,s_numTypes>::type{},std::forward<Sink>(i_sink));
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+template<size_t ... Indexs, typename ... T>
+template<typename Sink>
+bool iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::forward_prev_value_in(Sink&& i_sink) const
+{
+	if(m_currIndex >= 0)
+	{
+		m_currIndex--;
+
+		get(typename mpl::make_sequence<0,s_numTypes>::type{},std::forward<Sink>(i_sink));
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+template<size_t ... Indexs, typename ... T>
+template<typename Sink>
+bool iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::forward_shift_value_in(int i_shift,Sink&& i_sink)
+{
+	size_t newIndex = m_currIndex + i_shift;
+
+	if(0 <= newIndex && newIndex < s_numTypes)
+	{
+		m_currIndex = newIndex;
+
+		get(typename mpl::make_sequence<0,s_numTypes>::type{},std::forward<Sink>(i_sink));
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+template<size_t ... Indexs, typename ... T>
+template<typename Sink>
+bool iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::forward_shift_value_in(int i_shift,Sink&& i_sink) const
+{
+	size_t newIndex = m_currIndex + i_shift;
+
+	if(0 <= newIndex && newIndex < s_numTypes)
+	{
+		m_currIndex = newIndex;
+
+		get(typename mpl::make_sequence<0,s_numTypes>::type{},std::forward<Sink>(i_sink));
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+template<size_t ... Indexs, typename ... T>
+bool iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::valid() const noexcept
+{
+	return 0 <= m_currIndex && m_currIndex < s_numTypes;
+}
+template<size_t ... Indexs, typename ... T>
+template<typename Sink, size_t ... IIndexs>
+void iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::get(const mpl::sequence<IIndexs...>&, Sink&& i_sink)
+{
+	typedef void(*funcType)(Sink,tuple<T...>&);
+	typedef iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>> tuple_adaptor_t;
+
+	static const funcType funcTable[] = { &tuple_adaptor_t::_get<Indexs> ... };
+
+	(*funcTable[m_currIndex])(std::forward<Sink>(i_sink),m_iterable);
+}
+template<size_t ... Indexs, typename ... T>
+template<typename Sink, size_t ... IIndexs>
+void iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::get(const mpl::sequence<IIndexs...>&, Sink&& i_sink) const
+{
+	typedef void(*funcType)(Sink,const tuple<T...>&);
+	typedef iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>> tuple_adaptor_t;
+
+	static const funcType funcTable[] = { &tuple_adaptor_t::_get<Indexs> ... };
+
+	(*funcTable[m_currIndex])(std::forward<Sink>(i_sink),m_iterable);
+}
+template<size_t ... Indexs, typename ... T>
+template<size_t Index,typename Sink>
+void iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::_get(Sink&& i_sink, tuple<T...>& i_iterable)
+{
+	i_sink(i_iterable.template get<Index>());
+}
+template<size_t ... Indexs, typename ... T>
+template<size_t Index,typename Sink>
+void iterable_adaptor<const detail::tuple_impl<mpl::sequence<Indexs...>,T...>>::_get(Sink&& i_sink, const tuple<T...>& i_iterable)
+{
+	i_sink(i_iterable.template get<Index>());
 }
 
 }

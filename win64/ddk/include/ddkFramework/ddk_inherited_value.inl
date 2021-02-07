@@ -18,8 +18,8 @@ inherited_value<TT> make_inherited_value(Args&& ... i_args)
 
 template<typename T,typename Allocator>
 template<typename TT>
-inherited_value<T,Allocator>::inherited_value(const shared_pointer_wrapper<TT>& i_value)
-: m_typeInfo(rtti<T>())
+inherited_value<T,Allocator>::inherited_value(const distributed_pointer_wrapper<TT>& i_value)
+: m_typeInfo(rtti::type_info<T>())
 , m_value(i_value)
 {
 }
@@ -41,13 +41,13 @@ template<typename T, typename Allocator>
 TEMPLATE(typename ... Args)
 REQUIRED(IS_CONSTRUCTIBLE(T,Args...))
 inherited_value<T,Allocator>::inherited_value(Args&& ... i_args)
-: m_typeInfo(rtti<T>())
+: m_typeInfo(rtti::type_info<T>())
 {
 	if(void* mem = m_allocator.allocate(1,sizeof(T)))
 	{
-		T* newValue = new(mem) T(std::forward<Args>(i_args) ...);
+		T* newValue = new(mem) typename std::remove_const<T>::type(std::forward<Args>(i_args) ...);
 
-		m_value = as_shared_reference(newValue,get_reference_wrapper_deleter<T>(m_allocator));
+		m_value = as_distributed_reference(newValue,get_reference_wrapper_deleter(m_allocator));
 	}
 	else
 	{
@@ -94,7 +94,7 @@ bool inherited_value<T,Allocator>::is() const
 {
     static_assert(std::is_base_of<T,TT>::value, "You shall provide an inherited type from T");
 
-    return m_typeInfo == rtti<TT>();
+    return m_typeInfo == rtti::type_info<TT>();
 }
 template<typename T, typename Allocator>
 inherited_value<T,Allocator>::operator bool() const
@@ -102,7 +102,7 @@ inherited_value<T,Allocator>::operator bool() const
     return m_typeInfo.empty() == false;
 }
 template<typename T, typename Allocator>
-const TypeInfo& inherited_value<T,Allocator>::get_type_info() const
+const rtti::TypeInfo& inherited_value<T,Allocator>::get_type_info() const
 {
     return m_typeInfo;
 }
@@ -127,16 +127,16 @@ typename inherited_value<T,Allocator>::const_reference inherited_value<T,Allocat
 	return *m_value;
 }
 template<typename T,typename Allocator>
-template<typename Visitor>
+template<typename Interface, typename Visitor>
 bool inherited_value<T,Allocator>::may_visit() const
 {
-	return __may_visit(*m_value,reinterpret_cast<const Visitor*>(0xDEAD));
+	return __may_visit(static_cast<const Interface&>(*m_value),reinterpret_cast<const Visitor*>(0xDEAD));
 }
 template<typename T,typename Allocator>
-template<typename Visitor>
+template<typename Interface, typename Visitor>
 void inherited_value<T,Allocator>::visit(Visitor&& i_visitor) const
 {
-	__visit(m_typeInfo,*m_value,i_visitor);
+	__visit(m_typeInfo,static_cast<const Interface&>(*m_value),i_visitor);
 }
 
 }

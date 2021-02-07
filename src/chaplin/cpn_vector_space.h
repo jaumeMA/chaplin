@@ -15,25 +15,25 @@ struct identity_prod_matrix
 
 }
 
-template<typename FreeModule, typename InnerProdMatrix>
+template<typename Free_Module, typename InnerProdMatrix>
 struct vector_mult_operation
 {
     PUBLISH_OPERATION_PROPERTIES(vector_mult_operation,vector_prod_operation,linear,conjugate,positive_definite);
 
-    typedef typename FreeModule::ring_type ring_type;
+    typedef typename Free_Module::ring_type ring_type;
     typedef InnerProdMatrix inner_prod_matrix_t;
 
-    friend inline ring_type operator*(const FreeModule& i_lhs, const FreeModule& i_rhs)
+    friend inline ring_type operator*(const Free_Module& i_lhs, const Free_Module& i_rhs)
     {
         static const inner_prod_matrix_t s_prodMatrix;
 
         ring_type res;
 
-        for(size_t rowIndex = 0;rowIndex < FreeModule::rank();rowIndex++)
+        for(size_t rowIndex = 0;rowIndex < Free_Module::rank();rowIndex++)
         {
             ring_type partialProd = ring_type::mult_operation::identity;
 
-            for(size_t colIndex=0;colIndex<FreeModule::rank();colIndex++)
+            for(size_t colIndex=0;colIndex<Free_Module::rank();colIndex++)
             {
                 partialProd = partialProd + static_cast<const ring_type&>(i_lhs[colIndex]) * s_prodMatrix(colIndex,rowIndex);
             }
@@ -45,11 +45,11 @@ struct vector_mult_operation
 
         return res;
     }
-    inline operator FreeModule() const;
+    inline operator Free_Module() const;
 };
 
-template<typename FreeModule, typename InnerProdMatrix = detail::identity_prod_matrix<typename FreeModule::ring_type,FreeModule::rank()>>
-using vector_space = typename FreeModule::template equip_with<vector_mult_operation<FreeModule,InnerProdMatrix>>;
+template<typename Free_Module, typename InnerProdMatrix = detail::identity_prod_matrix<typename Free_Module::ring_type,Free_Module::rank>>
+using vector_space = typename Free_Module::template equip_with<vector_mult_operation<Free_Module,InnerProdMatrix>>;
 
 template<typename VectorSpace>
 using vector_sub_space = typename forget_vector_prod<free_sub_module<VectorSpace>>::template equip_withequip_with<vector_mult_operation<forget_vector_prod<free_sub_module<VectorSpace>>,typename VectorSpace::inner_prod_matrix_t>>;

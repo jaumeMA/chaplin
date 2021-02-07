@@ -3,6 +3,7 @@
 #include "ddk_union_iterable_impl.h"
 #include "ddk_intersection_iterable_impl.h"
 #include "ddk_async.h"
+#include "ddk_forwarding_iterable_value_callable.h"
 
 namespace ddk
 {
@@ -16,20 +17,20 @@ Iterable make_iterable(IIterable&& i_iterable)
 }
 
 TEMPLATE(typename Iterable)
-REQUIRED(IS_ITERABLE(Iterable))
+REQUIRED(IS_BASE_OF_ITERABLE(Iterable))
 Iterable deduce_iterable(Iterable&& i_iterable)
 {
 	return i_iterable;
 }
 
-TEMPLATE(typename Iterable)
-REQUIRED(IS_NOT_ITERABLE(Iterable))
-resolved_iterable<Iterable> deduce_iterable(Iterable&& i_iterable)
+TEMPLATE(typename Container)
+REQUIRED(IS_NOT_BASE_OF_ITERABLE(Container))
+resolved_iterable<Container> deduce_iterable(Container&& i_iterable)
 {
-	typedef resolved_iterable<Iterable> iterable_type;
+	typedef resolved_iterable<Container> iterable_type;
 	typedef typename iterable_type::traits traits;
 
-	return iterable_type{ make_shared_reference<detail::iterable_impl<traits,Iterable>>(std::forward<Iterable>(i_iterable)) };
+	return iterable_type{ make_shared_reference<detail::iterable_impl<traits,Container>>(std::forward<Container>(i_iterable)) };
 }
 
 }
@@ -59,20 +60,65 @@ typename ddk::mpl::static_if<std::is_base_of<ddk::detail::iterable_value_base,It
 {
 	return { i_rhs,i_lhs };
 }
+TEMPLATE(typename Return,typename Type,typename Allocator, typename Container)
+REQUIRED(IS_NOT_BASE_OF_ITERABLE(Container))
+ddk::detail::iterable<ddk::transformed_traits<ddk::resolved_iterable_traits_as<Container,Return>>> operator<<=(const ddk::detail::iterable_transform<ddk::function<Return(Type),Allocator>>& i_lhs, Container& i_rhs)
+{
+	typedef ddk::resolved_iterable_traits<Container> traits_t;
+	typedef ddk::resolved_iterable_traits_as<Container,Return> return_traits_t;
+
+	return ddk::detail::iterable<ddk::transformed_traits<return_traits_t>>(ddk::detail::make_iterable_impl<ddk::detail::transformed_iterable_impl<ddk::transformed_traits<return_traits_t>,traits_t,Return,Type>>(share(ddk::deduce_iterable(i_rhs)),i_lhs.get_transform()));
+}
+TEMPLATE(typename Type,typename Allocator,typename Container)
+REQUIRED(IS_NOT_BASE_OF_ITERABLE(Container))
+ddk::detail::iterable<ddk::resolved_iterable_traits<Container>> operator<<=(const ddk::detail::iterable_filter<ddk::function<bool(Type),Allocator>>& i_lhs,Container& i_rhs)
+{
+	typedef ddk::resolved_iterable_traits<Container> traits_t;
+
+	return ddk::detail::iterable<traits_t>(ddk::detail::make_iterable_impl<ddk::detail::filtered_iterable_impl<traits_t>>(share(ddk::deduce_iterable(i_rhs)),i_lhs.get_filter()));
+}
+TEMPLATE(typename T,typename Container)
+REQUIRED(IS_NOT_BASE_OF_ITERABLE(Container))
+ddk::detail::iterable<ddk::resolved_iterable_traits<Container>> operator<<=(const ddk::detail::iterable_order<T>& i_lhs,Container& i_rhs)
+{
+	typedef ddk::resolved_iterable_traits<Container> traits_t;
+
+	return ddk::detail::iterable<traits_t>(ddk::detail::make_iterable_impl<ddk::detail::ordered_iterable_impl<T,traits_t>>(share(ddk::deduce_iterable(i_rhs)),i_lhs.get_order()));
+}
+TEMPLATE(typename Function,typename Container)
+REQUIRED(IS_CALLABLE(Function),IS_NOT_BASE_OF_ITERABLE(Container))
+void operator<<=(Function&& i_lhs, Container& i_rhs)
+{
+	typedef ddk::resolved_iterable_action<const Container> action;
+
+	try
+	{
+		ddk::visit_iterator(i_rhs,ddk::forwarding_iterable_value_callable<Function,action>{std::forward<Function>(i_lhs)},action{});
+	}
+	catch(const ddk::suspend_exception&)
+	{
+	}
+}
 
 namespace ddk
 {
 
-template<typename ... Traits>
-detail::iterable<detail::union_iterable_traits<Traits...>> concat(const ddk::detail::iterable<Traits>& ... i_iterables)
+TEMPLATE(typename ... Iterables)
+REQUIRED_COND(mpl::get_num_types<Iterables...>()!=0)
+detail::iterable<detail::union_iterable_traits<resolved_iterable_traits<Iterables>...>> concat(const Iterables& ... i_iterables)
 {
-	return ddk::detail::make_iterable_impl<ddk::detail::union_iterable_impl<ddk::detail::iterable<Traits>...>>(i_iterables...);
+    typedef detail::iterable<detail::union_iterable_traits<resolved_iterable_traits<Iterables>...>> ret_type;
+
+	return ret_type{ ddk::detail::make_iterable_impl<ddk::detail::union_iterable_impl<ddk::detail::iterable<resolved_iterable_traits<Iterables>>...>>(deduce_iterable(i_iterables) ...) };
 }
 
-template<typename ... Traits>
-detail::iterable<detail::intersection_iterable_traits<Traits...>> fusion(const ddk::detail::iterable<Traits>& ... i_iterables)
+TEMPLATE(typename ... Iterables)
+REQUIRED_COND(mpl::get_num_types<Iterables...>()!=0)
+detail::iterable<detail::intersection_iterable_traits<resolved_iterable_traits<Iterables>...>> fusion(const Iterables& ... i_iterables)
 {
-	return ddk::detail::make_iterable_impl<ddk::detail::intersection_iterable_impl<ddk::detail::iterable<Traits> ...>>(i_iterables...);
+    typedef detail::iterable<detail::intersection_iterable_traits<resolved_iterable_traits<Iterables>...>> ret_type;
+
+	return ret_type{ ddk::detail::make_iterable_impl<ddk::detail::intersection_iterable_impl<ddk::detail::iterable<resolved_iterable_traits<Iterables>> ...>>(deduce_iterable(i_iterables)...) };
 }
 
 }

@@ -6,6 +6,6 @@ namespace cpn
 {
 
 //by now
-typedef function_allocator = ddk::system_allocator;
+using function_allocator = ddk::system_allocator;
 
 }

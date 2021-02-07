@@ -33,7 +33,12 @@ await_executor<Return>::await_executor(const ddk::function<Return()>& i_callable
 }
 template<typename Return>
 await_executor<Return>::await_executor(const await_executor& other)
-: await_executor(other.m_callable, { other.get_stack_allocator().get_alloc_impl(), other.get_stack_allocator().get_num_max_pages() })
+: await_executor(other,other.get_stack_allocator())
+{
+}
+template<typename Return>
+await_executor<Return>::await_executor(const await_executor& other,const stack_allocator& i_stackAllocator)
+: await_executor(other.m_callable,{ i_stackAllocator.get_alloc_impl(), i_stackAllocator.get_num_max_pages() })
 {
 }
 template<typename Return>
@@ -79,7 +84,7 @@ bool await_executor<Return>::resume()
 	}
 }
 template<typename Return>
-bool await_executor<Return>::resume(const ddk::function<void(sink_reference)>& i_sink)
+bool await_executor<Return>::resume(const sink_type& i_sink)
 {
 	if(m_callee.resume_from(m_caller) == FiberExecutionState::Done)
 	{
@@ -99,7 +104,7 @@ bool await_executor<Return>::resume(const ddk::function<void(sink_reference)>& i
 		}
 		else
 		{
-			if(typed_yielder_context<Return>* newContext = m_callee.get_typed_context<Return>())
+			if(typed_yielder_context<Return>* newContext = m_caller.get_typed_context<Return>())
 			{
 				eval(i_sink,newContext->get_value());
 			}

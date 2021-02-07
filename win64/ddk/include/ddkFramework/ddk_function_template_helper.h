@@ -2,12 +2,17 @@
 
 #include "ddk_template_helper.h"
 #include "ddk_tuple.h"
+#include "ddk_system_allocator.h"
 
 #define define_place_arg(_INDEX) \
 static const ddk::mpl::place_holder<_INDEX> arg_##_INDEX;
 
 namespace ddk
 {
+
+template<typename,typename = system_allocator>
+class function;
+
 namespace mpl
 {
 
@@ -110,19 +115,47 @@ struct aqcuire_callable_return_type
 	typedef typename aqcuire_callable_return_type<decltype(&Functor::operator())>::args_type args_type;
 };
 
-template<typename T, typename ... Types>
+template<typename>
+struct _is_function;
+
+template<typename T>
+struct _is_function: public std::false_type
+{
+};
+template<typename Return,typename ... Types,typename Allocator>
+struct _is_function<function<Return(Types...),Allocator>> : public std::true_type
+{
+};
+
+template<typename T>
+struct is_function
+{
+private:
+	typedef typename std::remove_const<typename std::remove_reference<T>::type>::type raw_type;
+
+public:
+	static const bool value = _is_function<raw_type>::value;
+};
+
+template<typename T, typename ... Args>
 struct is_valid_functor
 {
 private:
     template<typename TT>
-	static std::true_type func(const TT&, decltype(&TT::operator())); // non template call operator
-    template<typename TT, typename TTT = decltype(std::declval<TT>().operator()(std::declval<Types>() ...))>
-	static std::true_type func(const TT&, TTT); // template call operator
-    template<typename TT, typename ... TTT>
-	static std::false_type func(const TT&, TTT&& ...);
+	static std::true_type _resolve(TT&, typename std::add_pointer<decltype(std::declval<TT>().operator()(std::declval<Args>() ...))>::type);
+    template<typename TT>
+	static std::false_type _resolve(TT&, ...);
+
+    template<typename TT>
+	static std::true_type resolve(TT&, typename TT::callable_tag*);
+    template<typename TT>
+	static std::true_type resolve(TT&, decltype(&TT::operator()));
+    template<typename TT>
+	static decltype(_resolve(std::declval<T&>(),nullptr)) resolve(TT&, ...);
 
 public:
-    static const bool value = decltype(func(std::declval<T>(),nullptr))::value;
+    typedef typename static_if<is_function<T>::value,std::true_type,decltype(resolve(std::declval<T&>(),nullptr))>::type type;
+    static const bool value = type::value;
 };
 
 }

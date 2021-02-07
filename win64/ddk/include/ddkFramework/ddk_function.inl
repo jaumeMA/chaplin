@@ -4,116 +4,107 @@
 
 namespace ddk
 {
+namespace detail
+{
 
-template<typename Return, typename ... Types, typename Allocator>
+const size_t k_small_buffer_allocation_size = 32;
+
+template<typename Return,typename ... Types,typename Allocator,typename FunctionImpl>
+function_impl<Return(Types...),Allocator,FunctionImpl>::function_impl()
+: m_allocator(k_small_buffer_allocation_size,Allocator())
+{
+}
+template<typename Return, typename ... Types, typename Allocator, typename FunctionImpl>
 template<typename AAllocator>
-function<Return(Types...),Allocator>::function(const function<Return(Types...),AAllocator>& other)
+function_impl<Return(Types...),Allocator,FunctionImpl>::function_impl(const function_impl<Return(Types...),AAllocator,FunctionImpl>& other)
 : m_functionImpl(other.m_functionImpl)
 , m_allocator(other.m_allocator)
 {
 }
-template<typename Return, typename ... Types, typename Allocator>
+template<typename Return, typename ... Types, typename Allocator, typename FunctionImpl>
 template<typename AAllocator>
-function<Return(Types...),Allocator>::function(function<Return(Types...),AAllocator>&& other)
+function_impl<Return(Types...),Allocator,FunctionImpl>::function_impl(function_impl<Return(Types...),AAllocator,FunctionImpl>&& other)
 : m_functionImpl(std::move(other.m_functionImpl))
 , m_allocator(other.m_allocator)
 {
 }
-template<typename Return, typename ... Types, typename Allocator>
-function<Return(Types...),Allocator>::function(std::nullptr_t)
+template<typename Return, typename ... Types, typename Allocator, typename FunctionImpl>
+function_impl<Return(Types...),Allocator,FunctionImpl>::function_impl(std::nullptr_t)
+: m_allocator(k_small_buffer_allocation_size,Allocator())
 {
 }
-template<typename Return, typename ... Types, typename Allocator>
+template<typename Return, typename ... Types, typename Allocator, typename FunctionImpl>
 TEMPLATE(typename T)
 REQUIRED(IS_CALLABLE_NOT_FUNCTION(T))
-function<Return(Types...),Allocator>::function(T&& i_functor, const Allocator& i_allocator)
-: m_allocator(i_allocator)
+function_impl<Return(Types...),Allocator,FunctionImpl>::function_impl(T&& i_functor, const Allocator& i_allocator)
+: m_allocator(k_small_buffer_allocation_size,i_allocator)
 {
-    typedef detail::functor_impl<typename std::remove_const<typename std::remove_reference<T>::type>::type,Return,Types...> Functor;
+    typedef typename mpl::static_if<detail::is_base_of_inherited_functor_impl<mpl::remove_qualifiers<T>>,mpl::remove_qualifiers<T>,detail::aggregated_functor_impl<mpl::remove_qualifiers<T>,Return,Types...>>::type Functor;
 
-    if(void* mem = m_allocator.allocate(1,sizeof(Functor)))
-    {
-        Functor* newFuncImpl = new(mem) Functor(std::forward<T>(i_functor));
+	std::pair<resource_deleter_const_lent_ref,void*> allocCtxt = m_allocator.allocate(sizeof(Functor));
 
-        m_functionImpl = as_shared_reference(newFuncImpl,get_reference_wrapper_deleter<Functor>(m_allocator));
-    }
-    else
-    {
-        throw bad_allocation_exception{"Could not allocate function specialization"};
-    }
+	Functor* newFuncImpl = new(allocCtxt.second) Functor(std::forward<T>(i_functor));
+
+    m_functionImpl = as_distributed_reference(newFuncImpl,allocCtxt.first);
 }
-template<typename Return, typename ... Types, typename Allocator>
-function<Return(Types...),Allocator>::function(Return(*i_call)(Types...), const Allocator& i_allocator)
-: m_allocator(i_allocator)
+template<typename Return, typename ... Types, typename Allocator, typename FunctionImpl>
+function_impl<Return(Types...),Allocator,FunctionImpl>::function_impl(Return(*i_call)(Types...), const Allocator& i_allocator)
+: m_allocator(k_small_buffer_allocation_size,i_allocator)
 {
     typedef detail::free_function_impl<Return,Types...> Functor;
 
-    if(void* mem = m_allocator.allocate(1,sizeof(Functor)))
-    {
-        Functor* newFuncImpl = new(mem) Functor(i_call);
+	std::pair<resource_deleter_const_lent_ref,void*> allocCtxt = m_allocator.allocate(sizeof(Functor));
 
-        m_functionImpl = as_shared_reference(newFuncImpl,get_reference_wrapper_deleter<Functor>(m_allocator));
-    }
-    else
-    {
-        throw bad_allocation_exception{"Could not allocate function specialization"};
-    }
+    Functor* newFuncImpl = new(allocCtxt.second) Functor(i_call);
+
+    m_functionImpl = as_distributed_reference(newFuncImpl,allocCtxt.first);
 }
-template<typename Return, typename ... Types, typename Allocator>
+template<typename Return, typename ... Types, typename Allocator, typename FunctionImpl>
 template<typename T>
-function<Return(Types...),Allocator>::function(T *i_pRef, Return(T::*i_call)(Types...), const Allocator& i_allocator)
-: m_allocator(i_allocator)
+function_impl<Return(Types...),Allocator,FunctionImpl>::function_impl(T *i_pRef, Return(T::*i_call)(Types...), const Allocator& i_allocator)
+: m_allocator(k_small_buffer_allocation_size,i_allocator)
 {
     typedef detail::relative_function_impl<T,Return,Types...> Functor;
 
-    if(void* mem = m_allocator.allocate(1,sizeof(Functor)))
-    {
-        Functor* newFuncImpl = new(mem) Functor(i_pRef,i_call);
+	std::pair<resource_deleter_const_lent_ref,void*> allocCtxt = m_allocator.allocate(sizeof(Functor));
 
-        m_functionImpl = as_shared_reference(newFuncImpl,get_reference_wrapper_deleter<Functor>(m_allocator));
-    }
-    else
-    {
-        throw bad_allocation_exception{"Could not allocate function specialization"};
-    }
+	Functor* newFuncImpl = new(allocCtxt.second) Functor(i_pRef,i_call);
+
+	m_functionImpl = as_distributed_reference(newFuncImpl,allocCtxt.first);
 }
-template<typename Return, typename ... Types, typename Allocator>
+template<typename Return, typename ... Types, typename Allocator, typename FunctionImpl>
 template<typename T>
-function<Return(Types...),Allocator>::function(const T *i_pRef, Return(T::*i_call)(Types...)const, const Allocator& i_allocator)
+function_impl<Return(Types...),Allocator,FunctionImpl>::function_impl(const T *i_pRef, Return(T::*i_call)(Types...)const, const Allocator& i_allocator)
+: m_allocator(k_small_buffer_allocation_size,i_allocator)
 {
     typedef detail::relative_function_impl<const T,Return,Types...> Functor;
 
-    if(void* mem = m_allocator.allocate(1,sizeof(Functor)))
-    {
-        Functor* newFuncImpl = new(mem) Functor(i_pRef,i_call);
+	std::pair<resource_deleter_const_lent_ref,void*> allocCtxt = m_allocator.allocate(sizeof(Functor));
 
-        m_functionImpl = as_shared_reference(newFuncImpl,get_reference_wrapper_deleter<Functor>(m_allocator));
-    }
-    else
-    {
-        throw bad_allocation_exception{"Could not allocate function specialization"};
-    }
+	Functor* newFuncImpl = new(allocCtxt.second) Functor(i_pRef,i_call);
+
+	m_functionImpl = as_distributed_reference(newFuncImpl,allocCtxt.first);
 }
-template<typename Return, typename ... Types, typename Allocator>
-function<Return(Types...),Allocator>& function<Return(Types...),Allocator>::operator=(std::nullptr_t)
+template<typename Return, typename ... Types, typename Allocator, typename FunctionImpl>
+function_impl<Return(Types...),Allocator,FunctionImpl>& function_impl<Return(Types...),Allocator,FunctionImpl>::operator=(std::nullptr_t)
 {
     m_functionImpl.clean();
 
     return *this;
 }
-template<typename Return, typename ... Types, typename Allocator>
-bool function<Return(Types...),Allocator>::operator==(std::nullptr_t) const
+template<typename Return, typename ... Types, typename Allocator, typename FunctionImpl>
+bool function_impl<Return(Types...),Allocator,FunctionImpl>::operator==(std::nullptr_t) const
 {
     return m_functionImpl.empty();
 }
-template<typename Return, typename ... Types, typename Allocator>
-bool function<Return(Types...),Allocator>::operator!=(std::nullptr_t) const
+template<typename Return, typename ... Types, typename Allocator, typename FunctionImpl>
+bool function_impl<Return(Types...),Allocator,FunctionImpl>::operator!=(std::nullptr_t) const
 {
     return m_functionImpl.empty() == false;
 }
-template<typename Return,typename ... Types,typename Allocator>
+template<typename Return,typename ... Types,typename Allocator,typename FunctionImpl>
 template<typename ... Args>
-Return function<Return(Types...),Allocator>::inline_eval(Args&& ... i_args) const
+Return function_impl<Return(Types...),Allocator,FunctionImpl>::inline_eval(Args&& ... i_args) const
 {
 	if(m_functionImpl)
 	{
@@ -128,12 +119,18 @@ Return function<Return(Types...),Allocator>::inline_eval(Args&& ... i_args) cons
 	}
 	else
 	{
-		throw call_function_exception{ "Trying to call empty function" };
+		throw call_function_exception{ "Trying to call empty function_impl" };
 	}
 }
-template<typename Return, typename ... Types, typename Allocator>
+template<typename Return,typename ... Types,typename Allocator,typename FunctionImpl>
 template<typename ... Args>
-resolved_function<Return,detail::unresolved_types<tuple<Args...>,Types...>,Allocator> function<Return(Types...),Allocator>::operator()(Args&& ... i_args) const
+Return function_impl<Return(Types...),Allocator,FunctionImpl>::inline_eval(const function_arguments<Args...>& i_args) const
+{
+    return eval_arguments(typename mpl::make_sequence<0,mpl::get_num_types<Args...>()>::type{},i_args);
+}
+template<typename Return, typename ... Types, typename Allocator, typename FunctionImpl>
+template<typename ... Args>
+resolved_function<Return,detail::unresolved_types<tuple<Args...>,Types...>,Allocator> function_impl<Return(Types...),Allocator,FunctionImpl>::operator()(Args&& ... i_args) const
 {
     if(m_functionImpl)
     {
@@ -145,12 +142,12 @@ resolved_function<Return,detail::unresolved_types<tuple<Args...>,Types...>,Alloc
     }
     else
     {
-        throw call_function_exception{"Trying to call empty function"};
+        throw call_function_exception{"Trying to call empty function_impl"};
     }
 }
-template<typename Return, typename ... Types, typename Allocator>
+template<typename Return, typename ... Types, typename Allocator, typename FunctionImpl>
 template<size_t ... Indexs, typename ... Args>
-Return function<Return(Types...),Allocator>::eval_tuple(const mpl::sequence<Indexs...>&, const tuple<Args...>& i_args) const
+Return function_impl<Return(Types...),Allocator,FunctionImpl>::eval_arguments(const mpl::sequence<Indexs...>&, const function_arguments<Args...>& i_args) const
 {
     if(m_functionImpl)
     {
@@ -165,154 +162,9 @@ Return function<Return(Types...),Allocator>::eval_tuple(const mpl::sequence<Inde
     }
     else
     {
-        throw call_function_exception{"Trying to call empty function"};
+        throw call_function_exception{"Trying to call empty function_impl"};
     }
 }
 
-//0 args version
-template<typename Return, typename Allocator>
-template<typename AAllocator>
-function<Return(),Allocator>::function(const function<Return(),AAllocator>& other)
-: m_functionImpl(other.m_functionImpl)
-, m_allocator(other.m_allocator)
-{
 }
-template<typename Return, typename Allocator>
-template<typename AAllocator>
-function<Return(),Allocator>::function(function<Return(),AAllocator>&& other)
-: m_functionImpl(std::move(other.m_functionImpl))
-, m_allocator(other.m_allocator)
-{
-}
-template<typename Return, typename Allocator>
-function<Return(),Allocator>::function(std::nullptr_t)
-{
-}
-template<typename Return, typename Allocator>
-TEMPLATE(typename T)
-REQUIRED(IS_CALLABLE_NOT_FUNCTION(T))
-function<Return(),Allocator>::function(T&& i_functor, const Allocator& i_allocator)
-: m_allocator(i_allocator)
-{
-    typedef detail::functor_impl<typename std::remove_const<typename std::remove_reference<T>::type>::type,Return> Functor;
-
-    if(void* mem = m_allocator.allocate(1,sizeof(Functor)))
-    {
-        Functor* newFuncImpl = new Functor(std::forward<T>(i_functor));
-
-        m_functionImpl = as_shared_reference(newFuncImpl,get_reference_wrapper_deleter<Functor>(m_allocator));
-    }
-    else
-    {
-        throw bad_allocation_exception{"Could not allocate function specialization"};
-    }
-}
-template<typename Return, typename Allocator>
-function<Return(),Allocator>::function(Return(*i_call)(), const Allocator& i_allocator)
-: m_allocator(i_allocator)
-{
-    typedef detail::free_function_impl<Return> Functor;
-
-    if(void* mem = m_allocator.allocate(1,sizeof(Functor)))
-    {
-        Functor* newFuncImpl = new Functor(i_call);
-
-        m_functionImpl = as_shared_reference(newFuncImpl,get_reference_wrapper_deleter<Functor>(m_allocator));
-    }
-    else
-    {
-        throw bad_allocation_exception{"Could not allocate function specialization"};
-    }
-}
-template<typename Return, typename Allocator>
-template<typename T>
-function<Return(),Allocator>::function(T *i_pRef, Return(T::*i_call)(), const Allocator& i_allocator)
-: m_allocator(i_allocator)
-{
-    typedef detail::relative_function_impl<T,Return> Functor;
-
-    if(void* mem = m_allocator.allocate(1,sizeof(Functor)))
-    {
-        Functor* newFuncImpl = new Functor(i_pRef,i_call);
-
-        m_functionImpl = as_shared_reference(newFuncImpl,get_reference_wrapper_deleter<Functor>(m_allocator));
-    }
-    else
-    {
-        throw bad_allocation_exception{"Could not allocate function specialization"};
-    }
-}
-template<typename Return, typename Allocator>
-template<typename T>
-function<Return(),Allocator>::function(const T *i_pRef, Return(T::*i_call)()const, const Allocator& i_allocator)
-{
-    typedef detail::relative_function_impl<const T,Return> Functor;
-
-    if(void* mem = m_allocator.allocate(1,sizeof(Functor)))
-    {
-        Functor* newFuncImpl = new Functor(i_pRef,i_call);
-
-        m_functionImpl = as_shared_reference(newFuncImpl,get_reference_wrapper_deleter<Functor>(m_allocator));
-    }
-    else
-    {
-        throw bad_allocation_exception{"Could not allocate function specialization"};
-    }
-}
-template<typename Return, typename Allocator>
-function<Return(),Allocator>& function<Return(),Allocator>::operator=(std::nullptr_t)
-{
-    m_functionImpl.clear();
-
-    return *this;
-}
-template<typename Return,typename Allocator>
-Return function<Return(),Allocator>::inline_eval() const
-{
-	if(m_functionImpl)
-	{
-		if constexpr(std::is_same<Return,void>::value)
-		{
-			m_functionImpl->operator()();
-		}
-		else
-		{
-			return m_functionImpl->operator()();
-		}
-	}
-	else
-	{
-		throw call_function_exception{ "Trying to call empty function" };
-	}
-}
-template<typename Return, typename Allocator>
-bool function<Return(),Allocator>::operator==(std::nullptr_t) const
-{
-    return m_functionImpl.empty();
-}
-template<typename Return, typename Allocator>
-bool function<Return(),Allocator>::operator!=(std::nullptr_t) const
-{
-    return m_functionImpl.empty() == false;
-}
-template<typename Return, typename Allocator>
-Return function<Return(),Allocator>::eval_tuple(const mpl::sequence<>&) const
-{
-    if(m_functionImpl)
-    {
-        if constexpr (std::is_same<Return,void>::value)
-        {
-            return m_functionImpl->operator()();
-        }
-        else
-        {
-            return m_functionImpl->operator()();
-        }
-    }
-    else
-    {
-        throw call_function_exception{"Trying to call empty function"};
-    }
-}
-
 }

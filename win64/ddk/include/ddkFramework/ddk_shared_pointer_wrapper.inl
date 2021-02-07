@@ -1,49 +1,36 @@
 
 namespace ddk
 {
+namespace detail
+{
 
-template<typename T>
-shared_pointer_wrapper<T>::shared_pointer_wrapper()
+template<typename T, typename ReferenceCounter>
+shared_pointer_wrapper_impl<T,ReferenceCounter>::shared_pointer_wrapper_impl()
 : m_data(nullptr)
 , m_refCounter(nullptr)
 , m_deleter(nullptr)
 {
 }
-template<typename T>
-shared_pointer_wrapper<T>::shared_pointer_wrapper(std::nullptr_t)
+template<typename T, typename ReferenceCounter>
+shared_pointer_wrapper_impl<T,ReferenceCounter>::shared_pointer_wrapper_impl(std::nullptr_t)
 : m_data(nullptr)
 , m_refCounter(nullptr)
 , m_deleter(nullptr)
 {
 }
-template<typename T>
-shared_pointer_wrapper<T>::shared_pointer_wrapper(T* i_data,IReferenceWrapperDeleter* i_refDeleter)
-: m_data(i_data)
-, m_refCounter(nullptr)
-, m_deleter(i_refDeleter)
-{
-	if(m_data)
-	{
-		m_refCounter = make_tagged_pointer<shared_reference_counter>(ReferenceAllocationType::Dynamic);
-
-		m_refCounter->incrementSharedReference();
-	}
-}
-template<typename T>
-shared_pointer_wrapper<T>::shared_pointer_wrapper(const shared_pointer_wrapper& other)
-: m_data(nullptr)
-, m_refCounter(nullptr)
+template<typename T, typename ReferenceCounter>
+shared_pointer_wrapper_impl<T,ReferenceCounter>::shared_pointer_wrapper_impl(const shared_pointer_wrapper_impl& other)
+: m_data(other.m_data)
+, m_refCounter(other.m_refCounter)
 , m_deleter(other.m_deleter)
 {
-	m_data = other.m_data;
-
-	if((m_refCounter = other.m_refCounter))
+	if(m_refCounter)
 	{
 		m_refCounter->incrementSharedReference();
 	}
 }
-template<typename T>
-shared_pointer_wrapper<T>::shared_pointer_wrapper(shared_pointer_wrapper&& other)
+template<typename T, typename ReferenceCounter>
+shared_pointer_wrapper_impl<T,ReferenceCounter>::shared_pointer_wrapper_impl(shared_pointer_wrapper_impl&& other)
 : m_data(nullptr)
 , m_refCounter(nullptr)
 , m_deleter(other.m_deleter)
@@ -51,26 +38,23 @@ shared_pointer_wrapper<T>::shared_pointer_wrapper(shared_pointer_wrapper&& other
 	std::swap(m_data,other.m_data);
 	std::swap(m_refCounter,other.m_refCounter);
 }
-template<typename T>
+template<typename T, typename ReferenceCounter>
 template<typename TT>
-shared_pointer_wrapper<T>::shared_pointer_wrapper(const shared_pointer_wrapper<TT>& other)
-: m_data(nullptr)
-, m_refCounter(nullptr)
+shared_pointer_wrapper_impl<T,ReferenceCounter>::shared_pointer_wrapper_impl(const shared_pointer_wrapper_impl<TT,ReferenceCounter>& other)
+: m_data(other.m_data)
+, m_refCounter(other.m_refCounter)
 , m_deleter(other.m_deleter)
 {
 	static_assert(std::is_base_of<T,TT>::value,"You shall provide a base class of T");
 
-	if((m_data = other.m_data))
+	if(m_refCounter)
 	{
-		if((m_refCounter = other.m_refCounter))
-		{
-			m_refCounter->incrementSharedReference();
-		}
+		m_refCounter->incrementSharedReference();
 	}
 }
-template<typename T>
+template<typename T, typename ReferenceCounter>
 template<typename TT>
-shared_pointer_wrapper<T>::shared_pointer_wrapper(shared_pointer_wrapper<TT>&& other)
+shared_pointer_wrapper_impl<T,ReferenceCounter>::shared_pointer_wrapper_impl(shared_pointer_wrapper_impl<TT,ReferenceCounter>&& other)
 : m_data(nullptr)
 , m_refCounter(nullptr)
 , m_deleter(other.m_deleter)
@@ -84,16 +68,27 @@ shared_pointer_wrapper<T>::shared_pointer_wrapper(shared_pointer_wrapper<TT>&& o
 
 	other.m_data = nullptr;
 }
-template<typename T>
-shared_pointer_wrapper<T>::~shared_pointer_wrapper()
+template<typename T, typename ReferenceCounter>
+shared_pointer_wrapper_impl<T,ReferenceCounter>::shared_pointer_wrapper_impl(T* i_data,const tagged_reference_counter& i_refCounter, const tagged_pointer_deleter& i_refDeleter, bool i_alreadyIncremented)
+: m_data(i_data)
+, m_refCounter(i_refCounter)
+, m_deleter(i_refDeleter)
+{
+	if(m_refCounter && !i_alreadyIncremented)
+	{
+		m_refCounter->incrementSharedReference();
+	}
+}
+template<typename T, typename ReferenceCounter>
+shared_pointer_wrapper_impl<T,ReferenceCounter>::~shared_pointer_wrapper_impl()
 {
 	if(m_refCounter)
 	{
 		clearIfCounterVoid(m_refCounter->decrementSharedReference());
 	}
 }
-template<typename T>
-shared_pointer_wrapper<T>& shared_pointer_wrapper<T>::operator=(std::nullptr_t)
+template<typename T, typename ReferenceCounter>
+shared_pointer_wrapper_impl<T,ReferenceCounter>& shared_pointer_wrapper_impl<T,ReferenceCounter>::operator=(std::nullptr_t)
 {
 	if(m_refCounter)
 	{
@@ -102,8 +97,8 @@ shared_pointer_wrapper<T>& shared_pointer_wrapper<T>::operator=(std::nullptr_t)
 
 	return *this;
 }
-template<typename T>
-shared_pointer_wrapper<T>& shared_pointer_wrapper<T>::operator=(const shared_pointer_wrapper& other)
+template<typename T, typename ReferenceCounter>
+shared_pointer_wrapper_impl<T,ReferenceCounter>& shared_pointer_wrapper_impl<T,ReferenceCounter>::operator=(const shared_pointer_wrapper_impl& other)
 {
 	if(m_data != other.m_data)
 	{
@@ -123,8 +118,8 @@ shared_pointer_wrapper<T>& shared_pointer_wrapper<T>::operator=(const shared_poi
 
 	return *this;
 }
-template<typename T>
-shared_pointer_wrapper<T>& shared_pointer_wrapper<T>::operator=(shared_pointer_wrapper&& other)
+template<typename T, typename ReferenceCounter>
+shared_pointer_wrapper_impl<T,ReferenceCounter>& shared_pointer_wrapper_impl<T,ReferenceCounter>::operator=(shared_pointer_wrapper_impl&& other)
 {
 	if(m_data != other.m_data)
 	{
@@ -142,9 +137,9 @@ shared_pointer_wrapper<T>& shared_pointer_wrapper<T>::operator=(shared_pointer_w
 
 	return *this;
 }
-template<typename T>
+template<typename T, typename ReferenceCounter>
 template<typename TT>
-shared_pointer_wrapper<T>& shared_pointer_wrapper<T>::operator=(const shared_pointer_wrapper<TT>& other)
+shared_pointer_wrapper_impl<T,ReferenceCounter>& shared_pointer_wrapper_impl<T,ReferenceCounter>::operator=(const shared_pointer_wrapper_impl<TT,ReferenceCounter>& other)
 {
 	static_assert(std::is_base_of<T,TT>::value,"You shall provide inherited classes");
 
@@ -169,9 +164,9 @@ shared_pointer_wrapper<T>& shared_pointer_wrapper<T>::operator=(const shared_poi
 
 	return *this;
 }
-template<typename T>
+template<typename T, typename ReferenceCounter>
 template<typename TT>
-shared_pointer_wrapper<T>& shared_pointer_wrapper<T>::operator=(shared_pointer_wrapper<TT>&& other)
+shared_pointer_wrapper_impl<T,ReferenceCounter>& shared_pointer_wrapper_impl<T,ReferenceCounter>::operator=(shared_pointer_wrapper_impl<TT,ReferenceCounter>&& other)
 {
 	static_assert(std::is_base_of<T,TT>::value,"You shall provide inherited classes");
 
@@ -194,28 +189,28 @@ shared_pointer_wrapper<T>& shared_pointer_wrapper<T>::operator=(shared_pointer_w
 
 	return *this;
 }
-template<typename T>
-bool shared_pointer_wrapper<T>::operator==(std::nullptr_t) const
+template<typename T, typename ReferenceCounter>
+bool shared_pointer_wrapper_impl<T,ReferenceCounter>::operator==(std::nullptr_t) const
 {
 	return m_data == nullptr;
 }
-template<typename T>
-bool shared_pointer_wrapper<T>::operator!=(std::nullptr_t) const
+template<typename T, typename ReferenceCounter>
+bool shared_pointer_wrapper_impl<T,ReferenceCounter>::operator!=(std::nullptr_t) const
 {
 	return m_data != nullptr;
 }
-template<typename T>
-T* shared_pointer_wrapper<T>::operator->()
+template<typename T, typename ReferenceCounter>
+T* shared_pointer_wrapper_impl<T,ReferenceCounter>::operator->()
 {
 	return m_data;
 }
-template<typename T>
-const T* shared_pointer_wrapper<T>::operator->() const
+template<typename T, typename ReferenceCounter>
+const T* shared_pointer_wrapper_impl<T,ReferenceCounter>::operator->() const
 {
 	return m_data;
 }
-template<typename T>
-T& shared_pointer_wrapper<T>::operator*()
+template<typename T, typename ReferenceCounter>
+T& shared_pointer_wrapper_impl<T,ReferenceCounter>::operator*()
 {
 	if(m_data == nullptr)
 	{
@@ -224,8 +219,8 @@ T& shared_pointer_wrapper<T>::operator*()
 
 	return *m_data;
 }
-template<typename T>
-const T& shared_pointer_wrapper<T>::operator*() const
+template<typename T, typename ReferenceCounter>
+const T& shared_pointer_wrapper_impl<T,ReferenceCounter>::operator*() const
 {
 	if(m_data == nullptr)
 	{
@@ -234,52 +229,41 @@ const T& shared_pointer_wrapper<T>::operator*() const
 
 	return *m_data;
 }
-template<typename T>
-shared_pointer_wrapper<T>::operator bool() const
+template<typename T, typename ReferenceCounter>
+shared_pointer_wrapper_impl<T,ReferenceCounter>::operator bool() const
 {
 	return m_data != nullptr;
 }
-template<typename T>
-void shared_pointer_wrapper<T>::clear()
+template<typename T, typename ReferenceCounter>
+void shared_pointer_wrapper_impl<T,ReferenceCounter>::clear()
 {
 	if(m_refCounter)
 	{
 		clearIfCounterVoid(m_refCounter->decrementSharedReference());
 	}
 }
-template<typename T>
-T* shared_pointer_wrapper<T>::get()
+template<typename T, typename ReferenceCounter>
+T* shared_pointer_wrapper_impl<T,ReferenceCounter>::get()
 {
 	return m_data;
 }
-template<typename T>
-const T* shared_pointer_wrapper<T>::get() const
+template<typename T, typename ReferenceCounter>
+const T* shared_pointer_wrapper_impl<T,ReferenceCounter>::get() const
 {
 	return m_data;
 }
-template<typename T>
-const IReferenceWrapperDeleter* shared_pointer_wrapper<T>::get_deleter() const
+template<typename T, typename ReferenceCounter>
+tagged_pointer_deleter shared_pointer_wrapper_impl<T,ReferenceCounter>::get_deleter() const
 {
 	return m_deleter;
 }
-template<typename T>
-bool shared_pointer_wrapper<T>::empty() const
+template<typename T, typename ReferenceCounter>
+bool shared_pointer_wrapper_impl<T,ReferenceCounter>::empty() const
 {
 	return m_data == nullptr;
 }
-template<typename T>
-shared_pointer_wrapper<T>::shared_pointer_wrapper(T* i_data,const tagged_reference_counter& i_refCounter, const IReferenceWrapperDeleter* i_refDeleter, bool i_alreadyIncremented)
-: m_data(i_data)
-, m_refCounter(i_refCounter)
-, m_deleter(i_refDeleter)
-{
-	if(m_refCounter && !i_alreadyIncremented)
-	{
-		m_refCounter->incrementSharedReference();
-	}
-}
-template<typename T>
-void shared_pointer_wrapper<T>::clearIfCounterVoid(size_t i_currNumRefs)
+template<typename T, typename ReferenceCounter>
+void shared_pointer_wrapper_impl<T,ReferenceCounter>::clearIfCounterVoid(size_t i_currNumRefs)
 {
 	if(i_currNumRefs == 0)
 	{
@@ -287,27 +271,40 @@ void shared_pointer_wrapper<T>::clearIfCounterVoid(size_t i_currNumRefs)
 
 		const short tagCategory = m_refCounter.get_tag();
 
-		if(m_deleter)
+		ReferenceCounter* refCounter = m_refCounter.extract_pointer();
+		if(refCounter->hasWeakReferences() == false)
 		{
-			m_deleter->Deallocate(allocator_address_reference_wrapper(m_data));
+			if(tagCategory == ReferenceAllocationType::Dynamic)
+			{
+				::delete refCounter;
+			}
+			else if(tagCategory == ReferenceAllocationType::Contiguous)
+			{
+				refCounter->~ReferenceCounter();
+			}
+		}
+
+		if(const resource_deleter_interface* deleter = m_deleter.get_pointer())
+		{
+			const short allocCategory = m_deleter.get_tag();
+
+			if(allocCategory == AllocationMode::AllocationOnly)
+			{
+				m_data->~T();
+			}
+
+			deleter->deallocate(allocator_address_reference_wrapper(m_data));
 		}
 		else
 		{
 			::delete(m_data);
 		}
-
-		if(tagCategory != ReferenceAllocationType::Embedded)
-		{
-			shared_reference_counter* refCounter = m_refCounter.extract_pointer();
-			if(refCounter->hasWeakReferences() == false)
-			{
-				::delete refCounter;
-			}
-		}
 	}
 
 	m_data = nullptr;
 	m_refCounter = nullptr;
+	m_deleter = nullptr;
 }
 
+}
 }

@@ -3,12 +3,8 @@
 #include "cpn_algebraic_concepts.h"
 #include "cpn_vector_space.h"
 #include "cpn_function.h"
-
-#define DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(NAME,OP) \
-friend inline linear_function_impl operator OP(const linear_function& i_lhs, const linear_function& i_rhs) \
-{ \
-    return static_cast<const base_function&>(i_lhs) OP static_cast<const base_function&>(i_rhs); \
-}
+#include "ddk_constant_callable.h"
+#include "ddk_projection_callable.h"
 
 namespace cpn
 {
@@ -19,20 +15,22 @@ class linear_function;
 namespace detail
 {
 
+template<typename,typename,typename>
+class linear_function_impl;
+    
 template<typename ImFreeModule, typename DomFreeModule, size_t ... Indexs>
-class linear_function_impl : public function<linear_function,ImFreeModule,ddk::mpl::index_to_type<Indexs,typename DomFreeModule::ring_type>...>
+class linear_function_impl<ImFreeModule,DomFreeModule,ddk::mpl::sequence<Indexs...>> : public function<ImFreeModule(const ddk::mpl::index_to_type<Indexs,typename DomFreeModule::ring_type>& ...)>
 {
-    static_assert(IS_RING(ImSet), "You shall provide Set as image");
+    static_assert(IS_RING(ImFreeModule), "You shall provide Set as image");
     static_assert(IS_VECTOR_SPACE(DomFreeModule), "You shall provide Vector Space as dominion");
 
-    typedef function<linear_function,ImFreeModule,ddk::mpl::index_to_type<Indexs,typename DomFreeModule::ring_type>...> function_base_t;
+    typedef function<ImFreeModule(const ddk::mpl::index_to_type<Indexs,typename DomFreeModule::ring_type>& ...)> function_base_t;
 
-    DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(sum,+)
-    DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(subs,-)
-    DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION_CONSTANT(prod,*)
+    DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(linear_function_impl,sum,+)
+    DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(linear_function_impl,subs,-)
 
 public:
-    linear_function_impl(const ddk::constant_function<ImFreeModule>& i_constValue);
+    linear_function_impl(const ddk::constant_callable<ImFreeModule>& i_constValue);
     template<size_t Component>
     linear_function_impl(const ddk::projection_callable<Component>& i_component);
 
@@ -42,13 +40,17 @@ public:
 
 }
 
+template<typename>
+class linear_function;
 template<typename ImFreeModule, typename DomFreeModule>
-class linear_function<ImFreeModule(DomFreeModule)> : detail::linear_function_impl<ImFreeModule,DomFreeModule,typename mpl::make_sequence<0,DomFreeModule::rank()>::type>;
+class linear_function<ImFreeModule(const DomFreeModule&)> : detail::linear_function_impl<ImFreeModule,DomFreeModule,typename ddk::mpl::make_sequence<0,DomFreeModule::rank>::type>
 {
-    typedef detail::linear_function_impl<ImFreeModule,DomFreeModule,typename mpl::make_sequence<0,DomFreeModule::rank()>::type> base_t;
+    typedef detail::linear_function_impl<ImFreeModule,DomFreeModule,typename ddk::mpl::make_sequence<0,DomFreeModule::rank>::type> base_t;
 
 public:
     using base_t::base_t;
 };
 
 }
+
+#include "cpn_linear_function.inl"

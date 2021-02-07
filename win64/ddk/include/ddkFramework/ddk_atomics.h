@@ -107,13 +107,14 @@ struct atomic32
 
 private:
 	T* _get_typed_arena();
-	int32_t* _get_arena();
+	uint32_t* _get_arena();
 
 	arena<4,std::alignment_of<T>::value> m_arena;
 };
 
 //put here whatever specialization you need
 typedef atomic32<int> atomic_int;
+typedef atomic32<unsigned int> atomic_uint;
 
 template<typename T>
 struct atomic64

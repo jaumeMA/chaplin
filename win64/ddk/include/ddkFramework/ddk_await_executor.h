@@ -13,10 +13,12 @@ namespace detail
 {
 
 template<typename Return>
-class await_executor: public scheduler_interface, private yielder_interface,protected lend_from_this<await_executor<Return>,detail::scheduler_interface>
+class await_executor: public scheduler_interface, private yielder_interface, protected lend_from_this<await_executor<Return>,detail::scheduler_interface>
 {
+    friend class lend_from_this<await_executor<Return>,detail::scheduler_interface>;
+
 public:
-	typedef typename detail::sink_type_resolver<Return>::reference sink_reference;
+	typedef typename detail::sink_type_resolver<Return>::type sink_type;
 
 	await_executor();
 	await_executor(const ddk::function<Return()>& i_callable);
@@ -26,12 +28,13 @@ public:
 	await_executor& operator=(const await_executor&);
 
 	inline bool resume();
-	inline bool resume(const ddk::function<void(sink_reference)>& i_sink);
+	inline bool resume(const sink_type& i_sink);
 	inline const stack_allocator& get_stack_allocator() const;
 	inline void yield();
 	ExecutorState get_state() const;
 
 private:
+	await_executor(const await_executor& other,const stack_allocator&);
 	void yield(yielder_context* i_context) override;
 	void suspend(yielder_context* = nullptr) override;
 

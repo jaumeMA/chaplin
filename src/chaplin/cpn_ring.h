@@ -24,7 +24,7 @@ struct pow_mult_operation
 	static const pow_set_traits_t identity;
 	static const pow_set_traits_t annihilator;
 
-    static inline ddk::high_order_array<size_t,ddk::mpl::get_num_ranks<Dims...>()> dimension()
+    static inline ddk::high_order_array<size_t,ddk::mpl::num_ranks<Dims...>> dimension()
     {
         return { Dims... };
     }

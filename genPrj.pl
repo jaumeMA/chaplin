@@ -24,7 +24,7 @@ sub showHelp
 }
 
 my $project = '';	# option variable with default value
-my $platform = '';
+my $platform = 'Windows';
 if($^O eq 'linux')
 {
 	$platform = 'Linux';
@@ -38,7 +38,7 @@ elsif($^O eq "MSWin32")
 	$platform = 'Windows';
 }
 
-my $Compiler = "\"Visual Studio 15 2017 Win64\"";
+my $Compiler = "\"Visual Studio 16 2019\"";
 my $SolutionName = '';
 my $Mode='';
 my $Binaries='';
@@ -110,7 +110,6 @@ elsif($platform eq "iOS")
 }
 else
 {
-	echo $platform
 	showHelp();
 	
 	exit -1;

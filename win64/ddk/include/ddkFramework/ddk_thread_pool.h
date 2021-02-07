@@ -2,14 +2,15 @@
 
 #include "ddk_thread_impl.h"
 #include "ddk_thread.h"
-#include <functional>
-#include <vector>
 #include "ddk_optional.h"
 #include "ddk_reference_wrapper_deleter.h"
 #include "ddk_thread_sheaf.h"
 #include "ddk_result.h"
 #include "ddk_mutex.h"
 #include "ddk_cond_var.h"
+#include "ddk_mutex.h"
+#include <functional>
+#include <vector>
 
 namespace ddk
 {
@@ -48,9 +49,10 @@ private:
 
 }
 
-class thread_pool : public IReferenceWrapperDeleter
+class thread_pool : public resource_deleter_interface
 {
 	typedef std::vector<detail::thread_impl_interface*> thread_container;
+	typedef std::unordered_map<const void*,detail::thread_impl_interface*> thread_in_use_container;
 
 public:
 	enum Policy
@@ -75,11 +77,12 @@ public:
 	acquire_result<thread_sheaf> acquire_sheaf(size_t i_size);
 
 private:
-	void Deallocate(const void* i_object) const override;
+	void deallocate(const void* i_object) const override;
 
 	mutable thread_container m_availableThreads;
-	mutable thread_container m_underUseThreads;
+	mutable thread_in_use_container m_underUseThreads;
 	const Policy m_policy;
+	mutable mutex m_mutex;
 };
 
 }

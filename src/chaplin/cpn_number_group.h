@@ -57,7 +57,7 @@ struct rational_addition
 
 	friend inline rational_set operator+(const rational_set& i_lhs,const rational_set& i_rhs)
 	{
-		return { i_lhs.numerator() * i_rhs.denominator() + i_rhs.numerator() * i_lhs.denominator(),i_lhs.denominator() * i_rhs.denominator() };
+		return { static_cast<int>(i_lhs.numerator() * i_rhs.denominator() + i_rhs.numerator() * i_lhs.denominator()),i_lhs.denominator() * i_rhs.denominator() };
 	}
 };
 
@@ -77,7 +77,7 @@ struct rational_addition_inverse
 
 	friend inline rational_set operator-(const rational_set& i_rhs)
 	{
-		return { -i_rhs.denominator(), i_rhs.denominator() };
+		return { -i_rhs.numerator(), i_rhs.denominator() };
 	}
 };
 
