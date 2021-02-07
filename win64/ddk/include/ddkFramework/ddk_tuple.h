@@ -1,8 +1,8 @@
 #pragma once
 
+#include "ddk_arena.h"
 #include "ddk_embedded_type.h"
 #include "ddk_template_helper.h"
-#include "ddk_arena.h"
 #include "ddk_iterable_defs.h"
 #include <array>
 
