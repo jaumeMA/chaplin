@@ -24,7 +24,7 @@ struct pow_mod_operation
 
 	static const ring_type identity;
 	static inline constexpr size_t rank = ddk::mpl::num_ranks<Dims...>;
-	static inline constexpr std::array<size_t,ddk::mpl::num_ranks<Dims...>> dimension = {Dims...};
+	static inline constexpr ddk::high_order_array<size_t,ddk::mpl::num_ranks<Dims...>> dimension = {Dims...};
 	friend inline pow_set_traits_t operator^(const ring_type& i_lhs, const pow_set_traits_t& i_rhs)
 	{
 		pow_set_traits_t res;

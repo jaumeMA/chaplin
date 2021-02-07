@@ -2,8 +2,8 @@
 namespace cpn
 {
 
-template<typename Module>
-typename canonical_basis_operation<Module>::set_traits canonical_basis_operation<Module>::basis(size_t i_index)
+template<typename Module, size_t Rank>
+typename canonical_basis_operation<Module,Rank>::set_traits canonical_basis_operation<Module,Rank>::basis(size_t i_index)
 {
     set_traits res;
 

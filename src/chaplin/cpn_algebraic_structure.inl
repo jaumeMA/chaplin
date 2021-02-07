@@ -5,9 +5,9 @@ namespace detail
 {
 
 template<typename Set,typename ... Operators>
-TEMPLATE(typename SSet)
-REQUIRES(IS_CONSTRUCTIBLE(Set,SSet))
-constexpr algebraic_structure_impl<Set,ddk::mpl::type_pack<Operators...>>::algebraic_structure_impl(SSet&& other)
+TEMPLATE(typename T)
+REQUIRED_COND((IS_SAME_CLASS_COND(Set,T) || IS_NOT_BASE_OF_COND(Set,T)) && IS_CONSTRUCTIBLE_COND(Set,T))
+constexpr algebraic_structure_impl<Set,ddk::mpl::type_pack<Operators...>>::algebraic_structure_impl(const T& other)
 : Set(other)
 {
 }
@@ -20,7 +20,7 @@ constexpr algebraic_structure_impl<Set,ddk::mpl::type_pack<Operators...>>::algeb
 }
 template<typename Set,typename ... Operators>
 TEMPLATE(typename SSet)
-REQUIRES(IS_CONSTRUCTIBLE(Set,SSet))
+REQUIRED(IS_CONSTRUCTIBLE(Set,SSet))
 constexpr algebraic_structure_impl<Set,ddk::mpl::type_pack<Operators...>>::algebraic_structure_impl(const algebraic_structure_impl<SSet,ddk::mpl::type_pack<>>& other)
 : Set(static_cast<const SSet&>(other))
 {
@@ -36,7 +36,7 @@ constexpr algebraic_structure_impl<Set,ddk::mpl::type_pack<Operators...>>& algeb
 }
 template<typename Set,typename ... Operators>
 TEMPLATE(typename SSet)
-REQUIRES(IS_ASSIGNABLE(Set,SSet))
+REQUIRED(IS_ASSIGNABLE(Set,SSet))
 constexpr algebraic_structure_impl<Set,ddk::mpl::type_pack<Operators...>>& algebraic_structure_impl<Set,ddk::mpl::type_pack<Operators...>>::operator=(const algebraic_structure_impl<SSet,ddk::mpl::type_pack<>>& other)
 {
     Set::operator=(static_cast<const SSet&>(other));

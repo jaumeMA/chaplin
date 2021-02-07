@@ -11,12 +11,12 @@ struct integer_multiplication
 {
     PUBLISH_OPERATION_PROPERTIES(integer_multiplication,mult_operation,commutative,associative,distributive);
 
-	static constexpr integer_set identity = 1;
-	static constexpr integer_set annihilator = 0;
+	static constexpr integer_set identity = integer_set(1);
+	static constexpr integer_set annihilator = integer_set(0);
 
 	friend inline integer_set operator*(const integer_set& i_lhs,const integer_set& i_rhs)
 	{
-		return i_lhs.number() * i_rhs.number();
+		return integer_set(i_lhs.number() * i_rhs.number());
 	}
 };
 
@@ -44,12 +44,12 @@ struct rational_multiplication
 {
     PUBLISH_OPERATION_PROPERTIES(rational_multiplication,mult_operation,commutative,associative,distributive);
 
-	static constexpr rational_set identity = {1,1};
-	static constexpr rational_set annihilator = {0,1};
+	static constexpr rational_set identity = rational_set{1,1};
+	static constexpr rational_set annihilator = rational_set{0,1};
 
 	friend inline rational_set operator*(const rational_set& i_lhs,const rational_set& i_rhs)
 	{
-		return { i_lhs.numerator() * i_rhs.numerator(), i_lhs.denominator() * i_rhs.denominator() };
+		return rational_set{ i_lhs.numerator() * i_rhs.numerator(), i_lhs.denominator() * i_rhs.denominator() };
 	}
 };
 
@@ -84,7 +84,7 @@ struct real_multiplication
 	{
 		prod_symbolic_number_visitor prodVisitor;
 
-		return ddk::visit(prodVisitor,share(i_lhs.number()),share(i_rhs.number()));
+		return real_set(ddk::visit(prodVisitor,share(i_lhs.number()),share(i_rhs.number())));
 	}
 };
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <utility>
+#include "cpn_algebraic_structure.h"
 #include "cpn_set.h"
 #include "cpn_symbolic_number.h"
-#include "cpn_algebraic_structure.h"
+#include <utility>
 
 namespace cpn
 {

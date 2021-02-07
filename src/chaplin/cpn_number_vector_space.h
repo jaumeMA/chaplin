@@ -7,8 +7,8 @@
 namespace cpn
 {
 
-template<size_t ... Dims>
-using real_free_module_n = free_module<pow_module<real_module,Dims...>>;
+template<size_t Dim>
+using real_free_module_n = free_module<real_module,canonical_basis_operation<real_module,Dim>>;
 
 typedef real_free_module_n<1> real_free_module_1;
 typedef real_free_module_n<2> real_free_module_2;

@@ -11,11 +11,11 @@ struct integer_addition
 {
     PUBLISH_OPERATION_PROPERTIES(integer_addition,add_operation,commutative,associative,distributive);
 
-	static constexpr integer_set identity = 0;
+	static constexpr integer_set identity = integer_set(0);
 
 	friend inline integer_set operator+(const integer_set& i_lhs,const integer_set& i_rhs)
 	{
-		return i_lhs.number() + i_rhs.number();
+		return integer_set(i_lhs.number() + i_rhs.number());
 	}
 };
 
@@ -35,7 +35,7 @@ struct integer_addition_inverse
 
 	friend inline integer_set operator-(const integer_set& i_rhs)
 	{
-		return -i_rhs.number();
+		return integer_set(-i_rhs.number());
 	}
 };
 
@@ -53,11 +53,11 @@ struct rational_addition
 {
     PUBLISH_OPERATION_PROPERTIES(rational_addition,add_operation,commutative,associative,distributive);
 
-	static constexpr rational_set identity = {0,1};
+	static constexpr rational_set identity = rational_set{0,1};
 
 	friend inline rational_set operator+(const rational_set& i_lhs,const rational_set& i_rhs)
 	{
-		return { static_cast<int>(i_lhs.numerator() * i_rhs.denominator() + i_rhs.numerator() * i_lhs.denominator()),i_lhs.denominator() * i_rhs.denominator() };
+		return rational_set{ static_cast<int>(i_lhs.numerator() * i_rhs.denominator() + i_rhs.numerator() * i_lhs.denominator()),i_lhs.denominator() * i_rhs.denominator() };
 	}
 };
 
@@ -77,7 +77,7 @@ struct rational_addition_inverse
 
 	friend inline rational_set operator-(const rational_set& i_rhs)
 	{
-		return { -i_rhs.numerator(), i_rhs.denominator() };
+		return rational_set{ -i_rhs.numerator(), i_rhs.denominator() };
 	}
 };
 
@@ -99,7 +99,7 @@ struct real_addition
 	{
 		add_symbolic_number_visitor addVisitor;
 
-		return ddk::visit(addVisitor,share(i_lhs.number()),share(i_rhs.number()));
+		return real_set(ddk::visit(addVisitor,share(i_lhs.number()),share(i_rhs.number())));
 	}
 };
 
@@ -121,7 +121,7 @@ struct real_addition_inverse
 	{
 		neg_symbolic_number_visitor negVisitor;
 
-		return ddk::visit(negVisitor,share(i_lhs.number()));
+		return real_set(ddk::visit(negVisitor,share(i_lhs.number())));
 	}
 };
 

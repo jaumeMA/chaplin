@@ -21,7 +21,7 @@ struct integer_module_operation
 
 	friend inline integer_set operator^(const ring_type& i_lhs,const integer_set& i_rhs)
 	{
-		return i_lhs.number() * i_rhs.number();
+		return integer_set(i_lhs.number() * i_rhs.number());
 	}
 };
 
@@ -45,7 +45,7 @@ struct rational_module_operation
 
 	friend inline rational_set operator^(const ring_type& i_lhs,const rational_set& i_rhs)
 	{
-		return { i_lhs.numerator() * i_rhs.numerator(), i_lhs.denominator() * i_rhs.denominator() };
+		return rational_set{ i_lhs.numerator() * i_rhs.numerator(), i_lhs.denominator() * i_rhs.denominator() };
 	}
 };
 
@@ -71,7 +71,7 @@ struct real_module_operation
 	{
 		prod_symbolic_number_visitor prodVisitor;
 
-		return ddk::visit(prodVisitor,share(i_lhs.number()),share(i_rhs.number()));
+		return real_set(ddk::visit(prodVisitor,share(i_lhs.number()),share(i_rhs.number())));
 	}
 };
 

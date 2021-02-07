@@ -13,7 +13,7 @@ struct rational_division
 
 	friend inline rational_set operator/(const rational_set& i_lhs,const rational_set& i_rhs)
 	{
-		return { static_cast<int>(i_lhs.numerator() * i_rhs.denominator()), i_lhs.denominator() * i_rhs.numerator() };
+		return rational_set{ static_cast<int>(i_lhs.numerator() * i_rhs.denominator()), i_lhs.denominator() * i_rhs.numerator() };
 	}
 };
 
@@ -35,7 +35,7 @@ struct real_division
 	{
 		const div_symbolic_number_visitor divVisitor;
 
-		return ddk::visit(divVisitor,share(i_lhs.number()),share(i_rhs.number()));
+		return real_set(ddk::visit(divVisitor,share(i_lhs.number()),share(i_rhs.number())));
 	}
 };
 

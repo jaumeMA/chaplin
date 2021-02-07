@@ -1,5 +1,7 @@
 #pragma once
 
+#define _ENABLE_EXTENDED_ALIGNED_STORAGE
+
 #include "ddk_concepts.h"
 #include "ddk_type_concepts.h"
 #include "cpn_algebraic_concepts.h"
@@ -21,11 +23,11 @@ public:
     template<typename ... Operations>
     using equip_with = algebraic_structure_impl<Set,typename ddk::mpl::type_pack<Operators...>::template add<Operations...>::type>;
     typedef Set set_traits;
-	using Set::Set;
 
-    TEMPLATE(typename SSet)
-    REQUIRES(IS_CONSTRUCTIBLE(Set,SSet))
-    constexpr algebraic_structure_impl(SSet&& other);
+    algebraic_structure_impl() = default;
+    TEMPLATE(typename T)
+    REQUIRES_COND((IS_SAME_CLASS_COND(Set,T) || IS_NOT_BASE_OF_COND(Set,T)) && IS_CONSTRUCTIBLE_COND(Set,T))
+    constexpr algebraic_structure_impl(const T& other);
     TEMPLATE(typename SSet, typename ... OOperators)
     REQUIRES(IS_CONSTRUCTIBLE(Set,SSet),IS_SUPERSTRUCTURE_OF(ddk::mpl::type_pack<OOperators...>,operators_pack))
     constexpr algebraic_structure_impl(const algebraic_structure_impl<SSet,ddk::mpl::type_pack<OOperators...>>& other);
