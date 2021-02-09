@@ -14,22 +14,34 @@ friend inline _FUNC operator _OP(const _FUNC& i_lhs, const _FUNC& i_rhs) \
 
 namespace cpn
 {
+namespace detail
+{
 
 template<typename Return, typename ... Types>
-using inherited_function_base = ddk::inherited_value<ddk::detail::function_impl_base<Return,Types...>>;
+class function_impl_base : public ddk::detail::function_impl_base<Return,ddk::mpl::type_pack<Types...>>
+{
+public:
+    function_impl_base(function_impl_base&&) = default;
+};
+
+}
+
+template<typename Return, typename ... Types>
+using inherited_function_base = ddk::inherited_value<ddk::detail::function_impl_base<Return,ddk::mpl::type_pack<Types...>>>;
 
 template<typename>
 class function;
     
 template<typename Im, typename ... Dom>
-class function<Im(const Dom& ...)> : public ddk::detail::function_impl<Im(const Dom& ...),function_allocator,inherited_function_base<Im,const Dom& ...>>
+class function<Im(Dom ...)> : public ddk::detail::function_impl<Im(Dom...),function_allocator,inherited_function_base<Im,Dom...>>
 {
-    typedef ddk::detail::function_impl<Im(const Dom& ...),function_allocator,inherited_function_base<Im,const Dom& ...>> function_base_t;
+    typedef ddk::detail::function_impl<Im(Dom...),function_allocator,inherited_function_base<Im,Dom...>> function_base_t;
 
-public:
+protected:
     using function_base_t::function_base_t;
 };
 
 }
 
 #include "cpn_function.inl"
+#include "cpn_builtin_functions.h"

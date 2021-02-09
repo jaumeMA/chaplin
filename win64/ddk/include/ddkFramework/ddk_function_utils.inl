@@ -3,6 +3,16 @@
 
 namespace ddk
 {
+namespace detail
+{
+
+template<typename Return,typename ... Types,typename Allocator,typename FunctionImpl>
+function_view<Return(Types...)> lend(const detail::function_impl<Return(Types...),Allocator,FunctionImpl>& i_function)
+{
+	return lend(i_function.m_functionImpl);
+}
+
+}
 
 template<typename Object,typename Return,typename ... Types>
 detail::relative_function_impl<Object,Return,Types...> make_member_function(Object* i_object,Return(Object::*i_funcPtr)(Types...))
@@ -77,7 +87,7 @@ detail::resolved_callable<Functor,Allocator> make_function(Functor&& i_functor, 
 }
 TEMPLATE(typename Object, typename Return, typename Type, typename ... Types, typename Arg, typename ... Args)
 REQUIRED(IS_NOT_ALLOCATOR(Arg))
-detail::resolved_function<Return,detail::unresolved_types<tuple<Arg,Args...>,Type,Types...>> make_function(Object* i_object, Return(Object::*i_funcPtr)(Type,Types...), Arg&& i_arg, Args&& ... i_args)
+detail::resolved_function<Return,detail::unresolved_types<mpl::type_pack<Arg,Args...>,Type,Types...>> make_function(Object* i_object, Return(Object::*i_funcPtr)(Type,Types...), Arg&& i_arg, Args&& ... i_args)
 {
 	static_assert(mpl::get_num_types<Types...>() == mpl::get_num_types<Args...>(), "Unconsistent number of arguments with number of types");
 
@@ -87,7 +97,7 @@ detail::resolved_function<Return,detail::unresolved_types<tuple<Arg,Args...>,Typ
 }
 TEMPLATE(typename Object, typename Return, typename Type, typename ... Types, typename Arg, typename ... Args)
 REQUIRED(IS_NOT_ALLOCATOR(Arg))
-detail::resolved_function<Return,detail::unresolved_types<tuple<Arg,Args...>,Type,Types...>> make_function(const Object* i_object, Return(Object::*i_funcPtr)(Type,Types...)const, Arg&& i_arg, Args&& ... i_args)
+detail::resolved_function<Return,detail::unresolved_types<mpl::type_pack<Arg,Args...>,Type,Types...>> make_function(const Object* i_object, Return(Object::*i_funcPtr)(Type,Types...)const, Arg&& i_arg, Args&& ... i_args)
 {
 	static_assert(mpl::get_num_types<Types...>() == mpl::get_num_types<Args...>(), "Unconsistent number of arguments with number of types");
 
@@ -97,9 +107,9 @@ detail::resolved_function<Return,detail::unresolved_types<tuple<Arg,Args...>,Typ
 }
 TEMPLATE(typename Return, typename Type, typename ... Types, typename Arg, typename ... Args)
 REQUIRED(IS_NOT_ALLOCATOR(Arg))
-detail::resolved_function<Return,detail::unresolved_types<tuple<Arg,Args...>,Type,Types...>> make_function(Return(*i_funcPtr)(Type,Types...), Arg&& i_arg, Args&& ... i_args)
+detail::resolved_function<Return,detail::unresolved_types<mpl::type_pack<Arg,Args...>,Type,Types...>> make_function(Return(*i_funcPtr)(Type,Types...), Arg&& i_arg, Args&& ... i_args)
 {
-	static_assert(mpl::get_num_types<Types...>() == mpl::get_num_types<Args...>(), "Unconsistent number of arguments with number of types");
+	static_assert(mpl::num_types<Types...> == mpl::num_types<Args...>, "Unconsistent number of arguments with number of types");
 
     const function<Return(Type,Types...)> res(i_funcPtr);
 
@@ -109,7 +119,7 @@ TEMPLATE(typename Functor, typename Arg, typename ... Args)
 REQUIRED(IS_CLASS(Functor),IS_CALLABLE(Functor),IS_NOT_ALLOCATOR(Arg))
 detail::resolved_spec_callable<Functor,system_allocator,Arg,Args...> make_function(Functor&& i_functor, Arg&& i_arg, Args&& ... i_args)
 {
-	static_assert(mpl::aqcuire_callable_return_type<Functor>::args_type::size() == mpl::get_num_types<Arg,Args...>(), "Unconsistent number of arguments with number of types");
+	static_assert(mpl::aqcuire_callable_return_type<Functor>::args_type::size() == mpl::num_types<Arg,Args...>, "Unconsistent number of arguments with number of types");
 
     typedef detail::resolved_callable<Functor> function_type;
 
@@ -118,27 +128,27 @@ detail::resolved_spec_callable<Functor,system_allocator,Arg,Args...> make_functi
 	return res(std::forward<Arg>(i_arg),std::forward<Args>(i_args) ...);
 }
 template<typename Object, typename Return, typename Type, typename ... Types, typename Allocator, typename Arg, typename ... Args>
-detail::resolved_function<Return,detail::unresolved_types<tuple<Arg,Args...>,Type,Types...>,Allocator> make_function(Object* i_object, Return(Object::*i_funcPtr)(Type,Types...), const Allocator& i_allocator, Arg&& i_arg, Args&& ... i_args)
+detail::resolved_function<Return,detail::unresolved_types<mpl::type_pack<Arg,Args...>,Type,Types...>,Allocator> make_function(Object* i_object, Return(Object::*i_funcPtr)(Type,Types...), const Allocator& i_allocator, Arg&& i_arg, Args&& ... i_args)
 {
-	static_assert(mpl::get_num_types<Types...>() == mpl::get_num_types<Args...>(), "Unconsistent number of arguments with number of types");
+	static_assert(mpl::num_types<Types...> == mpl::num_types<Args...>, "Unconsistent number of arguments with number of types");
 
     const function<Return(Type,Types...),Allocator> res(i_object, i_funcPtr, i_allocator);
 
 	return res(std::forward<Arg>(i_arg),std::forward<Args>(i_args) ...);
 }
 template<typename Object, typename Return, typename Type, typename ... Types, typename Allocator, typename Arg, typename ... Args>
-detail::resolved_function<Return,detail::unresolved_types<tuple<Arg,Args...>,Type,Types...>,Allocator> make_function(const Object* i_object, Return(Object::*i_funcPtr)(Type,Types...)const, const Allocator& i_allocator, Arg&& i_arg, Args&& ... i_args)
+detail::resolved_function<Return,detail::unresolved_types<mpl::type_pack<Arg,Args...>,Type,Types...>,Allocator> make_function(const Object* i_object, Return(Object::*i_funcPtr)(Type,Types...)const, const Allocator& i_allocator, Arg&& i_arg, Args&& ... i_args)
 {
-	static_assert(mpl::get_num_types<Types...>() == mpl::get_num_types<Args...>(), "Unconsistent number of arguments with number of types");
+	static_assert(mpl::num_types<Types...> == mpl::num_types<Args...>, "Unconsistent number of arguments with number of types");
 
     const function<Return(Type,Types...),Allocator> res(i_object,i_funcPtr,i_allocator);
 
 	return res(std::forward<Arg>(i_arg),std::forward<Args>(i_args) ...);
 }
 template<typename Return, typename Type, typename ... Types, typename Allocator, typename Arg, typename ... Args>
-detail::resolved_function<Return,detail::unresolved_types<tuple<Arg,Args...>,Type,Types...>,Allocator> make_function(Return(*i_funcPtr)(Type,Types...), const Allocator& i_allocator, Arg&& i_arg, Args&& ... i_args)
+detail::resolved_function<Return,detail::unresolved_types<mpl::type_pack<Arg,Args...>,Type,Types...>,Allocator> make_function(Return(*i_funcPtr)(Type,Types...), const Allocator& i_allocator, Arg&& i_arg, Args&& ... i_args)
 {
-	static_assert(mpl::get_num_types<Types...>() == mpl::get_num_types<Args...>(), "Unconsistent number of arguments with number of types");
+	static_assert(mpl::num_types<Types...> == mpl::num_types<Args...>, "Unconsistent number of arguments with number of types");
 
     const function<Return(Type,Types...),Allocator> res(i_funcPtr,i_allocator);
 
@@ -157,14 +167,8 @@ detail::resolved_spec_callable<Functor,Allocator,Arg,Args...> make_function(Func
 	return res(std::forward<Arg>(i_arg),std::forward<Args>(i_args) ...);
 }
 
-template<typename Return, typename ... Types, typename Allocator>
-function_view<Return(Types...)> lend(const function<Return(Types...),Allocator>& i_function)
-{
-    return lend(i_function.m_functionImpl);
-}
-
-template<typename Return, typename Allocator>
-Return eval(const function<Return(),Allocator>& i_function)
+template<typename Return, typename Allocator, typename FunctionImpl>
+Return eval(const detail::function_impl<Return(),Allocator,FunctionImpl>& i_function)
 {
     if constexpr (std::is_same<Return,void>::value)
     {
@@ -175,9 +179,9 @@ Return eval(const function<Return(),Allocator>& i_function)
         return i_function.inline_eval();
     }
 }
-TEMPLATE(typename Return, typename ... Types, typename Allocator, typename ... Args)
+TEMPLATE(typename Return, typename ... Types, typename Allocator,typename FunctionImpl, typename ... Args)
 REQUIRED(is_function_argument<Args>::value==false ...)
-Return eval(const function<Return(Types...),Allocator>& i_function, Args&& ... i_args)
+Return eval(const detail::function_impl<Return(Types...),Allocator,FunctionImpl>& i_function, Args&& ... i_args)
 {
     if constexpr (std::is_same<Return,void>::value)
     {
@@ -188,8 +192,8 @@ Return eval(const function<Return(Types...),Allocator>& i_function, Args&& ... i
         return i_function.inline_eval(std::forward<Args>(i_args) ...);
     }
 }
-template<typename Return, typename ... Types, typename Allocator, typename ... Args>
-Return eval(const function<Return(Types...),Allocator>& i_function, const function_arguments<Args...>& i_args)
+template<typename Return, typename ... Types, typename Allocator,typename FunctionImpl, typename ... Args>
+Return eval(const detail::function_impl<Return(Types...),Allocator,FunctionImpl>& i_function, const function_arguments<Args...>& i_args)
 {
     if constexpr (std::is_same<Return,void>::value)
     {
@@ -214,8 +218,8 @@ auto eval(Function&& i_function,Args&& ... i_args)
 	}
 }
 
-template<typename Return,typename Allocator>
-Return eval_unsafe(const function<Return(),Allocator>& i_function)
+template<typename Return,typename Allocator,typename FunctionImpl>
+Return eval_unsafe(const detail::function_impl<Return(),Allocator,FunctionImpl>& i_function)
 {
 	if constexpr(std::is_same<Return,void>::value)
 	{
@@ -226,9 +230,9 @@ Return eval_unsafe(const function<Return(),Allocator>& i_function)
 		return i_function.inline_eval();
 	}
 }
-TEMPLATE(typename Return,typename ... Types, typename Allocator,typename ... Args)
+TEMPLATE(typename Return,typename ... Types, typename Allocator,typename FunctionImpl,typename ... Args)
 REQUIRED(is_function_argumenttion_arguments<Arg>::value==false ...)
-Return eval_unsafe(const function<Return(Types...),Allocator>& i_function,Args&& ... i_args)
+Return eval_unsafe(const detail::function_impl<Return(Types...),Allocator,FunctionImpl>& i_function,Args&& ... i_args)
 {
 	if constexpr(std::is_same<Return,void>::value)
 	{
@@ -239,8 +243,8 @@ Return eval_unsafe(const function<Return(Types...),Allocator>& i_function,Args&&
 		return i_function.inline_eval(std::forward<Args>(i_args) ...);
 	}
 }
-template<typename Return,typename ... Types,typename Allocator,typename ... Args>
-Return eval_unsafe(const function<Return(Types...),Allocator>& i_function,const function_arguments<Args...>& i_args)
+template<typename Return,typename ... Types,typename Allocator,typename FunctionImpl,typename ... Args>
+Return eval_unsafe(const detail::function_impl<Return(Types...),Allocator,FunctionImpl>& i_function,const function_arguments<Args...>& i_args)
 {
 	if constexpr(std::is_same<Return,void>::value)
 	{
@@ -252,13 +256,13 @@ Return eval_unsafe(const function<Return(Types...),Allocator>& i_function,const 
 	}
 }
 
-template<typename Return,typename ... Types,typename Allocator,typename ... Args>
-detail::resolved_function<Return,detail::unresolved_types<tuple<Args...>,Types...>,Allocator> specialize(const function<Return(Types...),Allocator>& i_function,Args&& ... i_args)
+template<typename Return,typename ... Types,typename Allocator,typename FunctionImpl,typename ... Args>
+detail::resolved_function<Return,detail::unresolved_types<mpl::type_pack<Args...>,Types...>,Allocator> specialize(const detail::function_impl<Return(Types...),Allocator,FunctionImpl>& i_function,Args&& ... i_args)
 {
 	return i_function(std::forward<Args>(i_args)...);
 }
-template<typename Return,typename ... Types,typename Allocator,typename ... Args>
-detail::resolved_function<Return,detail::unresolved_types<tuple<Args...>,Types...>,Allocator> specialize(const function<Return(Types...),Allocator>& i_function,const function_arguments<Args...>& i_args)
+template<typename Return,typename ... Types,typename Allocator,typename FunctionImpl,typename ... Args>
+detail::resolved_function<Return,detail::unresolved_types<mpl::type_pack<Args...>,Types...>,Allocator> specialize(const detail::function_impl<Return(Types...),Allocator,FunctionImpl>& i_function,const function_arguments<Args...>& i_args)
 {
 	return i_function(std::forward<Args>(i_args)...);
 }

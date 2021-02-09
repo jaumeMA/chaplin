@@ -2,24 +2,26 @@
 
 #include "cpn_algebraic_defs.h"
 
-#define IS_ALGEBRAIC_STRUCTURE(_TYPE,_STRUCTURE) \
-    cpn::concepts::is_algebraic_structure<_TYPE,_TYPE::_STRUCTURE>
+#define IS_ALGEBRAIC_STRUCTURE(_TYPE) \
+    typename _TYPE::operators_pack
+#define CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,_STRUCTURE) \
+    typename _TYPE::_STRUCTURE
 #define IS_SET(_TYPE) \
-    IS_ALGEBRAIC_STRUCTURE(_TYPE,set)
+    IS_ALGEBRAIC_STRUCTURE(_TYPE)
 #define IS_SEMI_GROUP(_TYPE) \
-    IS_ALGEBRAIC_STRUCTURE(_TYPE,semi_group)
+    IS_SET(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,add_operation)
 #define IS_GROUP(_TYPE) \
-    IS_ALGEBRAIC_STRUCTURE(_TYPE,group)
+    IS_SEMI_GROUP(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,add_inverse_operation)
 #define IS_SEMI_RING(_TYPE) \
-    IS_ALGEBRAIC_STRUCTURE(_TYPE,semi_ring)
+    IS_SEMI_GROUP(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,mult_operation)
 #define IS_RING(_TYPE) \
-    IS_ALGEBRAIC_STRUCTURE(_TYPE,mult_operation)
+    IS_GROUP(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,mult_operation)
 #define IS_MODULE(_TYPE) \
-    IS_ALGEBRAIC_STRUCTURE(_TYPE,module)
+    IS_GROUP(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,mod_operation)
 #define IS_FREE_MODULE(_TYPE) \
-    IS_ALGEBRAIC_STRUCTURE(_TYPE,free_module)
+    IS_MODULE(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,basis_operation)
 #define IS_VECTOR_SPACE(_TYPE) \
-    IS_ALGEBRAIC_STRUCTURE(_TYPE,vector_space)
+    IS_FREE_MODULE(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,vector_prod_operation)
 
 #define IS_SUPERSTRUCTURE_OF(_SUPER_TYPE_OPERATORS,_SUB_TYPE_OPERATORS) \
     typename std::enable_if<_SUPER_TYPE_OPERATORS::template contains(_SUB_TYPE_OPERATORS{})>::type
@@ -42,22 +44,22 @@ namespace concepts
 {
 
 template<typename,template<typename,typename...>typename>
-struct is_algebraic_structure_resolver;
+struct contains_algebraic_structure_resolver;
 
 template<typename,template<typename,typename...>typename>
-struct is_algebraic_structure_resolver
+struct contains_algebraic_structure_resolver
 {
     static const bool value = false;
 };
 
 template<typename Set, typename ... Operations,template<typename,typename...>typename Structure>
-struct is_algebraic_structure_resolver<Structure<Set,Operations...>,Structure>
+struct contains_algebraic_structure_resolver<Structure<Set,Operations...>,Structure>
 {
     static const bool value = true;
 };
 
 template<typename Type,template<typename,typename...>typename Structure>
-inline constexpr bool is_algebraic_structure = is_algebraic_structure_resolver<Type,Structure>::value;
+inline constexpr bool contains_algebraic_structure = contains_algebraic_structure_resolver<Type,Structure>::value;
 
 }
 }

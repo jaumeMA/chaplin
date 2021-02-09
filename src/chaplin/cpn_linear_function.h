@@ -21,8 +21,8 @@ class linear_function_impl;
 template<typename ImFreeModule, typename DomFreeModule, size_t ... Indexs>
 class linear_function_impl<ImFreeModule,DomFreeModule,ddk::mpl::sequence<Indexs...>> : public function<ImFreeModule(const ddk::mpl::index_to_type<Indexs,typename DomFreeModule::ring_type>& ...)>
 {
-    static_assert(IS_RING(ImFreeModule), "You shall provide Set as image");
-    static_assert(IS_VECTOR_SPACE(DomFreeModule), "You shall provide Vector Space as dominion");
+    //static_assert(IS_RING(ImFreeModule), "You shall provide Set as image");
+    //static_assert(IS_VECTOR_SPACE(DomFreeModule), "You shall provide Vector Space as dominion");
 
     typedef function<ImFreeModule(const ddk::mpl::index_to_type<Indexs,typename DomFreeModule::ring_type>& ...)> function_base_t;
 

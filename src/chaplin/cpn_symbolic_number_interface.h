@@ -9,8 +9,6 @@ namespace cpn
 
 class symbolic_number_interface : public ddk::distribute_from_this<symbolic_number_interface>
 {
-	DECLARE_TYPE_VISITABLE_BASE(symbolic_number_interface);
-
     friend inline auto share(symbolic_number_interface& i_value)
     {
         return i_value.ref_from_this();

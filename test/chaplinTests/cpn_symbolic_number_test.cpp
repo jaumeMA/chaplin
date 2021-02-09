@@ -12,6 +12,7 @@
 #include "cpn_number_field.h"
 #include "cpn_number_vector_space.h"
 #include "cpn_linear_function.h"
+#include "cpn_scalar_function.h"
 #include <utility>
 
 using namespace testing;
@@ -22,6 +23,7 @@ class CPNSymbolicNumberTest : public Test
 
 TEST(CPNSymbolicNumberTest, defaultRationalGroupConstruction)
 {
+	cpn::scalar_function<int(int)> prova = cpn::_x + cpn::_x * cpn::_x + cpn::sin;
 	cpn::rational_group fooReal1 = cpn::rational_set(10,7);
 	cpn::rational_group fooReal2 = cpn::rational_set(7,10);
 
