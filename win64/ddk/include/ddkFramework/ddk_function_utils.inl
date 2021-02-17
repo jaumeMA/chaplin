@@ -7,7 +7,7 @@ namespace detail
 {
 
 template<typename Return,typename ... Types,typename Allocator,typename FunctionImpl>
-function_view<Return(Types...)> lend(const detail::function_impl<Return(Types...),Allocator,FunctionImpl>& i_function)
+function_view<Return(Types...)> _lend(const function_impl<Return(Types...),Allocator,FunctionImpl>& i_function)
 {
 	return lend(i_function.m_functionImpl);
 }
@@ -15,23 +15,23 @@ function_view<Return(Types...)> lend(const detail::function_impl<Return(Types...
 }
 
 template<typename Object,typename Return,typename ... Types>
-detail::relative_function_impl<Object,Return,Types...> make_member_function(Object* i_object,Return(Object::*i_funcPtr)(Types...))
+constexpr detail::relative_function_impl<Object,Return,Types...> make_member_function(Object* i_object,Return(Object::*i_funcPtr)(Types...))
 {
 	return std::move(detail::relative_function_impl<Object,Return,Types...>(i_object,i_funcPtr));
 }
 template<typename Object,typename Return,typename ... Types>
-detail::relative_function_impl<const Object,Return,Types...> make_member_function(const Object* i_object,Return(Object::*i_funcPtr)(Types...)const)
+constexpr detail::relative_function_impl<const Object,Return,Types...> make_member_function(const Object* i_object,Return(Object::*i_funcPtr)(Types...)const)
 {
 	return std::move(detail::relative_function_impl<const Object,Return,Types...>(i_object,i_funcPtr));
 }
 template<typename Return,typename ... Types>
-detail::free_function_impl<Return,Types...> make_free_function(Return(*i_funcPtr)(Types...))
+constexpr detail::free_function_impl<Return,Types...> make_free_function(Return(*i_funcPtr)(Types...))
 {
 	return std::move(detail::free_function_impl<Return,Types...>(i_funcPtr));
 }
 TEMPLATE(typename Functor)
 REQUIRED(IS_CLASS(Functor),IS_CALLABLE(Functor))
-detail::resolved_functor_impl<Functor> make_functor_function(Functor&& i_functor)
+constexpr detail::resolved_functor_impl<Functor> make_functor_function(Functor&& i_functor)
 {
 	return { std::forward<Functor>(i_functor) };
 }
@@ -271,6 +271,12 @@ REQUIRED(IS_CALLABLE(Functor))
 specialized_callable<typename std::remove_reference<Functor>::type,Args...> specialize(Functor&& i_functor,Args&& ... i_args)
 {
 	return specialized_callable<typename std::remove_reference<Functor>::type,Args...>(std::forward<Functor>(i_functor),std::forward<Args>(i_args)...);
+}
+
+template<typename Return,typename ... Types,typename Allocator,typename FunctionImpl>
+function_view<Return(Types...)> lend(const detail::function_impl<Return(Types...),Allocator,FunctionImpl>& i_function)
+{
+	return _lend(i_function);
 }
 
 template<typename ... Callables>

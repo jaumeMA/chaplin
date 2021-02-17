@@ -118,16 +118,6 @@ std::false_type _is_function(...);
 template<typename T>
 inline constexpr bool is_function = decltype(_is_function(std::declval<T>()))::value;
 
-
-
-//template<typename Return,typename ... Types,typename Allocator,typename FunctionImpl>
-//std::true_type _is_function(const detail::function_impl<Return(Types...),Allocator,FunctionImpl>&);
-//template<typename T>
-//std::false_type _is_function(const T&,...);
-//
-//template<typename T>
-//inline constexpr bool is_function = decltype(_is_function(std::declval<T>()))::value;
-
 template<typename T, typename ... Args>
 struct is_valid_functor
 {

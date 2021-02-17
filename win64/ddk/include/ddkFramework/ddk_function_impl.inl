@@ -11,7 +11,7 @@ namespace detail
 template<typename Return, typename ... Types>
 template<size_t ... specIndexs, size_t ... notSpecIndexs>
 template<typename ... Args>
-function_impl_base<Return,mpl::type_pack<Types...>>::specialized_impl<mpl::sequence<specIndexs...>,mpl::sequence<notSpecIndexs...>>::specialized_impl(const function_base_const_dist_ref<Return,mpl::type_pack<Types...>>& i_object, tuple<Args...>&& i_args)
+function_impl_base<Return,mpl::type_pack<Types...>>::specialized_impl<mpl::sequence<specIndexs...>,mpl::sequence<notSpecIndexs...>>::specialized_impl(const distributed_reference_wrapper<const function_impl_base<Return,mpl::type_pack<Types...>>>& i_object, tuple<Args...>&& i_args)
 : m_object(i_object)
 , m_specArgs(std::move(i_args).template extract<specIndexs>() ...)
 {
@@ -51,7 +51,7 @@ Return function_impl_base<Return,mpl::type_pack<Types...>>::specialized_impl<mpl
 
 template<typename Return, typename ... Types>
 template<typename Allocator, typename ... Args>
-function_base_const_dist_ref<Return,unresolved_types<mpl::type_pack<Args...>,Types...>> function_impl_base<Return,mpl::type_pack<Types...>>::specialize(const Allocator& i_allocator, Args&& ... args) const
+function_impl_base_const_dist_ref<Return,unresolved_types<mpl::type_pack<Args...>,Types...>> function_impl_base<Return,mpl::type_pack<Types...>>::specialize(const Allocator& i_allocator, Args&& ... args) const
 {
     typedef typename mpl::pos_place_holder<0,mpl::type_pack<Args...>>::type not_spec_indexs;
     typedef typename mpl::dual_sequence<not_spec_indexs>::template at<0,s_numTypes>::type spec_sequence;
@@ -66,13 +66,13 @@ function_base_const_dist_ref<Return,unresolved_types<mpl::type_pack<Args...>,Typ
 }
 
 template<typename ObjectType, typename Return, typename ... Types>
-relative_function_impl<ObjectType,Return,Types...>::relative_function_impl(ObjectType* i_object, FuncPointerType i_funcPointer)
+constexpr relative_function_impl<ObjectType,Return,Types...>::relative_function_impl(ObjectType* i_object, FuncPointerType i_funcPointer)
 : m_object(i_object)
 , m_funcPointer(i_funcPointer)
 {
 }
 template<typename ObjectType,typename Return,typename ... Types>
-relative_function_impl<ObjectType,Return,Types...>::relative_function_impl(relative_function_impl&& other)
+constexpr relative_function_impl<ObjectType,Return,Types...>::relative_function_impl(relative_function_impl&& other)
 : m_object(other.m_object)
 , m_funcPointer(other.m_funcPointer)
 {
@@ -132,7 +132,7 @@ Return relative_function_impl<ObjectType,Return,Types...>::apply(const mpl::sequ
 }
 
 template<typename Return, typename ... Types>
-free_function_impl<Return,Types...>::free_function_impl(FuncPointerType i_funcPointer)
+constexpr free_function_impl<Return,Types...>::free_function_impl(FuncPointerType i_funcPointer)
 : m_funcPointer(i_funcPointer)
 {
 }
@@ -189,12 +189,12 @@ Return free_function_impl<Return,Types...>::apply(const mpl::sequence<Indexs...>
 }
 
 template<typename T, typename Return, typename ... Types>
-aggregated_functor_impl<T,Return,Types...>::aggregated_functor_impl(const T& i_functor)
+constexpr aggregated_functor_impl<T,Return,Types...>::aggregated_functor_impl(const T& i_functor)
 : m_functor(i_functor)
 {
 }
 template<typename T,typename Return,typename ... Types>
-aggregated_functor_impl<T,Return,Types...>::aggregated_functor_impl(T&& i_functor)
+constexpr aggregated_functor_impl<T,Return,Types...>::aggregated_functor_impl(T&& i_functor)
 : m_functor(std::move(i_functor))
 {
 }

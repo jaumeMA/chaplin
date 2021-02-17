@@ -45,12 +45,13 @@ class function_impl<Return(Types...),Allocator,FunctionImpl>
     template<typename,typename,typename>
     friend class function_impl;
     template<typename RReturn,typename ... TTypes,typename AAllocator, typename FFunctionImpl>
-    friend function_view<RReturn(TTypes...)> lend(const detail::function_impl<RReturn(TTypes...),AAllocator,FFunctionImpl>&);
+    friend function_view<RReturn(TTypes...)> _lend(const function_impl<RReturn(TTypes...),AAllocator,FFunctionImpl>&);
     friend std::true_type _is_function(const function_impl&);
 
 public:
 	struct callable_tag;
 	typedef Return return_type;
+    typedef mpl::type_pack<Types...> args_type;
 
 	function_impl();
     function_impl(std::nullptr_t);
@@ -92,7 +93,7 @@ protected:
 }
 
 template<typename Return, typename ... Types>
-using function_impl_const_ptr = detail::function_base_const_dist_ptr<Return,mpl::type_pack<Types...>>;
+using function_impl_const_ptr = detail::function_base_const_dist_ptr<Return,Types...>;
 
 template<typename Return, typename ... Types, typename Allocator>
 class function<Return(Types...),Allocator> : public detail::function_impl<Return(Types...),Allocator,function_impl_const_ptr<Return,Types...>>
