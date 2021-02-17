@@ -2,12 +2,12 @@
 namespace cpn
 {
 
-template<typename Module, size_t Rank>
-typename canonical_basis_operation<Module,Rank>::set_traits canonical_basis_operation<Module,Rank>::basis(size_t i_index)
+template<module_type T, size_t Rank>
+typename canonical_basis_operation<T,Rank>::set_traits canonical_basis_operation<T,Rank>::basis(size_t i_index)
 {
     set_traits res;
 
-    res[i_index] = ring_type::mult_operation::identity;
+    res[i_index] = basis_ring::mult_operation::identity;
 
     return res;
 }
@@ -17,7 +17,7 @@ typename sub_basis_operation<BasisOperation,SpecializedComponents...>::set_trait
 {
     set_traits res;
 
-    res[i_index] = ring_type::mult_operation::identity;
+    res[i_index] = basis_ring::mult_operation::identity;
 
     return res;
 }

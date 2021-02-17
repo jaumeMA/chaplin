@@ -13,7 +13,8 @@ set(PUBLIC_MODULE_HEADERS ${HEADERS} PARENT_SCOPE)
 
 target_link_libraries(chaplin
 	${LOCAL_MODULE_DEPENDENCIES}
-	ddk
+	ddkFramework
+	ddkUtils
 	pthread
 	log4cxx)
 

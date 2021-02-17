@@ -7,49 +7,49 @@ namespace cpn
 namespace detail
 {
 
-template<typename Ring, size_t Rank>
+template<ring_type T, size_t Rank>
 struct identity_prod_matrix
 {
-    inline Ring operator()(size_t i_row, size_t i_col) const;
+    inline T operator()(size_t i_row, size_t i_col) const;
 };
 
 }
 
-template<typename Free_Module, typename InnerProdMatrix>
+template<free_module_type T, typename InnerProdMatrix>
 struct vector_mult_operation
 {
     PUBLISH_OPERATION_PROPERTIES(vector_mult_operation,vector_prod_operation,linear,conjugate,positive_definite);
 
-    typedef typename Free_Module::ring_type ring_type;
+    typedef typename T::ring_t ring_t;
     typedef InnerProdMatrix inner_prod_matrix_t;
 
-    friend inline ring_type operator*(const Free_Module& i_lhs, const Free_Module& i_rhs)
+    friend inline ring_t operator*(const T& i_lhs, const T& i_rhs)
     {
         static const inner_prod_matrix_t s_prodMatrix;
 
-        ring_type res;
+        ring_t res;
 
-        for(size_t rowIndex = 0;rowIndex < Free_Module::rank();rowIndex++)
+        for(size_t rowIndex = 0;rowIndex < T::rank;rowIndex++)
         {
-            ring_type partialProd = ring_type::mult_operation::identity;
+            ring_t partialProd = ring_t::mult_operation::identity;
 
-            for(size_t colIndex=0;colIndex<Free_Module::rank();colIndex++)
+            for(size_t colIndex=0;colIndex<T::rank;colIndex++)
             {
-                partialProd = partialProd + static_cast<const ring_type&>(i_lhs[colIndex]) * s_prodMatrix(colIndex,rowIndex);
+                partialProd = partialProd + static_cast<const ring_t&>(i_lhs[colIndex]) * s_prodMatrix(colIndex,rowIndex);
             }
 
-            partialProd = partialProd * static_cast<const ring_type&>(i_rhs[rowIndex]);
+            partialProd = partialProd * static_cast<const ring_t&>(i_rhs[rowIndex]);
 
             res = res + partialProd;
         }
 
         return res;
     }
-    inline operator Free_Module() const;
+    inline operator T() const;
 };
 
-template<typename Free_Module, typename InnerProdMatrix = detail::identity_prod_matrix<typename Free_Module::ring_type,Free_Module::rank>>
-using vector_space = typename Free_Module::template equip_with<vector_mult_operation<Free_Module,InnerProdMatrix>>;
+template<free_module_type T, typename InnerProdMatrix = detail::identity_prod_matrix<typename T::ring_t,T::rank>>
+using vector_space = typename T::template equip_with<vector_mult_operation<T,InnerProdMatrix>>;
 
 template<typename VectorSpace>
 using vector_sub_space = typename forget_vector_prod<free_sub_module<VectorSpace>>::template equip_withequip_with<vector_mult_operation<forget_vector_prod<free_sub_module<VectorSpace>>,typename VectorSpace::inner_prod_matrix_t>>;

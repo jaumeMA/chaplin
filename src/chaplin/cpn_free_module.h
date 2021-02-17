@@ -5,13 +5,13 @@
 namespace cpn
 {
 
-template<typename Module, size_t Rank>
+template<module_type T, size_t Rank>
 struct canonical_basis_operation
 {
     PUBLISH_OPERATION_PROPERTIES(canonical_basis_operation,basis_operation);
 
-    typedef typename Module::set_traits set_traits;
-    typedef typename Module::ring_type ring_type;
+    typedef typename T::set_traits set_traits;
+    typedef typename T::ring_t basis_ring;
 
     static inline constexpr size_t rank = Rank;
     static inline set_traits basis(size_t i_index);
@@ -22,18 +22,18 @@ struct sub_basis_operation
 {
     PUBLISH_OPERATION_PROPERTIES(sub_basis_operation,basis_operation);
 
-    typedef typename BasisOperation::ring_type ring_type;
-    typedef ddk::high_order_array<ring_type,BasisOperation::rank() - ddk::mpl::num_ranks<SpecializedComponents...>> set_traits;
+    typedef typename BasisOperation::basis_ring basis_ring;
+    typedef pow_set<basis_ring,BasisOperation::rank() - ddk::mpl::num_ranks<SpecializedComponents...>> set_traits;
 
     static inline constexpr size_t rank = BasisOperation::rank - ddk::mpl::num_ranks<SpecializedComponents...>;
     static inline set_traits basis(size_t i_index);
 };
 
-template<typename Module, typename BasisOperation>
-using free_module = typename algebraic_structure<ddk::high_order_array<module_ring<Module>,BasisOperation::rank>>::template equip_with<BasisOperation,pow_add_operation<forget_add_inverse<forget_mult<module_ring<Module>>>,BasisOperation::rank>,pow_add_inverse_operation<forget_add_inverse<forget_mult<module_ring<Module>>>,BasisOperation::rank>>;
+template<module_type T, typename BasisOperation>
+using free_module = typename algebraic_structure<pow_set<ring_as_module<module_ring<T>>,BasisOperation::rank>>::template equip_with<BasisOperation,pow_add_operation<forget_add_inverse<forget_mult<ring_as_module<module_ring<T>>>>,BasisOperation::rank>,pow_add_inverse_operation<forget_mult<ring_as_module<module_ring<T>>>,BasisOperation::rank>,pow_mod_operation<ring_as_module<module_ring<T>>,BasisOperation::rank>>;
 
-template<typename FreeModule, size_t ... SpecializedComponents>
-using free_sub_module = typename forget_basis<FreeModule>::template equip_with<sub_basis_operation<typename FreeModule::basis_operation,SpecializedComponents...>>;
+template<free_module_type T, size_t ... SpecializedComponents>
+using free_sub_module = typename forget_basis<T>::template equip_with<sub_basis_operation<typename T::basis_operation,SpecializedComponents...>>;
 
 }
 

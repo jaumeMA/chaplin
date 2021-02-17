@@ -15,11 +15,11 @@ struct integer_module_operation
 {
     PUBLISH_OPERATION_PROPERTIES(integer_module_operation,mod_operation,commutative,associative,distributive);
 
-    typedef integer_ring ring_type;
+    typedef integer_ring ring_t;
 
-	static constexpr ring_type identity = ring_type(ring_type::mult_operation::identity);
+	static constexpr ring_t identity = ring_t(ring_t::mult_operation::identity);
 
-	friend inline integer_set operator^(const ring_type& i_lhs,const integer_set& i_rhs)
+	friend inline integer_set operator^(const ring_t& i_lhs,const integer_set& i_rhs)
 	{
 		return integer_set(i_lhs.number() * i_rhs.number());
 	}
@@ -39,11 +39,11 @@ struct rational_module_operation
 {
     PUBLISH_OPERATION_PROPERTIES(rational_module_operation,mod_operation,commutative,associative,distributive);
 
-    typedef rational_ring ring_type;
+    typedef rational_ring ring_t;
 
-	static constexpr ring_type identity = ring_type(ring_type::mult_operation::identity);
+	static constexpr ring_t identity = ring_t(ring_t::mult_operation::identity);
 
-	friend inline rational_set operator^(const ring_type& i_lhs,const rational_set& i_rhs)
+	friend inline rational_set operator^(const ring_t& i_lhs,const rational_set& i_rhs)
 	{
 		return rational_set{ i_lhs.numerator() * i_rhs.numerator(), i_lhs.denominator() * i_rhs.denominator() };
 	}
@@ -63,11 +63,11 @@ struct real_module_operation
 {
     PUBLISH_OPERATION_PROPERTIES(real_module_operation,mod_operation,commutative,associative,distributive);
 
-    typedef real_ring ring_type;
+    typedef real_ring ring_t;
 
-	static const ring_type identity;
+	static const ring_t identity;
 
-	friend inline real_set operator^(const ring_type& i_lhs,const real_set& i_rhs)
+	friend inline real_set operator^(const ring_t& i_lhs,const real_set& i_rhs)
 	{
 		prod_symbolic_number_visitor prodVisitor;
 

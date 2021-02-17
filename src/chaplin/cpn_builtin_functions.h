@@ -2,15 +2,23 @@
 
 #include "ddk_rtti.h"
 #include "cpn_function.h"
-#include "ddk_concepts.h"
+#include "cpn_math_functions.h"
 #include "cpn_function_concepts.h"
-#include <cmath>
+#include "ddk_concepts.h"
+#include "ddk_projection_callable.h"
 
-#define DEFINE_ARITHMETIC_UNARY_OPERATION(_NAME,_OP) \
-template<typename ImSet, typename ... Dom> \
-struct _NAME##_unary_functor : public ddk::detail::inherited_functor_impl<ImSet,Dom ...> \
+#define DEFINE_ARITHMETIC_UNARY_OPERATION(_NAME,_OP,_CONCEPT) \
+namespace ddk \
 { \
-    typedef cpn::function<ImSet(const Dom& ...)> function_t; \
+namespace detail \
+{ \
+ \
+template<_CONCEPT,typename> \
+struct _NAME##_unary_functor; \
+template<_CONCEPT ImSet, typename ... Dom> \
+struct _NAME##_unary_functor<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...> \
+{ \
+    typedef cpn::function_impl<ImSet(mpl::type_pack<Dom...>)> function_t; \
     \
 public: \
     _NAME##_unary_functor(const function_t & i_rhs) \
@@ -20,29 +28,44 @@ public: \
     \
     ImSet operator()(Dom ... i_args) const \
     { \
-        return _OP m_rhs(std::forward<Dom>(i_args)...); \
+        return ImSet{}; \
     } \
     \
 private: \
     const function_t m_rhs; \
-} PUBLISH_RTTI_INHERITANCE(_NAME##_unary_functor,cpn::detail::function_impl_base); \
+} PUBLISH_RTTI_INHERITANCE(_NAME##_unary_functor,function_impl_base); \
  \
 template<typename RhsFunction> \
 struct _NAME##_unary_template_functor \
 { \
-    constexpr _NAME##_unary_template_functor() = default; \
-    template<typename Type,typename ... Types> \
-    static inline _NAME##_unary_functor<Type,ddk::mpl::type_pack<Types...>> instance() \
+    constexpr _NAME##_unary_template_functor(const RhsFunction& i_rhs) \
+    : m_rhs(i_rhs) \
     { \
-        return { RhsFunction::template instance<Type,Types...>() }; \
     } \
-};
+    template<typename Type,typename ... Types> \
+    constexpr inline _NAME##_unary_functor<Type,mpl::type_pack<Types...>> instance() const \
+    { \
+        return { m_rhs.template instance<Type,Types...>() }; \
+    } \
+private: \
+    const RhsFunction m_rhs; \
+}; \
+ \
+} \
+}
 
-#define DEFINE_ARITHMETIC_BINARY_OPERATION(_NAME,_OP) \
-template<typename ImSet, typename ... Dom> \
-struct _NAME##_binary_functor : public ddk::detail::inherited_functor_impl<ImSet,Dom ...> \
+#define DEFINE_ARITHMETIC_BINARY_OPERATION(_NAME,_OP,_CONCEPT) \
+namespace ddk \
 { \
-    typedef cpn::function<ImSet(Dom...)> function_t; \
+namespace detail \
+{ \
+ \
+template<_CONCEPT,typename> \
+struct _NAME##_binary_functor; \
+template<_CONCEPT ImSet, typename ... Dom> \
+struct _NAME##_binary_functor<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom ...> \
+{ \
+    typedef cpn::function_impl<ImSet(mpl::type_pack<Dom...>)> function_t; \
         \
 public: \
     _NAME##_binary_functor(const function_t& i_lhs, const function_t& i_rhs) \
@@ -53,93 +76,205 @@ public: \
     \
     ImSet operator()(Dom ... i_args) const \
     { \
-        return ddk::eval(m_lhs,std::forward<Dom>(i_args)...) _OP ddk::eval(m_rhs,std::forward<Dom>(i_args)...); \
+        return { ddk::eval(m_lhs,std::forward<Dom>(i_args)...)##_OP ddk::eval(m_rhs,std::forward<Dom>(i_args)...) }; \
     } \
     \
 private: \
     const function_t m_lhs; \
     const function_t m_rhs; \
-} PUBLISH_RTTI_INHERITANCE(_NAME##_binary_functor,cpn::detail::function_impl_base); \
+} PUBLISH_RTTI_INHERITANCE(_NAME##_binary_functor,function_impl_base); \
  \
 template<typename LhsFunction, typename RhsFunction> \
 struct _NAME##_binary_template_functor \
 { \
-    constexpr _NAME##_binary_template_functor() = default; \
+    constexpr _NAME##_binary_template_functor(const LhsFunction& i_lhs, const RhsFunction& i_rhs) \
+    : m_lhs(i_lhs) \
+    , m_rhs(i_rhs) \
+    { \
+    } \
     template<typename Type, typename ... Types> \
-    static inline _NAME##_binary_functor<Type,Types...> instance() \
+    constexpr inline _NAME##_binary_functor<Type,mpl::type_pack<Types...>> instance() const \
     { \
-        return _NAME##_binary_functor<Type,Types...>{LhsFunction::template instance<Type,Types...>(), RhsFunction::template instance<Type,Types...>() }; \
+        return {m_lhs.template instance<Type,Types...>(),m_rhs.template instance<Type,Types...>() }; \
     } \
-};
-
-#define DEFINE_BUILTIN_FUNCTION(_NAME,_FUNC) \
-template<typename ImSet, typename ... Dom> \
-struct _NAME##_builtin_function : public ddk::detail::inherited_functor_impl<ImSet,Dom...> \
-{ \
-    _NAME##_builtin_function() = default; \
-    _NAME##_builtin_function(_NAME##_builtin_function&&) = default; \
-    ImSet operator()(Dom... i_args) const \
-    { \
-        return static_cast<ImSet>(_FUNC(std::forward<Dom>(i_args) ...)); \
-    } \
-    \
-} PUBLISH_RTTI_INHERITANCE(_NAME##_builtin_function,cpn::detail::function_impl_base); \
+private: \
+    const LhsFunction m_lhs; \
+    const RhsFunction m_rhs; \
+}; \
  \
+} \
+}
+
+#define DEFINE_BUILTIN_FUNCTION_OPERATOR(_NAME,_OP) \
+namespace ddk \
+{ \
+namespace detail \
+{ \
+ \
+TEMPLATE(typename T,typename TT) \
+REQUIRES_COND(IS_INSTANTIABLE_COND(T) || IS_INSTANTIABLE_COND(TT)) \
+constexpr inline _NAME##_binary_template_functor<decltype(resolve_template_function(std::declval<T>())),decltype(resolve_template_function(std::declval<TT>()))> operator##_OP(const T& i_lhs,const TT& i_rhs) \
+{ \
+    typedef decltype(resolve_template_function(std::declval<T>())) lhs_template_functor; \
+    typedef decltype(resolve_template_function(std::declval<TT>())) rhs_template_functor; \
+    \
+    return { lhs_template_functor(i_lhs),rhs_template_functor(i_rhs) }; \
+} \
+ \
+} \
+}
+
+#define DEFINE_BUILTIN_FUNCTION(_NAME,_FUNC,_CONSTRAINT) \
+namespace ddk \
+{ \
+namespace detail \
+{ \
+ \
+template<typename,typename> \
+struct _NAME##__builtin_function; \
+template<typename ImSet, typename ... Dom> \
+struct _NAME##__builtin_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...> \
+{ \
+    constexpr _NAME##__builtin_function() = default; \
+    inline ImSet operator()(Dom... i_args) const \
+    { \
+        return _FUNC(std::forward<Dom>(i_args)...); \
+    } \
+}; \
+template<typename ImSet, _CONSTRAINT T> \
+struct _NAME##_builtin_function : _NAME##__builtin_function<ImSet,T> \
+{ \
+}; \
+PUBLISH_RTTI_INHERITANCE(_NAME##_builtin_function,function_impl_base); \
 struct _NAME##_builtin_template_function \
 { \
     constexpr _NAME##_builtin_template_function() = default; \
     template<typename Type,typename ... Types> \
-    static inline _NAME##_builtin_function<Type,Types...> instance() \
+    constexpr inline _NAME##__builtin_function<Type,mpl::type_pack<Types...>> instance() const \
     { \
-        return _NAME##_builtin_function<Type,Types...>{}; \
+        return {}; \
     } \
-\
+    TEMPLATE(typename T) \
+    REQUIRES(IS_INSTANTIABLE(T)) \
+    constexpr builtin_composed_template_function<_NAME##_builtin_template_function,T> operator()(const T& other) const \
+    { \
+        return { *this, other }; \
+    } \
 }; \
-extern const _NAME##_builtin_template_function _NAME = _NAME##_builtin_template_function{};
-
-#define DEFINE_BUILTIN_FUNCTION_OPERATOR(_NAME,_OP) \
-TEMPLATE(typename LhsFunctor,typename RhsFunctor) \
-REQUIRES(IS_INSTANTIABLE(LhsFunctor),IS_INSTANTIABLE(RhsFunctor)) \
-inline cpn::detail::##_NAME##_binary_template_functor<LhsFunctor,RhsFunctor> operator##_OP(const LhsFunctor& i_lhs,const RhsFunctor& i_rhs) \
+ \
+} \
+} \
+namespace cpn \
 { \
-    return {}; \
+ \
+const ddk::detail::_NAME##_builtin_template_function _NAME = ddk::detail::_NAME##_builtin_template_function{}; \
+ \
 }
 
-namespace cpn
+namespace ddk
 {
 namespace detail
 {
 
-//arithmetic operations
-DEFINE_ARITHMETIC_UNARY_OPERATION(neg,-);
-DEFINE_ARITHMETIC_BINARY_OPERATION(add,+);
-DEFINE_ARITHMETIC_BINARY_OPERATION(subs,-);
-DEFINE_ARITHMETIC_BINARY_OPERATION(prod,*);
-DEFINE_ARITHMETIC_BINARY_OPERATION(div,/);
+template<typename Im, typename Callable, typename ... Dom>
+constexpr inline cpn::function_impl<Im(ddk::mpl::type_pack<Dom...>)> instantiate_template_callable(Callable&& i_callable, const ddk::mpl::type_pack<Dom...>&);
+
+template<typename,typename>
+struct builtin_composed_function;    
+template<typename ImSet,typename ... Dom>
+struct builtin_composed_function<ImSet,ddk::mpl::type_pack<Dom...>> : public ddk::detail::inherited_functor_impl<ImSet,Dom...>
+{
+    typedef cpn::function_impl<ImSet(ddk::mpl::type_pack<const ImSet&>)> function_lhs_t;
+    typedef cpn::function_impl<ImSet(ddk::mpl::type_pack<Dom...>)> function_rhs_t;
+
+public:
+    builtin_composed_function(const function_lhs_t& i_lhs, const function_rhs_t& i_rhs);
+    inline ImSet operator()(Dom... i_args) const;
+
+private:
+    const function_lhs_t m_lhs;
+    const function_rhs_t m_rhs;
+} PUBLISH_RTTI_INHERITANCE(builtin_composed_function,ddk::detail::function_impl_base);
+
+template<typename,typename>
+struct builtin_number_function;
+template<typename ImSet,typename ... Dom>
+struct builtin_number_function<ImSet,ddk::mpl::type_pack<Dom...>> : public ddk::detail::inherited_functor_impl<ImSet,Dom...>
+{
+    typedef cpn::function_impl<ImSet(ddk::mpl::type_pack<Dom...>)> function_t;
+
+public:
+    builtin_number_function(const function_t& i_number);
+    inline ImSet operator()(Dom... i_args) const;
+
+private:
+    const function_t m_number;
+} PUBLISH_RTTI_INHERITANCE(builtin_number_function,ddk::detail::function_impl_base);
+
+template<typename LhsFunction, typename RhsFunction>
+struct builtin_composed_template_function
+{
+    constexpr builtin_composed_template_function(const LhsFunction& i_lhs, const RhsFunction& i_rhs);
+
+    template<typename Type,typename ... Types>
+    constexpr inline builtin_composed_function<Type,ddk::mpl::type_pack<Types...>> instance() const;
+
+private:
+    const LhsFunction m_lhs;
+    const RhsFunction m_rhs;
+};
+
+template<typename T>
+struct builtin_numeric_template_function
+{
+    static_assert(std::is_arithmetic_v<T>, "You shall use numeric types for this kind of template function");
+
+    constexpr builtin_numeric_template_function(const T& i_number);
+
+    template<typename Type,typename ... Types>
+    constexpr inline builtin_number_function<Type,ddk::mpl::type_pack<Types...>> instance() const;
+
+private:
+    const T m_number;
+};
+
+TEMPLATE(typename T)
+REQUIRES(IS_INSTANTIABLE(T))
+constexpr T resolve_template_function(const T&);
+TEMPLATE(typename T)
+REQUIRES_COND(std::is_arithmetic_v<T>)
+constexpr builtin_numeric_template_function<T> resolve_template_function(const T&);
 
 }
+}
+
+//arithmetic operations
+DEFINE_ARITHMETIC_UNARY_OPERATION(neg,-,cpn::inverse_additive_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(add,+,cpn::additive_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(subs,-,cpn::substractive_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(prod,*,cpn::multiplicative_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(div,/,cpn::divisible_type);
 
 //predefined math functions
-DEFINE_BUILTIN_FUNCTION(sin,std::sin);
-DEFINE_BUILTIN_FUNCTION(cos,std::cos);
-DEFINE_BUILTIN_FUNCTION(_x,ddk::projection<0>);
-DEFINE_BUILTIN_FUNCTION(_x_0,ddk::projection<0>);
-DEFINE_BUILTIN_FUNCTION(_x_1,ddk::projection<1>);
-DEFINE_BUILTIN_FUNCTION(_x_2,ddk::projection<2>);
-DEFINE_BUILTIN_FUNCTION(_x_3,ddk::projection<3>);
-DEFINE_BUILTIN_FUNCTION(_x_4,ddk::projection<4>);
-DEFINE_BUILTIN_FUNCTION(_x_5,ddk::projection<5>);
-DEFINE_BUILTIN_FUNCTION(_x_6,ddk::projection<6>);
-DEFINE_BUILTIN_FUNCTION(_x_7,ddk::projection<7>);
-DEFINE_BUILTIN_FUNCTION(_x_8,ddk::projection<8>);
-DEFINE_BUILTIN_FUNCTION(_x_9,ddk::projection<9>);
-
+DEFINE_BUILTIN_FUNCTION(sin,cpn::detail::sin,cpn::type_pack_args_equal_to_1);
+DEFINE_BUILTIN_FUNCTION(cos,cpn::detail::cos,cpn::type_pack_args_equal_to_1);
+DEFINE_BUILTIN_FUNCTION(tan,cpn::detail::tan,cpn::type_pack_args_equal_to_1);
+DEFINE_BUILTIN_FUNCTION(x,ddk::projection<0>,cpn::type_pack_args_more_or_equal_to_1);
+DEFINE_BUILTIN_FUNCTION(x_0,ddk::projection<0>,cpn::type_pack_args_more_or_equal_to_1);
+DEFINE_BUILTIN_FUNCTION(x_1,ddk::projection<1>,cpn::type_pack_args_more_or_equal_to_2);
+DEFINE_BUILTIN_FUNCTION(x_2,ddk::projection<2>,cpn::type_pack_args_more_or_equal_to_3);
+DEFINE_BUILTIN_FUNCTION(x_3,ddk::projection<3>,cpn::type_pack_args_more_or_equal_to_4);
+DEFINE_BUILTIN_FUNCTION(x_4,ddk::projection<4>,cpn::type_pack_args_more_or_equal_to_5);
+DEFINE_BUILTIN_FUNCTION(x_5,ddk::projection<5>,cpn::type_pack_args_more_or_equal_to_6);
+DEFINE_BUILTIN_FUNCTION(x_6,ddk::projection<6>,cpn::type_pack_args_more_or_equal_to_7);
+DEFINE_BUILTIN_FUNCTION(x_7,ddk::projection<7>,cpn::type_pack_args_more_or_equal_to_8);
+DEFINE_BUILTIN_FUNCTION(x_8,ddk::projection<8>,cpn::type_pack_args_more_or_equal_to_9);
+DEFINE_BUILTIN_FUNCTION(x_9,ddk::projection<9>,cpn::type_pack_args_more_or_equal_to_10);
 
 DEFINE_BUILTIN_FUNCTION_OPERATOR(add,+)
 DEFINE_BUILTIN_FUNCTION_OPERATOR(subs,-)
 DEFINE_BUILTIN_FUNCTION_OPERATOR(prod,*)
-DEFINE_BUILTIN_FUNCTION_OPERATOR(div,/)
+DEFINE_BUILTIN_FUNCTION_OPERATOR(div,/ )
 
-}
 
 #include "cpn_builtin_functions.inl"

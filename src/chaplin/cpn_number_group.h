@@ -123,6 +123,12 @@ struct real_addition_inverse
 
 		return real_set(ddk::visit(negVisitor,share(i_lhs.number())));
 	}
+	friend inline real_set operator-(const real_set& i_lhs,const real_set& i_rhs)
+	{
+		add_symbolic_number_visitor addVisitor;
+
+		return real_set(ddk::visit(addVisitor,share(i_lhs.number()),share(i_rhs.number())));
+	}
 };
 
 using real_group = real_semi_group::template equip_with<real_addition_inverse>;

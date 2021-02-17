@@ -18,34 +18,31 @@ namespace detail
 template<typename,typename,typename>
 class linear_function_impl;
     
-template<typename ImFreeModule, typename DomFreeModule, size_t ... Indexs>
-class linear_function_impl<ImFreeModule,DomFreeModule,ddk::mpl::sequence<Indexs...>> : public function<ImFreeModule(const ddk::mpl::index_to_type<Indexs,typename DomFreeModule::ring_type>& ...)>
+template<free_module_type Im, free_module_type Dom, size_t ... Indexs>
+class linear_function_impl<Im,Dom,ddk::mpl::sequence<Indexs...>> : public function_impl<Im(ddk::mpl::type_pack<const ddk::mpl::index_to_type<Indexs,typename Dom::ring_type>&...>)>
 {
-    //static_assert(IS_RING(ImFreeModule), "You shall provide Set as image");
-    //static_assert(IS_VECTOR_SPACE(DomFreeModule), "You shall provide Vector Space as dominion");
-
-    typedef function<ImFreeModule(const ddk::mpl::index_to_type<Indexs,typename DomFreeModule::ring_type>& ...)> function_base_t;
+    typedef function_impl<Im(ddk::mpl::type_pack<const ddk::mpl::index_to_type<Indexs,typename Dom::ring_type>&...>)> function_base_t;
 
     DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(linear_function_impl,sum,+)
     DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(linear_function_impl,subs,-)
 
 public:
-    linear_function_impl(const ddk::constant_callable<ImFreeModule>& i_constValue);
-    template<size_t Component>
-    linear_function_impl(const ddk::projection_callable<Component>& i_component);
+    TEMPLATE(typename T)
+    REQUIRES(IS_LINEAR_INSTANTIABLE_BY(T,ImSet,DomSet))
+    linear_function_impl(T&& i_callable);
 
-	inline auto inline_eval(const DomFreeModule& i_value) const;
-    inline auto operator()(const DomFreeModule& i_value) const;
+	inline auto inline_eval(const Dom& i_value) const;
+    inline auto operator()(const Dom& i_value) const;
 };
 
 }
 
 template<typename>
 class linear_function;
-template<typename ImFreeModule, typename DomFreeModule>
-class linear_function<ImFreeModule(const DomFreeModule&)> : detail::linear_function_impl<ImFreeModule,DomFreeModule,typename ddk::mpl::make_sequence<0,DomFreeModule::rank>::type>
+template<free_module_type Im, free_module_type Dom>
+class linear_function<Im(const Dom&)> : detail::linear_function_impl<Im,Dom,typename ddk::mpl::make_sequence<0,Dom::rank>::type>
 {
-    typedef detail::linear_function_impl<ImFreeModule,DomFreeModule,typename ddk::mpl::make_sequence<0,DomFreeModule::rank>::type> base_t;
+    typedef detail::linear_function_impl<Im,Dom,typename ddk::mpl::make_sequence<0,Dom::rank>::type> base_t;
 
 public:
     using base_t::base_t;

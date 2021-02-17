@@ -28,7 +28,8 @@ struct rational_set
 public:
 	rational_set() = default;
 	constexpr rational_set(const integer_set& i_value);
-	constexpr rational_set(int i_num, unsigned int i_den);
+	constexpr rational_set(int i_num, unsigned int i_den = 1);
+	constexpr rational_set(double i_value);
 	constexpr rational_set(const rational_set&) = default;
 
 	int numerator() const;
@@ -51,7 +52,8 @@ public:
     real_set(const real_set&) = default;
 
 	symbolic_number number() const;
-    bool operator==(const real_set& other) const;
+	double resolve(unsigned char i_accuracy = 8) const;
+	bool operator==(const real_set& other) const;
 
 private:
 	symbolic_number m_number;

@@ -4,25 +4,25 @@
 #include "cpn_function_concepts.h"
 #include "ddk_concepts.h"
 #include "cpn_set.h"
-#include "cpn_function.h"
+#include "cpn_function_template_helper.h"
 
 namespace cpn
 {
 
-//CONCEPTS!
 template<typename>
-class scalar_function;
+class function;
 
-template<typename ImSet, typename DomSet>
-class scalar_function<ImSet(DomSet)> : public function<ImSet(DomSet)>
+template<set_type ImSet, set_type DomSet>
+class function<ImSet(DomSet)> : public function_impl<ImSet(mpl::terse_function_dominion<DomSet>)>
 {
-    //static_assert(IS_SET(ImSet), "You shall provide Set as image");
-    //static_assert(IS_SET(ImSet), "You shall provide Set as dominion");
+    typedef function_impl<ImSet(mpl::terse_function_dominion<DomSet>)> function_base_t;
 
 public:
     TEMPLATE(typename T)
     REQUIRES(IS_INSTANTIABLE_BY(T,ImSet,DomSet))
-    scalar_function(T&& i_callable);
+    function(T&& i_callable);
+
+    using function_impl<ImSet(mpl::terse_function_dominion<DomSet>)>::m_functionImpl;
 };
 
 }

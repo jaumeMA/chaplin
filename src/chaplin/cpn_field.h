@@ -3,15 +3,15 @@
 namespace cpn
 {
 
-template<typename Set, typename AddOperation,typename MultOperation, typename DivisionOperation>
-using field = algebraic_structure<Set,AddOperation,MultOperation,DivisionOperation>;
+template<set_type T, typename AddOperation,typename MultOperation, typename DivisionOperation>
+using field = algebraic_structure<T,AddOperation,MultOperation,DivisionOperation>;
 
-template<typename Field, size_t ... Dims>
+template<field_type T, size_t ... Dims>
 struct pow_div_operation
 {
-    PUBLISH_OPERATION_PROPERTIES(pow_div_operation,div_operation,typename Field::operators_pack);
+    PUBLISH_OPERATION_PROPERTIES(pow_div_operation,div_operation,typename T::operators_pack);
 
-	typedef pow_set<Field,Dims...> pow_set_traits_t;
+	typedef pow_set<T,Dims...> pow_set_traits_t;
 
 	static const pow_set_traits_t identity;
 	friend inline pow_set_traits_t operator/(const pow_set_traits_t& i_lhs,const pow_set_traits_t& i_rhs)
@@ -24,15 +24,15 @@ struct pow_div_operation
 	}
 };
 
-template<typename Field, size_t ... Dims>
-using pow_field = typename pow_ring<forget_div<Field>,Dims...>::template equip_with<pow_div_operation<Field,Dims...>>;
+template<field_type T, size_t ... Dims>
+using pow_field = typename pow_ring<forget_div<T>,Dims...>::template equip_with<pow_div_operation<T,Dims...>>;
 
-template<typename ... Fields>
+template<field_type ... T>
 struct sum_div_operation
 {
-    PUBLISH_OPERATION_PROPERTIES(sum_div_operation,div_operation,ddk::mpl::type_pack_intersection<typename Fields::operators_pack...>);
+    PUBLISH_OPERATION_PROPERTIES(sum_div_operation,div_operation,ddk::mpl::type_pack_intersection<typename T::operators_pack...>);
 
-    typedef sum_set<Fields...> sum_set_traits_t;
+    typedef sum_set<T...> sum_set_traits_t;
 
 	struct div_field_operation : public ddk::static_visitor<sum_set_traits_t>
 	{
@@ -49,7 +49,7 @@ struct sum_div_operation
 	}
 };
 
-template<typename ... Fields>
-using sum_field = typename sum_ring<forget_div<Fields>...>::template equip_with<sum_div_operation<Fields...>>;
+template<field_type ... T>
+using sum_field = typename sum_ring<forget_div<T>...>::template equip_with<sum_div_operation<T...>>;
 
 }

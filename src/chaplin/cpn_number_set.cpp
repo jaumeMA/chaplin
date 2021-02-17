@@ -30,6 +30,10 @@ bool rational_set::operator==(const rational_set& other) const
     return (m_value.first == other.m_value.first) && (m_value.second == other.m_value.second);
 }
 
+real_set::real_set(const rational_set& i_value)
+: m_number(rational(integer(i_value.numerator()),integer(i_value.denominator())))
+{
+}
 real_set::real_set(const symbolic_number& i_number)
 : m_number(i_number)
 {
@@ -37,6 +41,10 @@ real_set::real_set(const symbolic_number& i_number)
 symbolic_number real_set::number() const
 {
 	return m_number;
+}
+double real_set::resolve(unsigned char i_accuracy) const
+{
+    return m_number.resolve(i_accuracy);
 }
 bool real_set::operator==(const real_set& other) const
 {

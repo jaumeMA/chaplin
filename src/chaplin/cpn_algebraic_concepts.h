@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cpn_algebraic_defs.h"
+#include "cpn_type_concepts.h"
 
 #define IS_ALGEBRAIC_STRUCTURE(_TYPE) \
     typename _TYPE::operators_pack
@@ -62,4 +63,24 @@ template<typename Type,template<typename,typename...>typename Structure>
 inline constexpr bool contains_algebraic_structure = contains_algebraic_structure_resolver<Type,Structure>::value;
 
 }
+
+template<typename T>
+concept set_type = requires (const T& i_lhs, const T& i_rhs){ { i_lhs == i_rhs}; };
+template<typename T>
+concept semi_group_type = set_type<T> && additive_type<T> && requires { { T::add_operation }; };
+template<typename T>
+concept group_type = semi_group_type<T> && substractive_type<T> && requires { { T::add_inverse_operation }; };
+template<typename T>
+concept semi_ring_type = semi_group_type<T> && multiplicative_type<T> && requires { { T::mult_operation }; };
+template<typename T>
+concept ring_type = group_type<T> && multiplicative_type<T> && requires { { T::mult_operation }; };
+template<typename T>
+concept field_type = ring_type<T> && divisible_type<T> && requires { { T::div_operation }; };
+template<typename T>
+concept module_type = group_type<T> && requires { { T::mod_operation }; };
+template<typename T>
+concept free_module_type = module_type<T> && requires { { T::basis_operation }; };
+template<typename T>
+concept vector_space_type = free_module_type<T> && requires { { T::vector_prod_operation }; };
+
 }

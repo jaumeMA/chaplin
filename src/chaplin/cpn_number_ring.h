@@ -86,6 +86,10 @@ struct real_multiplication
 
 		return real_set(ddk::visit(prodVisitor,share(i_lhs.number()),share(i_rhs.number())));
 	}
+	friend inline real_set operator^(const real_set& i_lhs, size_t i_exp)
+	{
+		return i_lhs;
+	}
 };
 
 using real_semi_ring = real_semi_group::template equip_with<real_multiplication>;
