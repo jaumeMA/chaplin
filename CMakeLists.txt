@@ -53,11 +53,22 @@ elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 		MAP_IMPORTED_CONFIG_RELEASE_DEBUG Release)
 
 	# Configure ddk (bundled library)
-	add_library(ddk SHARED IMPORTED)
-	set_target_properties(ddk PROPERTIES
-		INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_DIR}/ddk/include;${EXTERNAL_DIR}/ddk/include/ddkFramework;${EXTERNAL_DIR}/ddk/include/ddkUtils"
+	add_library(ddkFramework SHARED IMPORTED)
+	set_target_properties(ddkFramework PROPERTIES
+		INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_DIR}/ddk/include;${EXTERNAL_DIR}/ddk/include/ddkFramework"
 		IMPORTED_IMPLIB_RELEASE "${EXTERNAL_DIR}/ddk/lib/ddkFramework/ddkFramework.lib"
 		IMPORTED_IMPLIB_DEBUG "${EXTERNAL_DIR}/ddk/lib/ddkFramework/ddkFramework_d.lib"
+		IMPORTED_LOCATION_RELEASE "${EXTERNAL_DIR}/ddk/lib/ddkFramework/ddkFramework.lib"
+		IMPORTED_LOCATION_DEBUG "${EXTERNAL_DIR}/ddk/lib/ddkFramework/ddkFramework_d.lib"
+		MAP_IMPORTED_CONFIG_RELEASE_DEBUG Release)
+
+	add_library(ddkUtils SHARED IMPORTED)
+	set_target_properties(ddkUtils PROPERTIES
+		INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_DIR}/ddk/include;${EXTERNAL_DIR}/ddk/include/ddkUtils"
+		IMPORTED_IMPLIB_RELEASE "${EXTERNAL_DIR}/ddk/lib/ddkUtils/ddkUtils.lib"
+		IMPORTED_IMPLIB_DEBUG "${EXTERNAL_DIR}/ddk/lib/ddkUtils/ddkUtils_d.lib"
+		IMPORTED_LOCATION_RELEASE "${EXTERNAL_DIR}/ddk/lib/ddkUtils/ddkUtils.lib"
+		IMPORTED_LOCATION_DEBUG "${EXTERNAL_DIR}/ddk/lib/ddkUtils/ddkUtils_d.lib"
 		MAP_IMPORTED_CONFIG_RELEASE_DEBUG Release)
 
 elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
