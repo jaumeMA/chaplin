@@ -30,14 +30,20 @@ public: \
     { \
         return ImSet{}; \
     } \
+    const function_t& get_rhs() const \
+    { \
+        return m_rhs; \
+    } \
     \
 private: \
     const function_t m_rhs; \
 } PUBLISH_RTTI_INHERITANCE(_NAME##_unary_functor,function_impl_base); \
- \
+template<typename Im, typename ... Dom> \
+_NAME##_unary_functor(const cpn::function_impl<Im(mpl::type_pack<Dom...>)>&) -> _NAME##_unary_functor<Im,mpl::type_pack<Dom...>>; \
 template<typename RhsFunction> \
 struct _NAME##_unary_template_functor \
 { \
+    struct ___instantiable_tag; \
     constexpr _NAME##_unary_template_functor(const RhsFunction& i_rhs) \
     : m_rhs(i_rhs) \
     { \
@@ -78,15 +84,25 @@ public: \
     { \
         return { ddk::eval(m_lhs,std::forward<Dom>(i_args)...)##_OP ddk::eval(m_rhs,std::forward<Dom>(i_args)...) }; \
     } \
-    \
+    const function_t& get_lhs() const \
+    { \
+        return m_lhs; \
+    } \
+    const function_t& get_rhs() const \
+    { \
+        return m_rhs; \
+    } \
+\
 private: \
     const function_t m_lhs; \
     const function_t m_rhs; \
 } PUBLISH_RTTI_INHERITANCE(_NAME##_binary_functor,function_impl_base); \
- \
+template<typename Im, typename ... Dom> \
+_NAME##_binary_functor(const cpn::function_impl<Im(mpl::type_pack<Dom...>)>&,const cpn::function_impl<Im(mpl::type_pack<Dom...>)>&) -> _NAME##_binary_functor<Im,mpl::type_pack<Dom...>>; \
 template<typename LhsFunction, typename RhsFunction> \
 struct _NAME##_binary_template_functor \
 { \
+    struct ___instantiable_tag; \
     constexpr _NAME##_binary_template_functor(const LhsFunction& i_lhs, const RhsFunction& i_rhs) \
     : m_lhs(i_lhs) \
     , m_rhs(i_rhs) \
@@ -144,13 +160,13 @@ struct _NAME##__builtin_function<ImSet,mpl::type_pack<Dom...>> : public inherite
 template<typename ImSet, _CONSTRAINT T> \
 struct _NAME##_builtin_function : _NAME##__builtin_function<ImSet,T> \
 { \
-}; \
-PUBLISH_RTTI_INHERITANCE(_NAME##_builtin_function,function_impl_base); \
+} PUBLISH_RTTI_INHERITANCE(_NAME##_builtin_function,function_impl_base); \
 struct _NAME##_builtin_template_function \
 { \
+    struct ___instantiable_tag; \
     constexpr _NAME##_builtin_template_function() = default; \
     template<typename Type,typename ... Types> \
-    constexpr inline _NAME##__builtin_function<Type,mpl::type_pack<Types...>> instance() const \
+    constexpr inline _NAME##_builtin_function<Type,mpl::type_pack<Types...>> instance() const \
     { \
         return {}; \
     } \
@@ -184,12 +200,15 @@ struct builtin_composed_function;
 template<typename ImSet,typename ... Dom>
 struct builtin_composed_function<ImSet,ddk::mpl::type_pack<Dom...>> : public ddk::detail::inherited_functor_impl<ImSet,Dom...>
 {
-    typedef cpn::function_impl<ImSet(ddk::mpl::type_pack<const ImSet&>)> function_lhs_t;
+    typedef cpn::function_impl<ImSet(ddk::mpl::type_pack<ImSet>)> function_lhs_t;
     typedef cpn::function_impl<ImSet(ddk::mpl::type_pack<Dom...>)> function_rhs_t;
 
 public:
     builtin_composed_function(const function_lhs_t& i_lhs, const function_rhs_t& i_rhs);
     inline ImSet operator()(Dom... i_args) const;
+
+    const function_lhs_t& get_dest_function() const;
+    const function_rhs_t& get_source_function() const;
 
 private:
     const function_lhs_t m_lhs;
@@ -207,6 +226,8 @@ public:
     builtin_number_function(const function_t& i_number);
     inline ImSet operator()(Dom... i_args) const;
 
+    const function_t& get_number() const;
+
 private:
     const function_t m_number;
 } PUBLISH_RTTI_INHERITANCE(builtin_number_function,ddk::detail::function_impl_base);
@@ -214,6 +235,8 @@ private:
 template<typename LhsFunction, typename RhsFunction>
 struct builtin_composed_template_function
 {
+    struct ___instantiable_tag;
+        
     constexpr builtin_composed_template_function(const LhsFunction& i_lhs, const RhsFunction& i_rhs);
 
     template<typename Type,typename ... Types>
@@ -228,6 +251,8 @@ template<typename T>
 struct builtin_numeric_template_function
 {
     static_assert(std::is_arithmetic_v<T>, "You shall use numeric types for this kind of template function");
+
+    struct ___instantiable_tag;
 
     constexpr builtin_numeric_template_function(const T& i_number);
 

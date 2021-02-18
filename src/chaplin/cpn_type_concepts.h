@@ -20,8 +20,8 @@ template<typename T>
 concept divisible_type = requires (T i_lhs,T i_rhs) { i_lhs / i_rhs; };
 
 #define EXPAND_TYPE_PACK_ARGS_CONCEPTS(_NUM_ARGS) \
-template<typename T> concept type_pack_args_more_or_equal_to_##_NUM_ARGS = ddk::mpl::is_type_pack<T>::value && ddk::mpl::is_type_pack<T>::num_types >= _NUM_ARGS; \
-template<typename T> concept type_pack_args_equal_to_##_NUM_ARGS = ddk::mpl::is_type_pack<T>::value && ddk::mpl::is_type_pack<T>::num_types == _NUM_ARGS;
+template<typename T> concept type_pack_args_more_or_equal_to_##_NUM_ARGS = ddk::mpl::is_type_pack<T>::num_types >= _NUM_ARGS; \
+template<typename T> concept type_pack_args_equal_to_##_NUM_ARGS = ddk::mpl::is_type_pack<T>::num_types == _NUM_ARGS;
 
 EXPAND_TYPE_PACK_ARGS_CONCEPTS(1)
 EXPAND_TYPE_PACK_ARGS_CONCEPTS(2)

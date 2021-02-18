@@ -6,12 +6,6 @@
 #include "cpn_function_allocator.h"
 #include "ddk_rtti.h"
 
-#define DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(_FUNC,_NAME,_OP) \
-friend inline _FUNC operator##_OP(const _FUNC& i_lhs, const _FUNC& i_rhs) \
-{ \
-    return _NAME##_binary_functor(i_lhs,i_rhs); \
-}
-
 namespace cpn
 {
 
@@ -28,6 +22,9 @@ class function_impl<Im(ddk::mpl::type_pack<Dom...>)> : public ddk::detail::funct
 
 protected:
     using function_base_t::function_base_t;
+
+public:
+    using function_base_t::m_functionImpl;
 };
 
 }

@@ -2,7 +2,7 @@
 
 #include "cpn_algebraic_concepts.h"
 #include "cpn_vector_space.h"
-#include "cpn_function.h"
+#include "cpn_scalar_function.h"
 #include "ddk_constant_callable.h"
 #include "ddk_projection_callable.h"
 
@@ -23,7 +23,7 @@ class linear_function_impl<Im,Dom,ddk::mpl::sequence<Indexs...>> : public functi
 {
     typedef function_impl<Im(ddk::mpl::type_pack<const ddk::mpl::index_to_type<Indexs,typename Dom::ring_type>&...>)> function_base_t;
 
-    DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(linear_function_impl,sum,+)
+    DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(linear_function_impl,add,+)
     DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(linear_function_impl,subs,-)
 
 public:

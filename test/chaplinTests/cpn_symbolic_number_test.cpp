@@ -114,12 +114,21 @@ TEST(CPNSymbolicNumberTest, defaultPowModuleConstruction)
 	cpn::real_ring fooReal1;//(cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)));
 	cpn::real_module_3 fooReal2;//(cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)));
 
-	constexpr auto my_var = 2 * cpn::x_0 + cpn::x_1;// + ddk::detail::sin(ddk::detail::x_0 + ddk::detail::x_2 * 4.5f);
-	cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova = 2 * cpn::x + cpn::x;// + ddk::detail::sin(ddk::detail::x_0 + ddk::detail::x_2 * 4.5f);
+	constexpr auto my_var = 2 * cpn::x_0 + cpn::x_1 + cpn::sin(cpn::x_0 + cpn::x_2 * 5);
+	try
+	{
+		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova = my_var;
 
-	cpn::derivative_visitor<cpn::real_ring,cpn::real_free_module_3> multiVisitor;
+		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova2 = prova + my_var;
 
-	int res = ddk::visit(multiVisitor,prova.m_functionImpl);
+		cpn::derivative_visitor<cpn::real_ring,cpn::real_free_module_3> multiVisitor;
+
+		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova_prima = ddk::visit(multiVisitor,prova.m_functionImpl);
+	}
+	catch(...)
+	{
+	}
+
 
 
 	cpn::real_ring_3 fooReal3 = fooReal1 ^ fooReal2;

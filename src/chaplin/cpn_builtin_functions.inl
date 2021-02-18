@@ -9,7 +9,7 @@ namespace detail
 template<typename Im,typename Callable,typename ... Dom>
 constexpr cpn::function_impl<Im(ddk::mpl::type_pack<Dom...>)> instantiate_template_callable(Callable&& i_callable,const ddk::mpl::type_pack<Dom...>&)
 {
-    return i_callable.template instance<Im,Dom...>();
+    return i_callable.instance<Im,Dom...>();
 }
 
 template<typename ImSet,typename ... Dom>
@@ -22,6 +22,16 @@ template<typename ImSet,typename ... Dom>
 ImSet builtin_composed_function<ImSet,ddk::mpl::type_pack<Dom...>>::operator()(Dom... i_args) const
 {
     return ddk::eval(m_lhs,ddk::eval(m_rhs,std::forward<Dom>(i_args) ...));
+}
+template<typename ImSet,typename ... Dom>
+const typename builtin_composed_function<ImSet,ddk::mpl::type_pack<Dom...>>::function_lhs_t& builtin_composed_function<ImSet,ddk::mpl::type_pack<Dom...>>::get_dest_function() const
+{
+    return m_lhs;
+}
+template<typename ImSet,typename ... Dom>
+const typename builtin_composed_function<ImSet,ddk::mpl::type_pack<Dom...>>::function_rhs_t& builtin_composed_function<ImSet,ddk::mpl::type_pack<Dom...>>::get_source_function() const
+{
+    return m_rhs;
 }
 
 template<typename LhsFunction,typename RhsFunction>
@@ -46,6 +56,11 @@ template<typename ImSet,typename ... Dom>
 inline ImSet builtin_number_function<ImSet,ddk::mpl::type_pack<Dom...>>::operator()(Dom... i_args) const
 {
     return ddk::eval(m_number,std::forward<Dom>(i_args) ...);
+}
+template<typename ImSet,typename ... Dom>
+const typename builtin_number_function<ImSet,ddk::mpl::type_pack<Dom...>>::function_t& builtin_number_function<ImSet,ddk::mpl::type_pack<Dom...>>::get_number() const
+{
+    return m_number;
 }
 
 template<typename T>
