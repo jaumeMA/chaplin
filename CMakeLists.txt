@@ -23,12 +23,17 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	set_target_properties(log4cxx PROPERTIES
 		INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_DIR}/log4cxx/include"
 		IMPORTED_LOCATION "${EXTERNAL_DIR}/log4cxx/lib/liblog4cxx.a")
-	target_link_libraries(log4cxx INTERFACE apr aprutil libexpat)
 
-	add_library(ddk STATIC IMPORTED)
-	set_target_properties(ddk PROPERTIES
-		INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_DIR}/ddk/include;${EXTERNAL_DIR}/ddk/include/ddkFramework;${EXTERNAL_DIR}/ddk/include/ddkUtils"
+	      	# Configure ddk (bundled library)
+	add_library(ddkFramework STATIC IMPORTED)
+	set_target_properties(ddkFramework PROPERTIES
+		INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_DIR}/ddk/include;${EXTERNAL_DIR}/ddk/include/ddkFramework"
 		IMPORTED_LOCATION "${EXTERNAL_DIR}/ddk/lib/ddkFramework/libddkFramework.a")
+
+	add_library(ddkUtils STATIC IMPORTED)
+	set_target_properties(ddkUtils PROPERTIES
+		INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_DIR}/ddk/include;${EXTERNAL_DIR}/ddk/include/ddkUtils"
+		IMPORTED_LOCATION "${EXTERNAL_DIR}/ddk/lib/ddkUtils/libddkUtils.a")
 
 elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 

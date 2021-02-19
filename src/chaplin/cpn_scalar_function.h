@@ -7,7 +7,7 @@
 #include "cpn_function_template_helper.h"
 
 #define DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(_FUNC,_NAME,_OP) \
-friend inline _FUNC operator##_OP(const _FUNC& i_lhs, const _FUNC& i_rhs) \
+friend inline _FUNC operator _OP(const _FUNC& i_lhs, const _FUNC& i_rhs) \
 { \
     return { ddk::detail::_NAME##_binary_functor(i_lhs,i_rhs) }; \
 }

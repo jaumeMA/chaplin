@@ -17,7 +17,7 @@ namespace detail
 
 template<typename,typename,typename>
 class linear_function_impl;
-    
+
 template<free_module_type Im, free_module_type Dom, size_t ... Indexs>
 class linear_function_impl<Im,Dom,ddk::mpl::sequence<Indexs...>> : public function_impl<Im(ddk::mpl::type_pack<const ddk::mpl::index_to_type<Indexs,typename Dom::ring_type>&...>)>
 {
@@ -28,7 +28,7 @@ class linear_function_impl<Im,Dom,ddk::mpl::sequence<Indexs...>> : public functi
 
 public:
     TEMPLATE(typename T)
-    REQUIRES(IS_LINEAR_INSTANTIABLE_BY(T,ImSet,DomSet))
+    REQUIRES(IS_LINEAR_INSTANTIABLE_BY(T,Im,Dom))
     linear_function_impl(T&& i_callable);
 
 	inline auto inline_eval(const Dom& i_value) const;

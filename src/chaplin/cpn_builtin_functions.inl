@@ -9,7 +9,7 @@ namespace detail
 template<typename Im,typename Callable,typename ... Dom>
 constexpr cpn::function_impl<Im(ddk::mpl::type_pack<Dom...>)> instantiate_template_callable(Callable&& i_callable,const ddk::mpl::type_pack<Dom...>&)
 {
-    return i_callable.instance<Im,Dom...>();
+    return i_callable.template instance<Im,Dom...>();
 }
 
 template<typename ImSet,typename ... Dom>
@@ -44,7 +44,7 @@ template<typename LhsFunction,typename RhsFunction>
 template<typename Type,typename ... Types>
 constexpr builtin_composed_function<Type,ddk::mpl::type_pack<Types...>> builtin_composed_template_function<LhsFunction,RhsFunction>::instance() const
 {
-    return { m_lhs.template instance<Type,const Type&>(),m_rhs.template instance<Type,Types...>() };
+    return { m_lhs.template instance<Type,Type>(),m_rhs.template instance<Type,Types...>() };
 }
 
 template<typename ImSet,typename ... Dom>

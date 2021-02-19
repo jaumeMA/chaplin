@@ -43,9 +43,9 @@ typename derivative_visitor<Im,Dom>::return_type derivative_visitor<Im,Dom>::ope
 	}
 	else
 	{
-		const derivative_visitor<Im,Im> leftVisitor;
+		static const derivative_visitor<Im,Im> leftVisitor;
 
-		return ddk::visit(leftVisitor,i_function.get_dest_function().m_functionImpl) * ddk::visit(*this,i_function.get_source_function().m_functionImpl);
+		return return_type{ddk::detail::builtin_composed_function<Im,mpl::terse_function_dominion<Dom>>{ddk::visit(leftVisitor,i_function.get_dest_function().m_functionImpl),i_function.get_source_function()}} * ddk::visit(*this,i_function.get_source_function().m_functionImpl);
 	}
 }
 template<set_type Im,set_type Dom>

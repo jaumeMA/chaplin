@@ -20,7 +20,6 @@
 
 #include <string>
 #include <cstddef>
-#include <concepts>
 
 using namespace testing;
 

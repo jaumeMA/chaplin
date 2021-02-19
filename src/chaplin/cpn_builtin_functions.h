@@ -82,7 +82,7 @@ public: \
     \
     ImSet operator()(Dom ... i_args) const \
     { \
-        return { ddk::eval(m_lhs,std::forward<Dom>(i_args)...)##_OP ddk::eval(m_rhs,std::forward<Dom>(i_args)...) }; \
+        return { ddk::eval(m_lhs,std::forward<Dom>(i_args)...) _OP ddk::eval(m_rhs,std::forward<Dom>(i_args)...) }; \
     } \
     const function_t& get_lhs() const \
     { \
@@ -129,7 +129,7 @@ namespace detail \
  \
 TEMPLATE(typename T,typename TT) \
 REQUIRES_COND(IS_INSTANTIABLE_COND(T) || IS_INSTANTIABLE_COND(TT)) \
-constexpr inline _NAME##_binary_template_functor<decltype(resolve_template_function(std::declval<T>())),decltype(resolve_template_function(std::declval<TT>()))> operator##_OP(const T& i_lhs,const TT& i_rhs) \
+constexpr inline _NAME##_binary_template_functor<decltype(resolve_template_function(std::declval<T>())),decltype(resolve_template_function(std::declval<TT>()))> operator _OP(const T& i_lhs,const TT& i_rhs) \
 { \
     typedef decltype(resolve_template_function(std::declval<T>())) lhs_template_functor; \
     typedef decltype(resolve_template_function(std::declval<TT>())) rhs_template_functor; \
@@ -196,7 +196,7 @@ template<typename Im, typename Callable, typename ... Dom>
 constexpr inline cpn::function_impl<Im(ddk::mpl::type_pack<Dom...>)> instantiate_template_callable(Callable&& i_callable, const ddk::mpl::type_pack<Dom...>&);
 
 template<typename,typename>
-struct builtin_composed_function;    
+struct builtin_composed_function;
 template<typename ImSet,typename ... Dom>
 struct builtin_composed_function<ImSet,ddk::mpl::type_pack<Dom...>> : public ddk::detail::inherited_functor_impl<ImSet,Dom...>
 {
@@ -236,7 +236,7 @@ template<typename LhsFunction, typename RhsFunction>
 struct builtin_composed_template_function
 {
     struct ___instantiable_tag;
-        
+
     constexpr builtin_composed_template_function(const LhsFunction& i_lhs, const RhsFunction& i_rhs);
 
     template<typename Type,typename ... Types>
