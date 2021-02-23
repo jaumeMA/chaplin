@@ -14,14 +14,6 @@ friend inline _FUNC operator _OP(const _FUNC& i_lhs, const _FUNC& i_rhs) \
 
 namespace cpn
 {
-namespace detail
-{
-
-TEMPLATE(typename T, typename ... TT)
-REQUIRES(IS_SAME_CLASS(T,TT)...)
-inline ddk::high_order_array<T,1+ddk::mpl::num_types<TT...>> as_uniform_tuple(const ddk::function_arguments<T,TT...>& i_args);
-
-}
 
 template<typename>
 class function;
