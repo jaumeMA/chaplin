@@ -12,6 +12,36 @@ constexpr cpn::function_impl<Im(ddk::mpl::type_pack<Dom...>)> instantiate_templa
     return i_callable.template instance<Im,Dom...>();
 }
 
+template<cpn::coordinate_type ImSet,typename ... Dom>
+template<size_t ... Components>
+builtin_fusioned_function<ImSet,ddk::mpl::type_pack<Dom...>>::fusioned_components<ddk::mpl::sequence<Components...>>::fusioned_components(const ddk::detail::intersection_function<cpn::function_impl<ddk::mpl::nth_coordinate_of_t<Components,ImSet>(mpl::type_pack<Dom...>)>...>& i_callable)
+: m_fusionedFunction(i_callable)
+{
+}
+template<cpn::coordinate_type ImSet,typename ... Dom>
+template<typename ... T>
+builtin_fusioned_function<ImSet,ddk::mpl::type_pack<Dom...>>::builtin_fusioned_function(const ddk::detail::intersection_function<cpn::function_impl<T(mpl::type_pack<Dom...>)>...>& i_fusionedCallable)
+: m_callables(i_fusionedCallable)
+{
+}
+template<cpn::coordinate_type ImSet,typename ... Dom>
+ImSet builtin_fusioned_function<ImSet,ddk::mpl::type_pack<Dom...>>::operator()(Dom... i_args) const
+{
+    return execute(typename ddk::mpl::make_sequence<0,ImSet::num_coordinates>::type{},i_args...);
+}
+template<cpn::coordinate_type ImSet,typename ... Dom>
+template<size_t Index>
+const cpn::function_impl<ddk::mpl::nth_coordinate_of_t<Index,ImSet>(mpl::type_pack<Dom...>)>& builtin_fusioned_function<ImSet,ddk::mpl::type_pack<Dom...>>::get_callable() const
+{
+    return m_callables.m_fusionedFunction.template get_callable<Index>();
+}
+template<cpn::coordinate_type ImSet,typename ... Dom>
+template<size_t ... Indexs>
+ImSet builtin_fusioned_function<ImSet,ddk::mpl::type_pack<Dom...>>::execute(const ddk::mpl::sequence<Indexs...>&, Dom ... i_args) const
+{
+    return ImSet(ddk::eval(m_callables.m_fusionedFunction.template get_callable<Indexs>(),i_args...) ...);
+}
+
 template<typename ImSet,typename ... Dom>
 builtin_composed_function<ImSet,ddk::mpl::type_pack<Dom...>>::builtin_composed_function(const function_lhs_t& i_lhs,const function_rhs_t& i_rhs)
 : m_lhs(i_lhs)

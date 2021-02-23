@@ -23,8 +23,9 @@ public:
 
     template<typename ... Operations>
     using equip_with = algebraic_structure_impl<T,typename ddk::mpl::type_pack<Operators...>::template add<Operations...>::type>;
-    using T::operator==;    
+    using T::operator==;
 
+    using T::T;
     algebraic_structure_impl() = default;
     TEMPLATE(set_type TT)
     REQUIRES_COND((IS_SAME_CLASS_COND(T,TT) || IS_NOT_BASE_OF_COND(T,TT)) && IS_CONSTRUCTIBLE_COND(T,TT))

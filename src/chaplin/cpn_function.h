@@ -14,7 +14,7 @@ using inherited_function_base = ddk::inherited_value<ddk::detail::function_base<
 
 template<typename>
 class function_impl;
-    
+
 template<set_type Im,set_type ... Dom>
 class function_impl<Im(ddk::mpl::type_pack<Dom...>)> : public ddk::detail::function_impl<Im(Dom...),function_allocator,inherited_function_base<Im,Dom...>>
 {
@@ -25,8 +25,25 @@ protected:
 
 public:
     using function_base_t::m_functionImpl;
+    function_impl(const function_impl& other);
+    function_impl(function_impl&& other);
 };
 
+}
+
+namespace ddk
+{
+namespace mpl
+{
+
+template<cpn::set_type Return, cpn::set_type ... Types>
+struct aqcuire_callable_return_type<cpn::function_impl<Return(type_pack<Types...>)>>
+{
+	typedef Return return_type;
+	typedef type_pack<Types...> args_type;
+};
+
+}
 }
 
 #include "cpn_function.inl"

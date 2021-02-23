@@ -62,25 +62,33 @@ struct contains_algebraic_structure_resolver<Structure<Set,Operations...>,Struct
 template<typename Type,template<typename,typename...>typename Structure>
 inline constexpr bool contains_algebraic_structure = contains_algebraic_structure_resolver<Type,Structure>::value;
 
+CONTAINS_SYMBOL(add_operation)
+CONTAINS_SYMBOL(add_inverse_operation)
+CONTAINS_SYMBOL(mult_operation)
+CONTAINS_SYMBOL(div_operation)
+CONTAINS_SYMBOL(mod_operation)
+CONTAINS_SYMBOL(basis_operation)
+CONTAINS_SYMBOL(vector_prod_operation)
+
 }
 
 template<typename T>
 concept set_type = requires (const T& i_lhs, const T& i_rhs){ { i_lhs == i_rhs}; };
 template<typename T>
-concept semi_group_type = set_type<T> && additive_type<T> && requires { { T::add_operation }; };
+concept semi_group_type = set_type<T> && additive_type<T> && concepts::contains_symbol_add_operation<T>::value;
 template<typename T>
-concept group_type = semi_group_type<T> && substractive_type<T> && requires { { T::add_inverse_operation }; };
+concept group_type = semi_group_type<T> && substractive_type<T> && concepts::contains_symbol_add_inverse_operation<T>::value;
 template<typename T>
-concept semi_ring_type = semi_group_type<T> && multiplicative_type<T> && requires { { T::mult_operation }; };
+concept semi_ring_type = semi_group_type<T> && multiplicative_type<T> && concepts::contains_symbol_mult_operation<T>::value;
 template<typename T>
-concept ring_type = group_type<T> && multiplicative_type<T> && requires { { T::mult_operation }; };
+concept ring_type = group_type<T> && multiplicative_type<T> && concepts::contains_symbol_mult_operation<T>::value;
 template<typename T>
-concept field_type = ring_type<T> && divisible_type<T> && requires { { T::div_operation }; };
+concept field_type = ring_type<T> && divisible_type<T> && concepts::contains_symbol_div_operation<T>::value;
 template<typename T>
-concept module_type = group_type<T> && requires { { T::mod_operation }; };
+concept module_type = group_type<T> && concepts::contains_symbol_mod_operation<T>::value;
 template<typename T>
-concept free_module_type = module_type<T> && requires { { T::basis_operation }; };
+concept free_module_type = module_type<T> && concepts::contains_symbol_basis_operation<T>::value;
 template<typename T>
-concept vector_space_type = free_module_type<T> && requires { { T::vector_prod_operation }; };
+concept vector_space_type = free_module_type<T> && concepts::contains_symbol_vector_prod_operation<T>::value;
 
 }

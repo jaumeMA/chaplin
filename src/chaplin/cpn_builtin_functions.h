@@ -6,6 +6,7 @@
 #include "cpn_function_concepts.h"
 #include "ddk_concepts.h"
 #include "ddk_projection_callable.h"
+#include "ddk_intersection_function.h"
 
 #define DEFINE_ARITHMETIC_UNARY_OPERATION(_NAME,_OP,_CONCEPT) \
 namespace ddk \
@@ -25,6 +26,14 @@ public: \
     : m_rhs(i_rhs) \
     { \
     } \
+    _NAME##_unary_functor(const _NAME##_unary_functor& other) \
+    : m_rhs(other.m_rhs) \
+    { \
+    } \
+    _NAME##_unary_functor(_NAME##_unary_functor&& other) \
+    : m_rhs(std::move(other.m_rhs)) \
+    { \
+    } \
     \
     ImSet operator()(Dom ... i_args) const \
     { \
@@ -36,7 +45,7 @@ public: \
     } \
     \
 private: \
-    const function_t m_rhs; \
+    function_t m_rhs; \
 } PUBLISH_RTTI_INHERITANCE(_NAME##_unary_functor,function_impl_base); \
 template<typename Im, typename ... Dom> \
 _NAME##_unary_functor(const cpn::function_impl<Im(mpl::type_pack<Dom...>)>&) -> _NAME##_unary_functor<Im,mpl::type_pack<Dom...>>; \
@@ -79,6 +88,16 @@ public: \
     , m_rhs(i_rhs) \
     { \
     } \
+    _NAME##_binary_functor(const _NAME##_binary_functor& other) \
+    : m_lhs(other.m_lhs) \
+    , m_rhs(other.m_rhs) \
+    { \
+    } \
+    _NAME##_binary_functor(_NAME##_binary_functor&& other) \
+    : m_lhs(std::move(other.m_lhs)) \
+    , m_rhs(std::move(other.m_rhs)) \
+    { \
+    } \
     \
     ImSet operator()(Dom ... i_args) const \
     { \
@@ -94,8 +113,8 @@ public: \
     } \
 \
 private: \
-    const function_t m_lhs; \
-    const function_t m_rhs; \
+    function_t m_lhs; \
+    function_t m_rhs; \
 } PUBLISH_RTTI_INHERITANCE(_NAME##_binary_functor,function_impl_base); \
 template<typename Im, typename ... Dom> \
 _NAME##_binary_functor(const cpn::function_impl<Im(mpl::type_pack<Dom...>)>&,const cpn::function_impl<Im(mpl::type_pack<Dom...>)>&) -> _NAME##_binary_functor<Im,mpl::type_pack<Dom...>>; \
@@ -195,6 +214,36 @@ namespace detail
 template<typename Im, typename Callable, typename ... Dom>
 constexpr inline cpn::function_impl<Im(ddk::mpl::type_pack<Dom...>)> instantiate_template_callable(Callable&& i_callable, const ddk::mpl::type_pack<Dom...>&);
 
+template<cpn::coordinate_type,typename>
+struct builtin_fusioned_function;
+template<cpn::coordinate_type ImSet,typename ... Dom>
+struct builtin_fusioned_function<ImSet,ddk::mpl::type_pack<Dom...>> : public ddk::detail::inherited_functor_impl<ImSet,Dom...>
+{
+    template<typename>
+    struct fusioned_components;
+    template<size_t ... Components>
+    struct fusioned_components<ddk::mpl::sequence<Components...>>
+    {
+        fusioned_components(const ddk::detail::intersection_function<cpn::function_impl<ddk::mpl::nth_coordinate_of_t<Components,ImSet>(mpl::type_pack<Dom...>)>...>& i_callable);
+
+        ddk::detail::intersection_function<cpn::function_impl<ddk::mpl::nth_coordinate_of_t<Components,ImSet>(mpl::type_pack<Dom...>)>...> m_fusionedFunction;
+    };
+
+public:
+    template<typename ... T>
+    builtin_fusioned_function(const ddk::detail::intersection_function<cpn::function_impl<T(mpl::type_pack<Dom...>)>...>& i_args);
+
+    inline ImSet operator()(Dom... i_args) const;
+    template<size_t Index>
+    inline const cpn::function_impl<ddk::mpl::nth_coordinate_of_t<Index,ImSet>(mpl::type_pack<Dom...>)>& get_callable() const;
+
+private:
+    template<size_t ... Indexs>
+    inline ImSet execute(const ddk::mpl::sequence<Indexs...>&, Dom ... i_args) const;
+
+    const fusioned_components<typename ddk::mpl::make_sequence<0,ImSet::num_coordinates>::type> m_callables;
+} PUBLISH_RTTI_INHERITANCE(builtin_fusioned_function,ddk::detail::function_impl_base);
+
 template<typename,typename>
 struct builtin_composed_function;
 template<typename ImSet,typename ... Dom>
@@ -274,11 +323,11 @@ constexpr builtin_numeric_template_function<T> resolve_template_function(const T
 }
 
 //arithmetic operations
-DEFINE_ARITHMETIC_UNARY_OPERATION(neg,-,cpn::inverse_additive_type);
-DEFINE_ARITHMETIC_BINARY_OPERATION(add,+,cpn::additive_type);
-DEFINE_ARITHMETIC_BINARY_OPERATION(subs,-,cpn::substractive_type);
-DEFINE_ARITHMETIC_BINARY_OPERATION(prod,*,cpn::multiplicative_type);
-DEFINE_ARITHMETIC_BINARY_OPERATION(div,/,cpn::divisible_type);
+DEFINE_ARITHMETIC_UNARY_OPERATION(neg,-,cpn::inverse_additive_component_wise_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(add,+,cpn::additive_component_wise_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(subs,-,cpn::substractive_component_wise_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(prod,*,cpn::multiplicative_component_wise_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(div,/,cpn::divisible_component_wise_type);
 
 //predefined math functions
 DEFINE_BUILTIN_FUNCTION(sin,cpn::detail::sin,cpn::type_pack_args_equal_to_1);
