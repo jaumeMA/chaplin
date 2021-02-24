@@ -114,20 +114,20 @@ TEST(CPNSymbolicNumberTest, defaultPowModuleConstruction)
 	cpn::real_ring fooReal1;//(cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)));
 	cpn::real_module_3 fooReal2;//(cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)));
 
-	auto my_var = cpn::x_0 * cpn::x_0;// + cpn::x_1 + cpn::sin(cpn::x_0 + cpn::x_2 * 5);
-	//try
-	//{
-	//	cpn::function<cpn::real_free_module_2(cpn::real_free_module_3)> prova{ my_var, my_var };
+	auto my_var = cpn::x_0 * cpn::x_0 + cpn::x_1 + cpn::sin(cpn::x_0 + cpn::x_2 * 5);
+	try
+	{
+		cpn::function<cpn::real_free_module_2(cpn::real_free_module_3)> prova{ my_var, my_var };
 
-//		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova2 = prova + my_var;
-//
-//		cpn::derivative_visitor<cpn::real_ring,cpn::real_free_module_3> multiVisitor;
+		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova2 = prova + my_var;
+
+		//cpn::derivative_visitor<cpn::real_ring,cpn::real_free_module_3> multiVisitor;
 //
 //		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova_prima = ddk::visit(multiVisitor,prova.m_functionImpl);
-	//}
-	//catch(...)
-	//{
-	//}
+	}
+	catch(...)
+	{
+	}
 
 
 

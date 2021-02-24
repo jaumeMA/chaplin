@@ -1,7 +1,5 @@
 #pragma once
 
-#include "cpn_expression_inspector.h"
-
 #define IS_INSTANTIABLE_COND(_TYPE) \
 	cpn::concepts::is_instantiable<_TYPE>
 #define IS_INSTANTIABLE(_TYPE) \

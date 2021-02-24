@@ -124,7 +124,7 @@ private: \
 }
 
 #define DEFINE_BUILTIN_FUNCTION_OPERATOR(_NAME,_OP) \
-namespace cpn \
+namespace ddk \
 { \
 namespace detail \
 { \
@@ -337,3 +337,4 @@ DEFINE_BUILTIN_FUNCTION_OPERATOR(div,/ )
 
 
 #include "cpn_builtin_functions.inl"
+#include "cpn_expression_inspector.h"
