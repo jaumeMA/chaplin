@@ -37,6 +37,10 @@ if(NOT SET_UP_CONFIGURATIONS_DONE)
 			message("Unsupported architecture: ${SYSTEM_ARCHITECTURE}")
 		endif()
 
+		set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /std:c++latest /bigobj")
+		set( CMAKE_CXX_FLAGS_RELEASE_DEBUG "${CMAKE_CXX_FLAGS_RELEASE_DEBUG} /std:c++latest /bigobj")
+		set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /std:c++latest /bigobj")
+
 	elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 		ENABLE_LANGUAGE(ASM_NASM)
 		set(AGNOSTIC_COPY cp -u)

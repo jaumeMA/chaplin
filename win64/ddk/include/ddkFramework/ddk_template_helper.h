@@ -28,9 +28,14 @@ namespace mpl
 {
 
 template<bool ... Conds>
-inline constexpr bool evaluate()
+inline constexpr bool evaluate_and()
 {
     return (Conds && ...);
+}
+template<bool ... Conds>
+inline constexpr bool evaluate_or()
+{
+    return (Conds || ...);
 }
 
 template<bool,typename,typename>
@@ -479,6 +484,24 @@ struct is_same_type<A,A>
     static const bool value = true;
 };
 
+template<template<typename...>typename Predicate, typename ... T>
+struct not_predicate
+{
+
+template<typename ... TT>
+using type = typename static_if<Predicate<T...,TT...>::value,std::false_type,std::true_type>::type;;
+
+};
+
+template<template<typename...> typename Predicate, typename ... T>
+struct predicate
+{
+
+template<typename ... TT>
+using type = typename static_if<Predicate<T...,TT...>::value,std::true_type,std::false_type>::type;;
+
+};
+
 template<typename ...>
 struct homogeneous_types;
 
@@ -513,6 +536,9 @@ struct nth_type_of<0,Type,Types...>
 
 template<size_t Pos, typename ... Types>
 using nth_type_of_t = typename nth_type_of<Pos,Types...>::type;
+
+template<size_t Pos, typename T>
+using nth_coordinate_of_t = typename T::template nth_coordinate<Pos>;
 
 template<template<typename,typename...> typename Predicate, typename Type, typename ... Types>
 inline constexpr size_t nth_pos_of_predicate()
@@ -613,6 +639,11 @@ struct type_pack
 	{
 		typedef typename merge_type_packs<typename static_if<is_among_types<Types,TTypes...>,type_pack<>,type_pack<Types>>::type ...>::type type;
 	};
+    template<template<typename> typename Predicate>
+    struct drop_if
+    {
+        typedef typename merge_type_packs<typename static_if<Predicate<Types>::value,type_pack<>,type_pack<Types>>::type ...>::type type;
+    };
     template<typename ... TTypes>
 	static constexpr bool contains(const type_pack<TTypes...>&)
 	{
@@ -671,7 +702,7 @@ using type_pack_intersection = typename intersect_type_packs<Types...>::type;
 
 template<typename>
 struct is_type_pack;
-    
+
 template<typename T>
 struct is_type_pack
 {

@@ -5,26 +5,22 @@
 namespace cpn
 {
 
-template<typename>
-struct linearity_inspector
-{
-    static const bool value = false;
-};
+template<typename T>
+std::false_type linearity_inspection(const T&, ...);
 
-template<typename Lhs, typename Rhs>
-struct linearity_inspector<ddk::detail::add_binary_functor<Lhs,Rhs>>
-{
-    static const bool value = linearity_inspector<Lhs>::value && linearity_inspector<Rhs>::value;
-};
-template<typename Lhs, typename Rhs>
-struct linearity_inspector<ddk::detail::prod_binary_functor<Lhs,Rhs>>
-{
-    static const bool value = linearity_inspector<Lhs>::value && linearity_inspector<Rhs>::value;
-};
-template<size_t T>
-struct linearity_inspector<builtin_numeric_template_function<T>>
-{
-    static const bool value = true;
-};
+template<typename T>
+inline constexpr bool inspect_linearity = decltype(linearity_inspection(std::declval<T>()))::value;
+
+template<typename LhsFunction, typename RhsFunction>
+typename ddk::mpl::static_if<inspect_linearity<LhsFunction> && inspect_linearity<RhsFunction>,std::true_type,std::false_type>::type linearity_inspection(const ddk::detail::add_binary_template_functor<LhsFunction,RhsFunction>&);
+
+template<typename LhsFunction,typename RhsFunction>
+typename ddk::mpl::static_if<inspect_linearity<LhsFunction> && inspect_linearity<RhsFunction>,std::true_type,std::false_type>::type linearity_inspection(const ddk::detail::prod_binary_template_functor<LhsFunction,RhsFunction>&);
+
+template<typename LhsFunction,typename RhsFunction>
+typename ddk::mpl::static_if<inspect_linearity<LhsFunction>&& inspect_linearity<RhsFunction>,std::true_type,std::false_type>::type linearity_inspection(const ddk::detail::builtin_composed_template_function<LhsFunction,RhsFunction>&);
+
+template<typename T, typename TT = T::__instantiable_properties>
+typename ddk::mpl::static_if<T::__instantiable_properties::template contains(ddk::mpl::type_pack<linear>{}),std::true_type,std::false_type> linearity_inspection(const T&, ...);
 
 }

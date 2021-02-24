@@ -39,7 +39,7 @@ template<typename T>
 concept divisible_type = requires (T i_lhs,T i_rhs) { i_lhs / i_rhs; };
 
 template<typename T>
-concept coordinate_type = requires { { T::num_coordinates } };
+concept coordinate_type = requires { { T::num_coordinates }; };
 
 namespace concepts
 {

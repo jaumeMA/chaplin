@@ -9,7 +9,7 @@
 #include "ddk_projection_callable.h"
 #include "ddk_intersection_function.h"
 
-#define DEFINE_ARITHMETIC_UNARY_OPERATION(_NAME,_OP,_CONCEPT,...) \
+#define DEFINE_ARITHMETIC_UNARY_OPERATION(_NAME,_OP,_CONCEPT) \
 namespace ddk \
 { \
 namespace detail \
@@ -44,7 +44,8 @@ _NAME##_unary_functor(const cpn::function_impl<Im(mpl::type_pack<Dom...>)>&) -> 
 template<typename RhsFunction> \
 struct _NAME##_unary_template_functor \
 { \
-    typedef mpl::type_pack<__VA_ARGS__> __instantiable_properties; \
+    typedef void __instantiable_tag; \
+    typedef mpl::type_pack<> __instantiable_properties; \
     constexpr _NAME##_unary_template_functor(const RhsFunction& i_rhs) \
     : m_rhs(i_rhs) \
     { \
@@ -61,7 +62,7 @@ private: \
 } \
 }
 
-#define DEFINE_ARITHMETIC_BINARY_OPERATION(_NAME,_OP,_CONCEPT,...) \
+#define DEFINE_ARITHMETIC_BINARY_OPERATION(_NAME,_OP,_CONCEPT) \
 namespace ddk \
 { \
 namespace detail \
@@ -102,7 +103,8 @@ _NAME##_binary_functor(const cpn::function_impl<Im(mpl::type_pack<Dom...>)>&,con
 template<typename LhsFunction, typename RhsFunction> \
 struct _NAME##_binary_template_functor \
 { \
-    typedef mpl::type_pack<__VA_ARGS__> __instantiable_properties; \
+    typedef void __instantiable_tag; \
+    typedef mpl::type_pack<> __instantiable_properties; \
     constexpr _NAME##_binary_template_functor(const LhsFunction& i_lhs, const RhsFunction& i_rhs) \
     : m_lhs(i_lhs) \
     , m_rhs(i_rhs) \
@@ -122,7 +124,7 @@ private: \
 }
 
 #define DEFINE_BUILTIN_FUNCTION_OPERATOR(_NAME,_OP) \
-namespace ddk \
+namespace cpn \
 { \
 namespace detail \
 { \
@@ -163,6 +165,7 @@ struct _NAME##_builtin_function : _NAME##__builtin_function<ImSet,T> \
 } PUBLISH_RTTI_INHERITANCE(_NAME##_builtin_function,function_impl_base); \
 struct _NAME##_builtin_template_function \
 { \
+    typedef void __instantiable_tag; \
     typedef mpl::type_pack<__VA_ARGS__> __instantiable_properties; \
     constexpr _NAME##_builtin_template_function() = default; \
     template<typename Type,typename ... Types> \
@@ -176,10 +179,6 @@ struct _NAME##_builtin_template_function \
     { \
         return { *this, other }; \
     } \
-}; \
-struct linearity_inspector<_NAME##_builtin_template_function> \
-{ \
-    static const bool value = _LINEAR; \
 }; \
  \
 } \
@@ -269,8 +268,8 @@ private:
 template<typename LhsFunction, typename RhsFunction>
 struct builtin_composed_template_function
 {
-    typedef mpl::type_pack<__VA_ARGS__> __instantiable_properties;
-
+    typedef void __instantiable_tag;
+    typedef mpl::type_pack<cpn::linear> __instantiable_properties;
     constexpr builtin_composed_template_function(const LhsFunction& i_lhs, const RhsFunction& i_rhs);
 
     template<typename Type,typename ... Types>
@@ -286,6 +285,7 @@ struct builtin_numeric_template_function
 {
     static_assert(std::is_arithmetic_v<T>, "You shall use numeric types for this kind of template function");
 
+    typedef void __instantiable_tag;
     typedef mpl::type_pack<cpn::linear> __instantiable_properties;
 
     constexpr builtin_numeric_template_function(const T& i_number);
@@ -318,17 +318,17 @@ DEFINE_ARITHMETIC_BINARY_OPERATION(div,/,cpn::divisible_component_wise_type);
 DEFINE_BUILTIN_FUNCTION(sin,cpn::detail::sin,cpn::type_pack_args_equal_to_1);
 DEFINE_BUILTIN_FUNCTION(cos,cpn::detail::cos,cpn::type_pack_args_equal_to_1);
 DEFINE_BUILTIN_FUNCTION(tan,cpn::detail::tan,cpn::type_pack_args_equal_to_1);
-DEFINE_BUILTIN_FUNCTION(x,ddk::projection<0>,cpn::type_pack_args_more_or_equal_to_1);
-DEFINE_BUILTIN_FUNCTION(x_0,ddk::projection<0>,cpn::type_pack_args_more_or_equal_to_1);
-DEFINE_BUILTIN_FUNCTION(x_1,ddk::projection<1>,cpn::type_pack_args_more_or_equal_to_2);
-DEFINE_BUILTIN_FUNCTION(x_2,ddk::projection<2>,cpn::type_pack_args_more_or_equal_to_3);
-DEFINE_BUILTIN_FUNCTION(x_3,ddk::projection<3>,cpn::type_pack_args_more_or_equal_to_4);
-DEFINE_BUILTIN_FUNCTION(x_4,ddk::projection<4>,cpn::type_pack_args_more_or_equal_to_5);
-DEFINE_BUILTIN_FUNCTION(x_5,ddk::projection<5>,cpn::type_pack_args_more_or_equal_to_6);
-DEFINE_BUILTIN_FUNCTION(x_6,ddk::projection<6>,cpn::type_pack_args_more_or_equal_to_7);
-DEFINE_BUILTIN_FUNCTION(x_7,ddk::projection<7>,cpn::type_pack_args_more_or_equal_to_8);
-DEFINE_BUILTIN_FUNCTION(x_8,ddk::projection<8>,cpn::type_pack_args_more_or_equal_to_9);
-DEFINE_BUILTIN_FUNCTION(x_9,ddk::projection<9>,cpn::type_pack_args_more_or_equal_to_10);
+DEFINE_BUILTIN_FUNCTION(x,ddk::projection<0>,cpn::type_pack_args_more_or_equal_to_1,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_0,ddk::projection<0>,cpn::type_pack_args_more_or_equal_to_1,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_1,ddk::projection<1>,cpn::type_pack_args_more_or_equal_to_2,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_2,ddk::projection<2>,cpn::type_pack_args_more_or_equal_to_3,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_3,ddk::projection<3>,cpn::type_pack_args_more_or_equal_to_4,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_4,ddk::projection<4>,cpn::type_pack_args_more_or_equal_to_5,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_5,ddk::projection<5>,cpn::type_pack_args_more_or_equal_to_6,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_6,ddk::projection<6>,cpn::type_pack_args_more_or_equal_to_7,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_7,ddk::projection<7>,cpn::type_pack_args_more_or_equal_to_8,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_8,ddk::projection<8>,cpn::type_pack_args_more_or_equal_to_9,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_9,ddk::projection<9>,cpn::type_pack_args_more_or_equal_to_10,cpn::linear);
 
 DEFINE_BUILTIN_FUNCTION_OPERATOR(add,+)
 DEFINE_BUILTIN_FUNCTION_OPERATOR(subs,-)
