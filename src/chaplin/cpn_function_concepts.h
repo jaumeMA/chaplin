@@ -18,7 +18,7 @@ namespace concepts
 
 template<typename T>
 std::false_type is_instantiable_resolver(const T&,...);
-template<typename T,typename = typename T::___instantiable_tag>
+template<typename T,typename = typename T::__instantiable_properties>
 std::true_type is_instantiable_resolver(T&);
 
 template<typename T>

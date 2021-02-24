@@ -1,14 +1,15 @@
 #pragma once
 
-#include "ddk_rtti.h"
 #include "cpn_function.h"
 #include "cpn_math_functions.h"
 #include "cpn_function_concepts.h"
+#include "cpn_algebraic_defs.h"
+#include "ddk_rtti.h"
 #include "ddk_concepts.h"
 #include "ddk_projection_callable.h"
 #include "ddk_intersection_function.h"
 
-#define DEFINE_ARITHMETIC_UNARY_OPERATION(_NAME,_OP,_CONCEPT) \
+#define DEFINE_ARITHMETIC_UNARY_OPERATION(_NAME,_OP,_CONCEPT,...) \
 namespace ddk \
 { \
 namespace detail \
@@ -26,15 +27,6 @@ public: \
     : m_rhs(i_rhs) \
     { \
     } \
-    _NAME##_unary_functor(const _NAME##_unary_functor& other) \
-    : m_rhs(other.m_rhs) \
-    { \
-    } \
-    _NAME##_unary_functor(_NAME##_unary_functor&& other) \
-    : m_rhs(std::move(other.m_rhs)) \
-    { \
-    } \
-    \
     ImSet operator()(Dom ... i_args) const \
     { \
         return ImSet{}; \
@@ -52,7 +44,7 @@ _NAME##_unary_functor(const cpn::function_impl<Im(mpl::type_pack<Dom...>)>&) -> 
 template<typename RhsFunction> \
 struct _NAME##_unary_template_functor \
 { \
-    struct ___instantiable_tag; \
+    typedef mpl::type_pack<__VA_ARGS__> __instantiable_properties; \
     constexpr _NAME##_unary_template_functor(const RhsFunction& i_rhs) \
     : m_rhs(i_rhs) \
     { \
@@ -69,7 +61,7 @@ private: \
 } \
 }
 
-#define DEFINE_ARITHMETIC_BINARY_OPERATION(_NAME,_OP,_CONCEPT) \
+#define DEFINE_ARITHMETIC_BINARY_OPERATION(_NAME,_OP,_CONCEPT,...) \
 namespace ddk \
 { \
 namespace detail \
@@ -88,17 +80,6 @@ public: \
     , m_rhs(i_rhs) \
     { \
     } \
-    _NAME##_binary_functor(const _NAME##_binary_functor& other) \
-    : m_lhs(other.m_lhs) \
-    , m_rhs(other.m_rhs) \
-    { \
-    } \
-    _NAME##_binary_functor(_NAME##_binary_functor&& other) \
-    : m_lhs(std::move(other.m_lhs)) \
-    , m_rhs(std::move(other.m_rhs)) \
-    { \
-    } \
-    \
     ImSet operator()(Dom ... i_args) const \
     { \
         return { ddk::eval(m_lhs,std::forward<Dom>(i_args)...) _OP ddk::eval(m_rhs,std::forward<Dom>(i_args)...) }; \
@@ -121,7 +102,7 @@ _NAME##_binary_functor(const cpn::function_impl<Im(mpl::type_pack<Dom...>)>&,con
 template<typename LhsFunction, typename RhsFunction> \
 struct _NAME##_binary_template_functor \
 { \
-    struct ___instantiable_tag; \
+    typedef mpl::type_pack<__VA_ARGS__> __instantiable_properties; \
     constexpr _NAME##_binary_template_functor(const LhsFunction& i_lhs, const RhsFunction& i_rhs) \
     : m_lhs(i_lhs) \
     , m_rhs(i_rhs) \
@@ -159,7 +140,7 @@ constexpr inline _NAME##_binary_template_functor<decltype(resolve_template_funct
 } \
 }
 
-#define DEFINE_BUILTIN_FUNCTION(_NAME,_FUNC,_CONSTRAINT) \
+#define DEFINE_BUILTIN_FUNCTION(_NAME,_FUNC,_CONSTRAINT,...) \
 namespace ddk \
 { \
 namespace detail \
@@ -182,7 +163,7 @@ struct _NAME##_builtin_function : _NAME##__builtin_function<ImSet,T> \
 } PUBLISH_RTTI_INHERITANCE(_NAME##_builtin_function,function_impl_base); \
 struct _NAME##_builtin_template_function \
 { \
-    struct ___instantiable_tag; \
+    typedef mpl::type_pack<__VA_ARGS__> __instantiable_properties; \
     constexpr _NAME##_builtin_template_function() = default; \
     template<typename Type,typename ... Types> \
     constexpr inline _NAME##_builtin_function<Type,mpl::type_pack<Types...>> instance() const \
@@ -195,6 +176,10 @@ struct _NAME##_builtin_template_function \
     { \
         return { *this, other }; \
     } \
+}; \
+struct linearity_inspector<_NAME##_builtin_template_function> \
+{ \
+    static const bool value = _LINEAR; \
 }; \
  \
 } \
@@ -284,7 +269,7 @@ private:
 template<typename LhsFunction, typename RhsFunction>
 struct builtin_composed_template_function
 {
-    struct ___instantiable_tag;
+    typedef mpl::type_pack<__VA_ARGS__> __instantiable_properties;
 
     constexpr builtin_composed_template_function(const LhsFunction& i_lhs, const RhsFunction& i_rhs);
 
@@ -301,7 +286,7 @@ struct builtin_numeric_template_function
 {
     static_assert(std::is_arithmetic_v<T>, "You shall use numeric types for this kind of template function");
 
-    struct ___instantiable_tag;
+    typedef mpl::type_pack<cpn::linear> __instantiable_properties;
 
     constexpr builtin_numeric_template_function(const T& i_number);
 

@@ -85,7 +85,7 @@ TEST(CPNSymbolicNumberTest, defaultPowGroupConstruction)
 	cpn::real_group_3 fooReal1;//(cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)));
 	cpn::real_group_3 fooReal2;//(cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)));
 
-	//cpn::real_ring_3 fooReal4 = fooReal2;
+//	cpn::real_ring_3 fooReal4 = fooReal2;
 	cpn::real_group_3 fooReal3 = fooReal1 + fooReal2;
 }
 
@@ -97,6 +97,7 @@ TEST(CPNSymbolicNumberTest, defaultPowRingConstruction)
 
 	cpn::real_ring_3 fooReal3 = fooReal1 + fooReal2;
 	cpn::real_ring_3 fooReal4 = fooReal1 * fooReal2;
+	cpn::real_group_3 fooReal0 = fooReal4;
 }
 
 template<typename...>
@@ -133,7 +134,7 @@ TEST(CPNSymbolicNumberTest, defaultPowModuleConstruction)
 	cpn::real_ring_3 fooReal3 = fooReal1 ^ fooReal2;
     cpn::real_group_3 fooReal4 = fooReal2 + fooReal2;
 
-    //cpn::real_free_module_3 fooReal5 = fooReal2;
+    cpn::real_free_module_3 fooReal5 = fooReal2;
 
 }
 
