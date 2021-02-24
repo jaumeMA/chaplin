@@ -22,8 +22,6 @@ template<set_type ImSet, set_type DomSet>
 class function<ImSet(DomSet)> : public function_impl<ImSet(mpl::terse_function_dominion<DomSet>)>
 {
     typedef function_impl<ImSet(mpl::terse_function_dominion<DomSet>)> function_base_t;
-    template<size_t Index>
-    using nth_coordinate_type = ddk::mpl::nth_coordinate_of_t<Index,ImSet>;
 
     DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(function,add,+);
     DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(function,subs,-);
@@ -32,11 +30,11 @@ class function<ImSet(DomSet)> : public function_impl<ImSet(mpl::terse_function_d
 
 public:
     function(const function_base_t& i_function);
-    TEMPLATE(typename T)
-    REQUIRES(IS_INSTANTIABLE_BY(T,ImSet,mpl::terse_function_dominion<DomSet>))
-    function(const T& i_callable);
+    TEMPLATE(typename Callable)
+    REQUIRES(IS_INSTANTIABLE_BY(Callable,ImSet,mpl::terse_function_dominion<DomSet>))
+    function(const Callable& i_callable);
     TEMPLATE(typename ... Callables)
-    REQUIRES(IS_COORDINATE(ImSet),IS_INSTANTIABLE(Callables)...)
+    REQUIRES(IS_NUMBER_OF_ARGS_GREATER(1,Callables...),IS_INSTANTIABLE_BY(Callables,ImSet,mpl::terse_function_dominion<DomSet>)...)
     function(const Callables& ... i_callables);
 
     using function_impl<ImSet(mpl::terse_function_dominion<DomSet>)>::m_functionImpl;

@@ -117,13 +117,15 @@ TEST(CPNSymbolicNumberTest, defaultPowModuleConstruction)
 	auto my_var = cpn::x_0 * cpn::x_0 + cpn::x_1 + cpn::sin(cpn::x_0 + cpn::x_2 * 5);
 	try
 	{
-		cpn::function<cpn::real_free_module_2(cpn::real_free_module_3)> prova{ my_var, my_var };
+		cpn::function<cpn::real_free_module_2(cpn::real_free_module_3)> prova_0{ my_var, my_var };
 
-		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova2 = prova + my_var;
+		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova1{my_var};
 
-		//cpn::derivative_visitor<cpn::real_ring,cpn::real_free_module_3> multiVisitor;
-//
-//		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova_prima = ddk::visit(multiVisitor,prova.m_functionImpl);
+		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova2 = prova1 + my_var;
+
+		cpn::derivative_visitor<cpn::real_ring,cpn::real_free_module_3> multiVisitor;
+
+		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova_prima = ddk::visit(multiVisitor,prova1.m_functionImpl);
 	}
 	catch(...)
 	{
