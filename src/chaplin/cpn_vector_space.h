@@ -13,7 +13,62 @@ struct identity_prod_matrix
     inline T operator()(size_t i_row, size_t i_col) const;
 };
 
+template<typename,size_t>
+struct CartesianCoordinates;
+template<typename,size_t>
+struct SphericalCoordinates;
+template<typename,size_t>
+struct CylindricalCoordinates;
+
+template<typename T, size_t Dims>
+struct CartesianCoordinates
+{
+    template<typename Coordinates>
+    ddk::high_order_array<T,Dims> transform(const ddk::high_order_array<T,Dims>&);
+
+    template<>
+    inline ddk::high_order_array<T,Dims> transform<SphericalCoordinates<T,Dims>>(const ddk::high_order_array<T,Dims>& i_vector);
+    template<>
+    inline ddk::high_order_array<T,Dims> transform<CylindricalCoordinates<T,Dims>>(const ddk::high_order_array<T,Dims>& i_vector);
+};
+
+template<typename T,size_t Dims>
+struct SphericalCoordinates
+{
+    template<typename Coordinates>
+    ddk::high_order_array<T,Dims> transform(const T&);
+
+    template<>
+    inline ddk::high_order_array<T,Dims> transform<CartesianCoordinates<T,Dims>>(const ddk::high_order_array<T,Dims>& i_vector);
+    template<>
+    inline ddk::high_order_array<T,Dims> transform<CylindricalCoordinates<T,Dims>>(const ddk::high_order_array<T,Dims>& i_vector);
+};
+
+template<typename T,size_t Dims>
+struct CylindricalCoordinates
+{
+    template<typename Coordinates>
+    ddk::high_order_array<T,Dims> transform(const ddk::high_order_array<T,Dims>&);
+
+    template<>
+    inline ddk::high_order_array<T,Dims> transform<CartesianCoordinates<T,Dims>>(const ddk::high_order_array<T,Dims>& i_vector);
+    template<>
+    inline ddk::high_order_array<T,Dims> transform<SphericalCoordinates<T,Dims>>(const ddk::high_order_array<T,Dims>& i_vector);
+};
+
 }
+
+template<free_module_type T, typename Coordinates = detail::CartesianCoordinates<typename T::ring_t,T::rank>>
+struct coordinate_transform
+{
+    PUBLISH_OPERATION_PROPERTIES(coordinate_transform,coordinate_transform_operation);
+
+    //ToDo: Define coordinate transformations
+    template<typename CCoordinates>
+    T transform(const T& i_vector)
+    {
+    }
+};
 
 template<free_module_type T, typename InnerProdMatrix>
 struct vector_mult_operation
@@ -48,8 +103,8 @@ struct vector_mult_operation
     inline operator T() const;
 };
 
-template<free_module_type T, typename InnerProdMatrix = detail::identity_prod_matrix<typename T::ring_t,T::rank>>
-using vector_space = typename T::template equip_with<vector_mult_operation<T,InnerProdMatrix>>;
+template<free_module_type T, typename Coordinates = detail::CartesianCoordinates<typename T::ring_t, T::rank>, typename InnerProdMatrix = detail::identity_prod_matrix<typename T::ring_t,T::rank>>
+using vector_space = typename T::template equip_with<coordinate_transform<T,Coordinates>,vector_mult_operation<T,InnerProdMatrix>>;
 
 template<typename VectorSpace>
 using vector_sub_space = typename forget_vector_prod<free_sub_module<VectorSpace>>::template equip_withequip_with<vector_mult_operation<forget_vector_prod<free_sub_module<VectorSpace>>,typename VectorSpace::inner_prod_matrix_t>>;

@@ -19,12 +19,9 @@ template<typename,typename,typename>
 class linear_function_impl;
 
 template<free_module_type Im, free_module_type Dom, size_t ... Indexs>
-class linear_function_impl<Im,Dom,ddk::mpl::sequence<Indexs...>> : public function_impl<Im(ddk::mpl::type_pack<const ddk::mpl::index_to_type<Indexs,typename Dom::ring_type>&...>)>
+class linear_function_impl<Im,Dom,ddk::mpl::sequence<Indexs...>> : public function<Im(Dom)>
 {
-    typedef function_impl<Im(ddk::mpl::type_pack<const ddk::mpl::index_to_type<Indexs,typename Dom::ring_type>&...>)> function_base_t;
-
-    DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(linear_function_impl,add,+)
-    DEFINE_MATH_HIGHER_ORDER_BINARY_FRIEND_FUNCTION(linear_function_impl,subs,-)
+    typedef function<Im(Dom)> function_base_t;
 
 public:
     TEMPLATE(typename T)
@@ -40,7 +37,7 @@ public:
 template<typename>
 class linear_function;
 template<free_module_type Im, free_module_type Dom>
-class linear_function<Im(const Dom&)> : detail::linear_function_impl<Im,Dom,typename ddk::mpl::make_sequence<0,Dom::rank>::type>
+class linear_function<Im(Dom)> : detail::linear_function_impl<Im,Dom,typename ddk::mpl::make_sequence<0,Dom::rank>::type>
 {
     typedef detail::linear_function_impl<Im,Dom,typename ddk::mpl::make_sequence<0,Dom::rank>::type> base_t;
 

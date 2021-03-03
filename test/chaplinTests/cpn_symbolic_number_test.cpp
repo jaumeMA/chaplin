@@ -15,7 +15,8 @@
 #include "cpn_scalar_function.h"
 #include "ddk_rtti.h"
 #include "ddk_static_counter.h"
-#include "cpn_function_derivative_visitor.h"
+#include "cpn_function_space.h"
+#include "cpn_function_ops.h"
 #include <utility>
 
 #include <string>
@@ -114,18 +115,20 @@ TEST(CPNSymbolicNumberTest, defaultPowModuleConstruction)
 	cpn::real_ring fooReal1;//(cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)));
 	cpn::real_module_3 fooReal2;//(cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)));
 
-	auto my_var = cpn::x_0 * cpn::x_0 + cpn::x_1 + cpn::sin(cpn::x_0 + cpn::x_2 * 5);
+	auto my_var = cpn::x_0 * cpn::x_0 + cpn::x_1 * 2;// + cpn::sin(cpn::cos(cpn::x_0) + cpn::x_2 * 5);
 	try
 	{
-		cpn::function<cpn::real_free_module_2(cpn::real_free_module_3)> prova_0{ my_var, my_var };
+		cpn::F<cpn::R2,cpn::R3> prova_0 = {my_var,my_var};
 
-		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova1{my_var};
+		cpn::F<cpn::R2,cpn::R3> prova_1 = prova_0 + prova_0;
 
-		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova2 = prova1 + my_var;
+		cpn::FR<1,3> prova1 = my_var;
 
-		cpn::derivative_visitor<cpn::real_ring,cpn::real_free_module_3> multiVisitor;
+		cpn::FR<1,3> prova2 = prova1 + my_var;
 
-		cpn::function<cpn::real_ring(cpn::real_free_module_3)> prova_prima = ddk::visit(multiVisitor,prova1.m_functionImpl);
+		static_assert(cpn::get_rank<cpn::R1>()==1,"wtf");
+
+		cpn::derivative(prova2);
 	}
 	catch(...)
 	{
@@ -153,7 +156,7 @@ TEST(CPNSymbolicNumberTest, defaultPowFieldConstruction)
 
 TEST(CPNSymbolicNumberTest, defaultVectorSpaceConstruction)
 {
-	cpn::real_vector_space_3 fooRes1;
-	cpn::real_vector_space_3 fooRes2;
+	cpn::R3 fooRes1;
+	cpn::R3 fooRes2;
 	cpn::real_ring res = fooRes1 * fooRes2;
 }

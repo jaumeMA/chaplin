@@ -27,6 +27,7 @@ public:
 
     using T::T;
     algebraic_structure_impl() = default;
+    algebraic_structure_impl(const algebraic_structure_impl&) = default;
     TEMPLATE(set_type TT)
     REQUIRES_COND((IS_SAME_CLASS_COND(T,TT) || IS_NOT_BASE_OF_COND(T,TT)) && IS_CONSTRUCTIBLE_COND(T,TT))
     constexpr algebraic_structure_impl(const TT& other);
@@ -37,6 +38,7 @@ public:
     REQUIRES(IS_CONSTRUCTIBLE(T,TT))
     constexpr algebraic_structure_impl(const algebraic_structure_impl<TT,ddk::mpl::type_pack<>>& other);
 
+    algebraic_structure_impl& operator=(const algebraic_structure_impl&) = default;
     TEMPLATE(set_type TT, typename ... OOperators)
     REQUIRES(IS_ASSIGNABLE(T,TT),IS_SUPERSTRUCTURE_OF(ddk::mpl::type_pack<OOperators...>,operators_pack))
     constexpr algebraic_structure_impl& operator=(const algebraic_structure_impl<TT,ddk::mpl::type_pack<OOperators...>>& other);

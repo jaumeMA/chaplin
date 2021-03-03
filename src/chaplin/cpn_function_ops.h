@@ -2,15 +2,14 @@
 
 #include "cpn_algebraic_concepts.h"
 #include "ddk_high_order_array.h"
+#include "cpn_space_ops.h"
 
 namespace cpn
 {
 
 template<function_type Func>
-ddk::high_order_array<Func,Func::Im::rank,Func::Dom::rank> derivative(Func&& i_func);
-
-TEMPLATE(function_type Func, typename ... T)
-REQUIRES(IS_COORDINATE(T)...)
-ddk::high_order_array<Func,Func::Im::rank,ddk::mpl::num_types<T...>> derivative(Func&& i_func, const T& ... i_coordinates);
+inline ddk::high_order_array<Func,get_rank<typename Func::im_t>(),get_rank<typename Func::dom_t>()> derivative(const Func& i_func);
 
 }
+
+#include "cpn_function_ops.inl"

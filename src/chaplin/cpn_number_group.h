@@ -37,6 +37,10 @@ struct integer_addition_inverse
 	{
 		return integer_set(-i_rhs.number());
 	}
+	friend inline integer_set operator-(const integer_set& i_lhs,const integer_set& i_rhs)
+	{
+		return integer_set(i_lhs.number() - i_rhs.number());
+	}
 };
 
 using integer_group = integer_semi_group::template equip_with<integer_addition_inverse>;
@@ -78,6 +82,10 @@ struct rational_addition_inverse
 	friend inline rational_set operator-(const rational_set& i_rhs)
 	{
 		return rational_set{ -i_rhs.numerator(), i_rhs.denominator() };
+	}
+	friend inline rational_set operator-(const rational_set& i_lhs,const rational_set& i_rhs)
+	{
+		return rational_set{ static_cast<int>(i_lhs.numerator() * i_rhs.denominator() - i_rhs.numerator() * i_lhs.denominator()),i_lhs.denominator() * i_rhs.denominator() };
 	}
 };
 

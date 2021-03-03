@@ -20,6 +20,17 @@ class function_impl<Im(ddk::mpl::type_pack<Dom...>)> : public ddk::detail::funct
 {
     typedef ddk::detail::function_impl<Im(Dom...),function_allocator,inherited_function_base<Im,Dom...>> function_base_t;
 
+    template<typename Visitor>
+    friend inline auto visit(const function_impl& i_function)
+    {
+        return ddk::visit<Visitor>(i_function.m_functionImpl);
+    }
+    template<typename Visitor>
+    friend inline auto visit(Visitor&& i_visitor,const function_impl& i_function)
+    {
+        return ddk::visit(i_visitor,i_function.m_functionImpl);
+    }
+
 protected:
     using function_base_t::function_base_t;
 
@@ -27,6 +38,9 @@ public:
     using function_base_t::m_functionImpl;
     function_impl(const function_impl& other);
     function_impl(function_impl&& other);
+
+    function_impl& operator=(const function_impl& other) = default;
+    function_impl& operator=(function_impl&& other) = default;
 };
 
 }

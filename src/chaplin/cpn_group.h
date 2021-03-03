@@ -52,6 +52,14 @@ struct pow_add_inverse_operation
 
 		return res;
 	}
+	friend inline pow_set_traits_t operator-(const pow_set_traits_t& i_lhs,const pow_set_traits_t& i_rhs)
+	{
+		pow_set_traits_t res;
+
+		res <<= ddk::trans::iterable_subs(i_lhs,i_rhs);
+
+		return res;
+	}
 };
 
 template<group_type T, size_t ... Dims>
@@ -76,7 +84,7 @@ struct sum_add_operation
 	static const sum_set_traits_t identity;
 	friend inline sum_set_traits_t operator+(const sum_set_traits_t& i_lhs,const sum_set_traits_t& i_rhs)
 	{
-		return ddk::visit(add_operation_visitor{},i_lhs,i_rhs);
+		return ddk::visit<add_operation_visitor>(i_lhs,i_rhs);
 	}
 };
 
@@ -97,10 +105,22 @@ struct sum_add_inverse_operation
 			return -i_lhs;
 		}
 	};
+	struct subs_operation_visitor: public ddk::static_visitor<sum_set_traits_t>
+	{
+		template<typename T1,typename T2>
+		sum_set_traits_t operator()(T1&& i_lhs,T2&& i_rhs) const
+		{
+			return i_lhs - i_rhs;
+		}
+	};
 
 	friend inline sum_set_traits_t operator-(const sum_set_traits_t& i_rhs)
 	{
-		return ddk::visit(inverse_operation_visitor{},i_rhs);
+		return ddk::visit<inverse_operation_visitor>(i_rhs);
+	}
+	friend inline sum_set_traits_t operator-(const sum_set_traits_t& i_lhs,const sum_set_traits_t& i_rhs)
+	{
+		return ddk::visit<subs_operation_visitor>(i_lhs,i_rhs);
 	}
 };
 

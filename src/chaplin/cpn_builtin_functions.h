@@ -208,9 +208,9 @@ struct builtin_fusioned_function<ImSet,ddk::mpl::type_pack<Dom...>> : public ddk
     template<size_t ... Components>
     struct fusioned_components<ddk::mpl::sequence<Components...>>
     {
-        fusioned_components(const ddk::detail::intersection_function<cpn::function_impl<ddk::mpl::nth_coordinate_of_t<Components,ImSet>(mpl::type_pack<Dom...>)>...>& i_callable);
+        fusioned_components(const ddk::detail::intersection_function<cpn::function_impl<ddk::mpl::index_to_type<Components,typename ImSet::place_type>(mpl::type_pack<Dom...>)>...>& i_callable);
 
-        ddk::detail::intersection_function<cpn::function_impl<ddk::mpl::nth_coordinate_of_t<Components,ImSet>(mpl::type_pack<Dom...>)>...> m_fusionedFunction;
+        ddk::detail::intersection_function<cpn::function_impl<ddk::mpl::index_to_type<Components,typename ImSet::place_type>(mpl::type_pack<Dom...>)>...> m_fusionedFunction;
     };
 
 public:
@@ -219,13 +219,13 @@ public:
 
     inline ImSet operator()(Dom... i_args) const;
     template<size_t Index>
-    inline const cpn::function_impl<ddk::mpl::nth_coordinate_of_t<Index,ImSet>(mpl::type_pack<Dom...>)>& get_callable() const;
+    inline const cpn::function_impl<typename ImSet::place_type(mpl::type_pack<Dom...>)>& get_callable() const;
 
 private:
     template<size_t ... Indexs>
     inline ImSet execute(const ddk::mpl::sequence<Indexs...>&, Dom ... i_args) const;
 
-    const fusioned_components<typename ddk::mpl::make_sequence<0,ImSet::num_coordinates>::type> m_callables;
+    const fusioned_components<typename ddk::mpl::make_sequence<0,ImSet::num_places>::type> m_callables;
 } PUBLISH_RTTI_INHERITANCE(builtin_fusioned_function,ddk::detail::function_impl_base);
 
 template<typename,typename>
@@ -308,27 +308,27 @@ constexpr builtin_numeric_template_function<T> resolve_template_function(const T
 }
 
 //arithmetic operations
-DEFINE_ARITHMETIC_UNARY_OPERATION(neg,-,cpn::inverse_additive_component_wise_type);
-DEFINE_ARITHMETIC_BINARY_OPERATION(add,+,cpn::additive_component_wise_type);
-DEFINE_ARITHMETIC_BINARY_OPERATION(subs,-,cpn::substractive_component_wise_type);
-DEFINE_ARITHMETIC_BINARY_OPERATION(prod,*,cpn::multiplicative_component_wise_type);
-DEFINE_ARITHMETIC_BINARY_OPERATION(div,/,cpn::divisible_component_wise_type);
+DEFINE_ARITHMETIC_UNARY_OPERATION(neg,-,cpn::inverse_additive_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(add,+,cpn::additive_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(subs,-,cpn::substractive_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(prod,*,cpn::multiplicative_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(div,/,cpn::divisible_type);
 
 //predefined math functions
 DEFINE_BUILTIN_FUNCTION(sin,cpn::detail::sin,cpn::type_pack_args_equal_to_1);
 DEFINE_BUILTIN_FUNCTION(cos,cpn::detail::cos,cpn::type_pack_args_equal_to_1);
 DEFINE_BUILTIN_FUNCTION(tan,cpn::detail::tan,cpn::type_pack_args_equal_to_1);
-DEFINE_BUILTIN_FUNCTION(x,ddk::projection<0>,cpn::type_pack_args_more_or_equal_to_1,cpn::linear);
-DEFINE_BUILTIN_FUNCTION(x_0,ddk::projection<0>,cpn::type_pack_args_more_or_equal_to_1,cpn::linear);
-DEFINE_BUILTIN_FUNCTION(x_1,ddk::projection<1>,cpn::type_pack_args_more_or_equal_to_2,cpn::linear);
-DEFINE_BUILTIN_FUNCTION(x_2,ddk::projection<2>,cpn::type_pack_args_more_or_equal_to_3,cpn::linear);
-DEFINE_BUILTIN_FUNCTION(x_3,ddk::projection<3>,cpn::type_pack_args_more_or_equal_to_4,cpn::linear);
-DEFINE_BUILTIN_FUNCTION(x_4,ddk::projection<4>,cpn::type_pack_args_more_or_equal_to_5,cpn::linear);
-DEFINE_BUILTIN_FUNCTION(x_5,ddk::projection<5>,cpn::type_pack_args_more_or_equal_to_6,cpn::linear);
-DEFINE_BUILTIN_FUNCTION(x_6,ddk::projection<6>,cpn::type_pack_args_more_or_equal_to_7,cpn::linear);
-DEFINE_BUILTIN_FUNCTION(x_7,ddk::projection<7>,cpn::type_pack_args_more_or_equal_to_8,cpn::linear);
-DEFINE_BUILTIN_FUNCTION(x_8,ddk::projection<8>,cpn::type_pack_args_more_or_equal_to_9,cpn::linear);
-DEFINE_BUILTIN_FUNCTION(x_9,ddk::projection<9>,cpn::type_pack_args_more_or_equal_to_10,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x,ddk::projection<0>,cpn::type_pack_args_more_or_equal_to_1,cpn::incognita,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_0,ddk::projection<0>,cpn::type_pack_args_more_or_equal_to_1,cpn::incognita,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_1,ddk::projection<1>,cpn::type_pack_args_more_or_equal_to_2,cpn::incognita,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_2,ddk::projection<2>,cpn::type_pack_args_more_or_equal_to_3,cpn::incognita,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_3,ddk::projection<3>,cpn::type_pack_args_more_or_equal_to_4,cpn::incognita,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_4,ddk::projection<4>,cpn::type_pack_args_more_or_equal_to_5,cpn::incognita,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_5,ddk::projection<5>,cpn::type_pack_args_more_or_equal_to_6,cpn::incognita,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_6,ddk::projection<6>,cpn::type_pack_args_more_or_equal_to_7,cpn::incognita,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_7,ddk::projection<7>,cpn::type_pack_args_more_or_equal_to_8,cpn::incognita,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_8,ddk::projection<8>,cpn::type_pack_args_more_or_equal_to_9,cpn::incognita,cpn::linear);
+DEFINE_BUILTIN_FUNCTION(x_9,ddk::projection<9>,cpn::type_pack_args_more_or_equal_to_10,cpn::incognita,cpn::linear);
 
 DEFINE_BUILTIN_FUNCTION_OPERATOR(add,+)
 DEFINE_BUILTIN_FUNCTION_OPERATOR(subs,-)

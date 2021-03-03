@@ -5,22 +5,20 @@
 namespace cpn
 {
 
-template<ring_type Im, typename Dom>
+template<module_type Im,set_type Dom>
 struct function_module_operation
 {
 	PUBLISH_OPERATION_PROPERTIES(function_module_operation,mod_operation,commutative,associative,distributive);
 
-	typedef integer_ring ring_t;
+	typedef typename Im::mod_operation::ring_t ring_t;
 
-	static constexpr ring_t identity = ring_t(ring_t::mult_operation::identity);
-
-	friend inline integer_set operator^(const Im& i_lhs,const Dom& i_rhs)
+	friend inline function_set<Im,Dom> operator^(const ring_t& i_lhs,const function_set<Im,Dom>& i_rhs)
 	{
 		return ddk::detail::prod_binary_functor(ddk::detail::builtin_numeric_template_function<Im>(i_lhs),i_rhs);
 	}
 };
 
-template<ring_type Im, set_type Dom>
-using function_module = function_group<Im,Dom>::template equip_with<function_module_operation<Im,Dom>>;
+template<module_type Im, set_type Dom>
+using function_module = typename function_group<Im,Dom>::template equip_with<function_module_operation<Im,Dom>>;
 
 }

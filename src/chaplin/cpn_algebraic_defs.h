@@ -14,6 +14,7 @@ struct commutative;
 struct linear;
 struct conjugate;
 struct positive_definite;
+struct incognita;
 
 template<typename T>
 std::false_type resolve_operation_property(T&&, ...);

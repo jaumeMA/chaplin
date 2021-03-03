@@ -16,11 +16,11 @@ typedef real_free_module_n<3> real_free_module_3;
 typedef real_free_module_n<4> real_free_module_4;
 
 template<size_t Dim>
-using real_vector_space_n = vector_space<real_free_module_n<Dim>>;
+using R_n = vector_space<real_free_module_n<Dim>>;
 
-typedef real_vector_space_n<1> real_vector_space_1;
-typedef real_vector_space_n<2> real_vector_space_2;
-typedef real_vector_space_n<3> real_vector_space_3;
-typedef real_vector_space_n<4> real_vector_space_4;
+typedef R_n<1> R1;
+typedef R_n<2> R2;
+typedef R_n<3> R3;
+typedef R_n<4> R4;
 
 }
