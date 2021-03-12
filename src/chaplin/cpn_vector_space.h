@@ -73,7 +73,7 @@ struct coordinate_transform
 template<free_module_type T, typename InnerProdMatrix>
 struct vector_mult_operation
 {
-    PUBLISH_OPERATION_PROPERTIES(vector_mult_operation,vector_prod_operation,linear,conjugate,positive_definite);
+    PUBLISH_OPERATION_PROPERTIES(vector_mult_operation,mult_operation,linear,conjugate,positive_definite);
 
     typedef typename T::ring_t ring_t;
     typedef InnerProdMatrix inner_prod_matrix_t;
@@ -101,6 +101,15 @@ struct vector_mult_operation
         return res;
     }
     inline operator T() const;
+};
+
+template<vector_space_type T>
+struct metric_from_vector_multiplication
+{
+    inline double operator()(const T& i_lhs,const T& i_rhs) const
+    {
+        return std::sqrt((i_lhs - i_rhs) * (i_lhs - i_rhs));
+    }
 };
 
 template<free_module_type T, typename Coordinates = detail::CartesianCoordinates<typename T::ring_t, T::rank>, typename InnerProdMatrix = detail::identity_prod_matrix<typename T::ring_t,T::rank>>

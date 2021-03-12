@@ -8,6 +8,8 @@ namespace cpn
 template<module_type T, size_t Rank>
 struct canonical_basis_operation
 {
+    static_assert(field_type<typename T::ring_t>, "A free module shall be a finite generated module over a field.");
+
     PUBLISH_OPERATION_PROPERTIES(canonical_basis_operation,basis_operation);
 
     typedef typename T::set_traits set_traits;

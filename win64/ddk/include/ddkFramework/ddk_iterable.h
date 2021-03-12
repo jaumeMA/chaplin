@@ -25,11 +25,19 @@ class iterable : protected iterable_interface
     template<typename TTraits>
     friend class iterable;
 	friend typename Traits::iterable_tag iterable_tag_resolver(const iterable&);
-	friend inline iterable_impl_lent_ref<typename Traits::iterable_base_traits> lend(const iterable<Traits>& i_iterable)
+	friend inline iterable_impl_lent_ref<typename Traits::iterable_base_traits> lend(iterable<Traits>& i_iterable)
     {
         return lend(i_iterable.m_iterableImpl);
     }
-    friend inline iterable_impl_shared_ref<typename Traits::iterable_base_traits> share(const iterable<Traits>& i_iterable)
+    friend inline const iterable_impl_lent_ref<typename Traits::iterable_base_traits> lend(const iterable<Traits>& i_iterable)
+    {
+        return lend(i_iterable.m_iterableImpl);
+    }
+    friend inline iterable_impl_dist_ref<typename Traits::iterable_base_traits> share(iterable<Traits>& i_iterable)
+    {
+        return i_iterable.m_iterableImpl;
+    }
+    friend inline const iterable_impl_dist_ref<typename Traits::iterable_base_traits> share(const iterable<Traits>& i_iterable)
     {
         return i_iterable.m_iterableImpl;
     }
@@ -44,17 +52,25 @@ public:
     typedef typename Traits::action action;
     typedef Traits traits;
 
-    iterable(iterable_impl_shared_ref<iterable_base_traits> i_iterableImpl);
+    iterable(iterable_impl_dist_ref<iterable_base_traits> i_iterableImpl);
     iterable(const iterable&);
     template<typename TTraits>
     iterable(const iterable<TTraits>& other);
 	~iterable();
 
-    action_result iterate(const function<void(reference)>& i_try, const shift_action& i_initialAction = go_to_place);
-    action_result iterate(const function<void(const_reference)>& i_try, const shift_action& i_initialAction = go_to_place) const;
-	action_result co_iterate(const function<void(iterable_value)>& i_try,const shift_action& i_initialAction = go_to_place);
-	action_result co_iterate(const function<void(iterable_const_value)>& i_try,const shift_action& i_initialAction = go_to_place) const;
-	bool inline forward_action(action i_action) const;
+    TEMPLATE(typename Function)
+    REQUIRES(IS_CALLABLE(Function))        
+    action_result iterate(Function&& i_try, const shift_action& i_initialAction = go_to_place);
+    TEMPLATE(typename Function)
+    REQUIRES(IS_CALLABLE(Function))
+    action_result iterate(Function&& i_try, const shift_action& i_initialAction = go_to_place) const;
+    TEMPLATE(typename Function)
+    REQUIRES(IS_CALLABLE(Function))
+    action_result co_iterate(Function&& i_try,const shift_action& i_initialAction = go_to_place);
+    TEMPLATE(typename Function)
+    REQUIRES(IS_CALLABLE(Function))
+    action_result co_iterate(Function&& i_try,const shift_action& i_initialAction = go_to_place) const;
+    bool inline forward_action(action i_action) const;
     bool inline operator==(const std::nullptr_t&) const;
     bool inline operator!=(const std::nullptr_t&) const;
     size_t inline size() const;
@@ -72,7 +88,7 @@ private:
     const_reference resolve_action(const action&) const;
 
 	mutable lendable<action_state> m_actionState;
-    iterable_impl_shared_ref<iterable_base_traits> m_iterableImpl;
+    iterable_impl_dist_ref<iterable_base_traits> m_iterableImpl;
     mutable iterable_state m_iterableState;
 	mutable detail::await_executor<void> m_executor;
 	mutable typed_arena<reference> m_iterableValueContainer;

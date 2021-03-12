@@ -11,6 +11,7 @@
 #include "cpn_number_module.h"
 #include "cpn_number_field.h"
 #include "cpn_number_vector_space.h"
+#include "cpn_number.h"
 #include "cpn_linear_function.h"
 #include "cpn_scalar_function.h"
 #include "ddk_rtti.h"
@@ -61,7 +62,7 @@ TEST(CPNSymbolicNumberTest, defaultRingConstruction)
 TEST(CPNSymbolicNumberTest, defaultModuleConstruction)
 {
 	cpn::symbolic_number foo = cpn::integer(10);
-	cpn::real_ring fooReal0 = cpn::real_set(cpn::integer(10));
+	cpn::real_field fooReal0 = cpn::real_set(cpn::integer(10));
 	cpn::real_module fooReal1 = cpn::real_set(cpn::integer(10));
 	cpn::real_module fooReal2 = cpn::real_set(cpn::integer(20));
 
@@ -112,10 +113,10 @@ TEST(CPNSymbolicNumberTest, defaultPowModuleConstruction)
 {
 	cpn::symbolic_number foo = cpn::integer(10);
 	cpn::real_ring fooReal0 = cpn::rational_set(10,5);
-	cpn::real_ring fooReal1;//(cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)));
+	cpn::real_field fooReal1;//(cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)));
 	cpn::real_module_3 fooReal2;//(cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)));
 
-	auto my_var = cpn::x_0 * cpn::x_0 + cpn::x_1 * 2;// + cpn::sin(cpn::cos(cpn::x_0) + cpn::x_2 * 5);
+	auto my_var = cpn::x_0 * cpn::x_1 + cpn::x_1 * 2;// + cpn::sin(cpn::cos(cpn::x_0) + cpn::x_2 * 5);
 	try
 	{
 		cpn::F<cpn::R2,cpn::R3> prova_0 = {my_var,my_var};

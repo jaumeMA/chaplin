@@ -49,14 +49,4 @@ typedef real_field_n<2> real_field_2;
 typedef real_field_n<3> real_field_3;
 typedef real_field_n<4> real_field_4;
 
-using real = real_field;
-
-template<size_t ... Dims>
-using real_n = pow_field<real,Dims...>;
-
-typedef real_n<1> real_1;
-typedef real_n<2> real_2;
-typedef real_n<3> real_3;
-typedef real_n<4> real_4;
-
 }

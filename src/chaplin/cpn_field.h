@@ -18,7 +18,7 @@ struct pow_div_operation
 	{
 		pow_set_traits_t res;
 
-		res <<= ddk::trans::iterable_div(i_lhs,i_rhs);
+		res <<= ddk::iter::div(i_lhs,i_rhs);
 
 		return res;
 	}

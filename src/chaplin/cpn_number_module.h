@@ -4,6 +4,7 @@
 #include "cpn_module.h"
 #include "cpn_number_group.h"
 #include "cpn_number_ring.h"
+#include "cpn_number_field.h"
 #include "ddkFramework/ddk_iterable_algorithm.h"
 #include "ddkFramework/ddk_concepts.h"
 #include "ddkFramework/ddk_type_concepts.h"
@@ -39,7 +40,7 @@ struct rational_module_operation
 {
     PUBLISH_OPERATION_PROPERTIES(rational_module_operation,mod_operation,commutative,associative,distributive);
 
-    typedef rational_ring ring_t;
+    typedef rational_field ring_t;
 
 	static constexpr ring_t identity = ring_t(ring_t::mult_operation::identity);
 
@@ -63,7 +64,7 @@ struct real_module_operation
 {
     PUBLISH_OPERATION_PROPERTIES(real_module_operation,mod_operation,commutative,associative,distributive);
 
-    typedef real_ring ring_t;
+    typedef real_field ring_t;
 
 	static const ring_t identity;
 

@@ -1,6 +1,7 @@
 
 #include "ddk_await.h"
 #include "ddk_transformed_iterable_action_impl.h"
+#include "ddk_iterable_interface_utils.h"
 
 namespace ddk
 {
@@ -8,7 +9,7 @@ namespace detail
 {
 
 template<typename Traits>
-iterable<Traits>::iterable(iterable_impl_shared_ref<iterable_base_traits> i_iterableImpl)
+iterable<Traits>::iterable(iterable_impl_dist_ref<iterable_base_traits> i_iterableImpl)
 : m_iterableImpl(std::move(i_iterableImpl))
 {
 }
@@ -29,15 +30,19 @@ iterable<Traits>::~iterable()
 {
 }
 template<typename Traits>
-action_result iterable<Traits>::iterate(const function<void(reference)>& i_try, const shift_action& i_initialAction)
+TEMPLATE(typename Function)
+REQUIRED(IS_CALLABLE(Function))
+action_result iterable<Traits>::iterate(Function&& i_try, const shift_action& i_initialAction)
 {
 	try
 	{
 		m_iterableImpl->iterate_impl(make_function([&](reference i_value)
 		{
+			typedef typename mpl::make_sequence<0,mpl::aqcuire_callable_args_type<Function>::type::size()>::type range_seq;
+
 			m_iterableState.apply(m_currAction);
 
-			eval(i_try,i_value);
+			call_iterable_payload(range_seq{},std::forward<Function>(i_try),i_value);
 
 			return m_currAction;
 		}),i_initialAction,lend(m_actionState));
@@ -49,15 +54,19 @@ action_result iterable<Traits>::iterate(const function<void(reference)>& i_try, 
 	return m_actionState->get();
 }
 template<typename Traits>
-action_result iterable<Traits>::iterate(const function<void(const_reference)>& i_try, const shift_action& i_initialAction) const
+TEMPLATE(typename Function)
+REQUIRED(IS_CALLABLE(Function))
+action_result iterable<Traits>::iterate(Function&& i_try, const shift_action& i_initialAction) const
 {
 	try
 	{
 		m_iterableImpl->iterate_impl(make_function([&](const_reference i_value)
 		{
+			typedef typename mpl::make_sequence<0,mpl::aqcuire_callable_args_type<Function>::type::size()>::type range_seq;
+
 			m_iterableState.apply(m_currAction);
 
-			eval(i_try,i_value);
+			call_iterable_payload(range_seq{},std::forward<Function>(i_try),i_value);
 
 			return m_currAction;
 		}),i_initialAction,lend(m_actionState));
@@ -69,7 +78,9 @@ action_result iterable<Traits>::iterate(const function<void(const_reference)>& i
 	return m_actionState->get();
 }
 template<typename Traits>
-action_result iterable<Traits>::co_iterate(const function<void(iterable_value)>& i_try, const shift_action& i_initialAction)
+TEMPLATE(typename Function)
+REQUIRED(IS_CALLABLE(Function))
+action_result iterable<Traits>::co_iterate(Function&& i_try, const shift_action& i_initialAction)
 {
 	m_executor = detail::await_executor<void>(make_function(m_iterableImpl.get(),&iterable_impl_interface<iterable_base_traits>::iterate_impl,make_function(this,&iterable<Traits>::private_iterate),i_initialAction,lend(m_actionState)));
 
@@ -83,7 +94,7 @@ action_result iterable<Traits>::co_iterate(const function<void(iterable_value)>&
             {
                 m_iterableState.apply(m_currAction);
 
-                eval(i_try,make_iterable_value<iterable_value>(*m_iterableValueContainer.template extract<reference>(),make_function(this,&iterable<Traits>::resolve_action),static_cast<iterable_interface&>(*this)));
+                eval(std::forward<Function>(i_try),make_iterable_value<iterable_value>(*m_iterableValueContainer.template extract<reference>(),make_function(this,&iterable<Traits>::resolve_action),static_cast<iterable_interface&>(*this)));
             }
             catch(const suspend_exception&)
             {
@@ -99,7 +110,9 @@ action_result iterable<Traits>::co_iterate(const function<void(iterable_value)>&
 	return m_actionState->get();
 }
 template<typename Traits>
-action_result iterable<Traits>::co_iterate(const function<void(iterable_const_value)>& i_try, const shift_action& i_initialAction) const
+TEMPLATE(typename Function)
+REQUIRED(IS_CALLABLE(Function))
+action_result iterable<Traits>::co_iterate(Function&& i_try, const shift_action& i_initialAction) const
 {
     typedef action(iterable<Traits>::*func_ptr)(const_reference)const;
 
@@ -115,7 +128,7 @@ action_result iterable<Traits>::co_iterate(const function<void(iterable_const_va
             {
                 m_iterableState.apply(m_currAction);
 
-                eval(i_try,make_iterable_value<iterable_const_value>(*m_iterableValueContainer.template extract<const_reference>(),make_function(this,&iterable<Traits>::resolve_action),const_cast<iterable_interface&>(static_cast<const iterable_interface&>(*this))));
+                eval(std::forward<Function>(i_try),make_iterable_value<iterable_const_value>(*m_iterableValueContainer.template extract<const_reference>(),make_function(this,&iterable<Traits>::resolve_action),const_cast<iterable_interface&>(static_cast<const iterable_interface&>(*this))));
             }
             catch(const suspend_exception&)
             {

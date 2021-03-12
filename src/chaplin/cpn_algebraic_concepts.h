@@ -24,6 +24,9 @@
 #define IS_RING(_TYPE) \
     IS_GROUP(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,mult_operation)
 
+#define IS_FIELD(_TYPE) \
+    IS_RING(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,div_operation)
+
 #define IS_MODULE(_TYPE) \
     IS_GROUP(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,mod_operation)
 
@@ -31,7 +34,8 @@
     IS_MODULE(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,basis_operation)
 
 #define IS_VECTOR_SPACE(_TYPE) \
-    IS_FREE_MODULE(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,vector_prod_operation)
+    IS_FREE_MODULE(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,mult_operation)
+
 
 #define IS_COORDINATE_SPACE(_TYPE) \
     IS_FREE_MODULE(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,coordinate_transform_operation)
@@ -89,7 +93,8 @@ CONTAINS_SYMBOL(mult_operation)
 CONTAINS_SYMBOL(div_operation)
 CONTAINS_SYMBOL(mod_operation)
 CONTAINS_SYMBOL(basis_operation)
-CONTAINS_SYMBOL(vector_prod_operation)
+CONTAINS_SYMBOL(point_conv_operation)
+CONTAINS_SYMBOL(metric_operation)
 
 }
 
@@ -110,7 +115,11 @@ concept module_type = group_type<T> && concepts::contains_symbol_mod_operation<T
 template<typename T>
 concept free_module_type = module_type<T> && concepts::contains_symbol_basis_operation<T>::value;
 template<typename T>
-concept vector_space_type = free_module_type<T> && concepts::contains_symbol_vector_prod_operation<T>::value;
+concept vector_space_type = free_module_type<T> && concepts::contains_symbol_mult_operation<T>::value;
+template<typename T>
+concept complete_space_type = set_type<T> && concepts::contains_symbol_point_conv_operation<T>::value;
+template<typename T>
+concept metric_space_type = set_type<T> && concepts::contains_symbol_metric_operation<T>::value;
 template<typename T>
 concept function_type = IS_CALLABLE_COND(T) && module_type<T>;
 

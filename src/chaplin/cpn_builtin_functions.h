@@ -27,7 +27,7 @@ public: \
     : m_rhs(i_rhs) \
     { \
     } \
-    ImSet operator()(Dom ... i_args) const \
+    ImSet operator()(Dom ... i_args) const final override\
     { \
         return ImSet{}; \
     } \
@@ -81,7 +81,7 @@ public: \
     , m_rhs(i_rhs) \
     { \
     } \
-    ImSet operator()(Dom ... i_args) const \
+    ImSet operator()(Dom ... i_args) const final override \
     { \
         return { ddk::eval(m_lhs,std::forward<Dom>(i_args)...) _OP ddk::eval(m_rhs,std::forward<Dom>(i_args)...) }; \
     } \
@@ -113,7 +113,7 @@ struct _NAME##_binary_template_functor \
     template<typename Type, typename ... Types> \
     constexpr inline _NAME##_binary_functor<Type,mpl::type_pack<Types...>> instance() const \
     { \
-        return {m_lhs.template instance<Type,Types...>(),m_rhs.template instance<Type,Types...>() }; \
+        return { m_lhs.template instance<Type,Types...>(),m_rhs.template instance<Type,Types...>() }; \
     } \
 private: \
     const LhsFunction m_lhs; \
@@ -154,7 +154,7 @@ template<typename ImSet, typename ... Dom> \
 struct _NAME##__builtin_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...> \
 { \
     constexpr _NAME##__builtin_function() = default; \
-    inline ImSet operator()(Dom... i_args) const \
+    ImSet operator()(Dom... i_args) const final override \
     { \
         return _FUNC(std::forward<Dom>(i_args)...); \
     } \
@@ -196,12 +196,12 @@ namespace detail
 {
 
 template<typename Im, typename Callable, typename ... Dom>
-constexpr inline cpn::function_impl<Im(ddk::mpl::type_pack<Dom...>)> instantiate_template_callable(Callable&& i_callable, const ddk::mpl::type_pack<Dom...>&);
+constexpr inline cpn::function_impl<Im(mpl::type_pack<Dom...>)> instantiate_template_callable(Callable&& i_callable, const ddk::mpl::type_pack<Dom...>&);
 
 template<cpn::coordinate_type,typename>
 struct builtin_fusioned_function;
 template<cpn::coordinate_type ImSet,typename ... Dom>
-struct builtin_fusioned_function<ImSet,ddk::mpl::type_pack<Dom...>> : public ddk::detail::inherited_functor_impl<ImSet,Dom...>
+struct builtin_fusioned_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...>
 {
     template<typename>
     struct fusioned_components;
@@ -210,60 +210,63 @@ struct builtin_fusioned_function<ImSet,ddk::mpl::type_pack<Dom...>> : public ddk
     {
         fusioned_components(const ddk::detail::intersection_function<cpn::function_impl<ddk::mpl::index_to_type<Components,typename ImSet::place_type>(mpl::type_pack<Dom...>)>...>& i_callable);
 
-        ddk::detail::intersection_function<cpn::function_impl<ddk::mpl::index_to_type<Components,typename ImSet::place_type>(mpl::type_pack<Dom...>)>...> m_fusionedFunction;
+        const ddk::detail::intersection_function<cpn::function_impl<ddk::mpl::index_to_type<Components,typename ImSet::place_type>(mpl::type_pack<Dom...>)>...> m_fusionedFunction;
     };
 
 public:
     template<typename ... T>
-    builtin_fusioned_function(const ddk::detail::intersection_function<cpn::function_impl<T(mpl::type_pack<Dom...>)>...>& i_args);
+    builtin_fusioned_function(const intersection_function<cpn::function_impl<T(mpl::type_pack<Dom...>)>...>& i_args);
 
-    inline ImSet operator()(Dom... i_args) const;
     template<size_t Index>
     inline const cpn::function_impl<typename ImSet::place_type(mpl::type_pack<Dom...>)>& get_callable() const;
 
+    ImSet operator()(Dom... i_args) const final override;
+
 private:
     template<size_t ... Indexs>
-    inline ImSet execute(const ddk::mpl::sequence<Indexs...>&, Dom ... i_args) const;
+    inline ImSet execute(const mpl::sequence<Indexs...>&, Dom ... i_args) const;
 
-    const fusioned_components<typename ddk::mpl::make_sequence<0,ImSet::num_places>::type> m_callables;
+    const fusioned_components<typename mpl::make_sequence<0,ImSet::num_places>::type> m_callables;
 } PUBLISH_RTTI_INHERITANCE(builtin_fusioned_function,ddk::detail::function_impl_base);
 
 template<typename,typename>
 struct builtin_composed_function;
 template<typename ImSet,typename ... Dom>
-struct builtin_composed_function<ImSet,ddk::mpl::type_pack<Dom...>> : public ddk::detail::inherited_functor_impl<ImSet,Dom...>
+struct builtin_composed_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...>
 {
-    typedef cpn::function_impl<ImSet(ddk::mpl::type_pack<ImSet>)> function_lhs_t;
-    typedef cpn::function_impl<ImSet(ddk::mpl::type_pack<Dom...>)> function_rhs_t;
+    typedef cpn::function_impl<ImSet(mpl::type_pack<ImSet>)> function_lhs_t;
+    typedef cpn::function_impl<ImSet(mpl::type_pack<Dom...>)> function_rhs_t;
 
 public:
     builtin_composed_function(const function_lhs_t& i_lhs, const function_rhs_t& i_rhs);
-    inline ImSet operator()(Dom... i_args) const;
 
     const function_lhs_t& get_dest_function() const;
     const function_rhs_t& get_source_function() const;
 
+    ImSet operator()(Dom... i_args) const final override;
+
 private:
     const function_lhs_t m_lhs;
     const function_rhs_t m_rhs;
-} PUBLISH_RTTI_INHERITANCE(builtin_composed_function,ddk::detail::function_impl_base);
+} PUBLISH_RTTI_INHERITANCE(builtin_composed_function,function_impl_base);
 
 template<typename,typename>
 struct builtin_number_function;
 template<typename ImSet,typename ... Dom>
-struct builtin_number_function<ImSet,ddk::mpl::type_pack<Dom...>> : public ddk::detail::inherited_functor_impl<ImSet,Dom...>
+struct builtin_number_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...>
 {
-    typedef cpn::function_impl<ImSet(ddk::mpl::type_pack<Dom...>)> function_t;
+    typedef cpn::function_impl<ImSet(mpl::type_pack<Dom...>)> function_t;
 
 public:
     builtin_number_function(const function_t& i_number);
-    inline ImSet operator()(Dom... i_args) const;
 
     const function_t& get_number() const;
 
+    ImSet operator()(Dom... i_args) const final override;
+
 private:
     const function_t m_number;
-} PUBLISH_RTTI_INHERITANCE(builtin_number_function,ddk::detail::function_impl_base);
+} PUBLISH_RTTI_INHERITANCE(builtin_number_function,function_impl_base);
 
 template<typename LhsFunction, typename RhsFunction>
 struct builtin_composed_template_function
@@ -273,7 +276,7 @@ struct builtin_composed_template_function
     constexpr builtin_composed_template_function(const LhsFunction& i_lhs, const RhsFunction& i_rhs);
 
     template<typename Type,typename ... Types>
-    constexpr inline builtin_composed_function<Type,ddk::mpl::type_pack<Types...>> instance() const;
+    constexpr inline builtin_composed_function<Type,mpl::type_pack<Types...>> instance() const;
 
 private:
     const LhsFunction m_lhs;

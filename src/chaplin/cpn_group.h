@@ -29,7 +29,7 @@ struct pow_add_operation
 	{
 		pow_set_traits_t res;
 
-		res <<= ddk::trans::iterable_sum(i_lhs,i_rhs);
+		res <<= ddk::iter::sum(i_lhs,i_rhs);
 
 		return res;
 	}
@@ -48,7 +48,7 @@ struct pow_add_inverse_operation
 	{
 		pow_set_traits_t res;
 
-		res <<= ddk::trans::iterable_neg(i_rhs);
+		res <<= ddk::iter::inv(i_rhs);
 
 		return res;
 	}
@@ -56,7 +56,7 @@ struct pow_add_inverse_operation
 	{
 		pow_set_traits_t res;
 
-		res <<= ddk::trans::iterable_subs(i_lhs,i_rhs);
+		res <<= ddk::iter::subs(i_lhs,i_rhs);
 
 		return res;
 	}

@@ -32,7 +32,7 @@ struct pow_mult_operation
 	{
 		pow_set_traits_t res;
 
-		res <<= ddk::trans::iterable_prod(i_lhs,i_rhs);
+		res <<= ddk::iter::prod(i_lhs,i_rhs);
 
 		return res;
 	}

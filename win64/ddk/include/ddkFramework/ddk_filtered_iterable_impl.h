@@ -23,7 +23,7 @@ private:
 };
 
 
-template<typename Traits>
+template<typename Traits, typename Function>
 class filtered_iterable_impl : public iterable_impl_interface<typename Traits::iterable_base_traits>
 {
     typedef typename Traits::iterable_base_traits iterable_base_traits;
@@ -34,7 +34,7 @@ public:
     typedef typename Traits::const_reference const_reference;
     typedef typename Traits::action action;
 
-    filtered_iterable_impl(iterable_impl_shared_ref<iterable_base_traits> i_iterableRef, const function<bool(const_reference)>& i_filter);
+    filtered_iterable_impl(iterable_impl_dist_ref<iterable_base_traits> i_iterableRef, const Function& i_filter);
 
 private:
     void iterate_impl(const function<action(reference)>& i_try, const shift_action& i_initialAction, action_state_lent_ptr i_actionStatePtr) override;
@@ -42,8 +42,8 @@ private:
     size_t size() const override;
     bool empty() const override;
 
-    iterable_impl_shared_ref<iterable_base_traits> m_iterableRef;
-    const function<bool(const_reference)> m_filter;
+    iterable_impl_dist_ref<iterable_base_traits> m_iterableRef;
+    const Function m_filter;
 };
 
 }

@@ -45,7 +45,7 @@ struct pow_mod_operation
 	{
 		pow_set_traits_t res;
 
-		res <<= ddk::trans::iterable_transform([&i_lhs](const T& i_value){ return i_lhs ^ i_value; },i_rhs);
+		res <<= ddk::iter::transform([&i_lhs](const T& i_value){ return i_lhs ^ i_value; }) <<= i_rhs;
 
 		return res;
 	}
@@ -53,7 +53,7 @@ struct pow_mod_operation
 	{
 		pow_set_traits_t res;
 
-		res <<= ddk::trans::iterable_transform([&i_rhs](const T& i_value){ return i_value ^ i_rhs; },i_lhs);
+		res <<= ddk::iter::transform([&i_rhs](const T& i_value){ return i_value ^ i_rhs; }) <<= i_lhs;
 
 		return res;
 	}

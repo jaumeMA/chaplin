@@ -50,11 +50,10 @@ namespace ddk
 namespace mpl
 {
 
-template<cpn::set_type Return, cpn::set_type ... Types>
+template<typename Return, typename ... Types>
 struct aqcuire_callable_return_type<cpn::function_impl<Return(type_pack<Types...>)>>
 {
-	typedef Return return_type;
-	typedef type_pack<Types...> args_type;
+	typedef Return type;
 };
 
 }
