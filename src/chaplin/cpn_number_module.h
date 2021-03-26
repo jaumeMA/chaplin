@@ -20,9 +20,9 @@ struct integer_module_operation
 
 	static constexpr ring_t identity = ring_t(ring_t::mult_operation::identity);
 
-	friend inline integer_set operator^(const ring_t& i_lhs,const integer_set& i_rhs)
+	friend inline integer_number operator^(const ring_t& i_lhs,const integer_number& i_rhs)
 	{
-		return integer_set(i_lhs.number() * i_rhs.number());
+		return i_lhs.number() * i_rhs.number();
 	}
 };
 
@@ -44,9 +44,9 @@ struct rational_module_operation
 
 	static constexpr ring_t identity = ring_t(ring_t::mult_operation::identity);
 
-	friend inline rational_set operator^(const ring_t& i_lhs,const rational_set& i_rhs)
+	friend inline rational_number operator^(const ring_t& i_lhs,const rational_number& i_rhs)
 	{
-		return rational_set{ i_lhs.numerator() * i_rhs.numerator(), i_lhs.denominator() * i_rhs.denominator() };
+		return i_lhs.number() * i_rhs.number();
 	}
 };
 
@@ -68,15 +68,13 @@ struct real_module_operation
 
 	static const ring_t identity;
 
-	friend inline real_set operator^(const ring_t& i_lhs,const real_set& i_rhs)
+	friend inline real_number operator^(const ring_t& i_lhs,const real_number& i_rhs)
 	{
-		prod_symbolic_number_visitor prodVisitor;
-
-		return real_set(ddk::visit(prodVisitor,share(i_lhs.number()),share(i_rhs.number())));
+		return i_lhs.number() * i_rhs.number();
 	}
 };
 
-using real_module = real_group::equip_with<real_module_operation>;
+using real_module = typename real_group::template equip_with<real_module_operation>;
 
 template<size_t ... Dims>
 using real_module_n = pow_module<real_module,Dims...>;

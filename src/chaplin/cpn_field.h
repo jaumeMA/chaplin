@@ -3,15 +3,15 @@
 namespace cpn
 {
 
-template<set_type T, typename AddOperation,typename MultOperation, typename DivisionOperation>
-using field = algebraic_structure<T,AddOperation,MultOperation,DivisionOperation>;
+template<ring_type T, typename DivisionOperation>
+using field = typename T::template equip_with<DivisionOperation>;
 
 template<field_type T, size_t ... Dims>
 struct pow_div_operation
 {
     PUBLISH_OPERATION_PROPERTIES(pow_div_operation,div_operation,typename T::operators_pack);
 
-	typedef pow_set<T,Dims...> pow_set_traits_t;
+	typedef typename pow_set<T,Dims...>::set_traits pow_set_traits_t;
 
 	static const pow_set_traits_t identity;
 	friend inline pow_set_traits_t operator/(const pow_set_traits_t& i_lhs,const pow_set_traits_t& i_rhs)
@@ -25,14 +25,14 @@ struct pow_div_operation
 };
 
 template<field_type T, size_t ... Dims>
-using pow_field = typename pow_ring<forget_div<T>,Dims...>::template equip_with<pow_div_operation<T,Dims...>>;
+using pow_field = typename pow_ring<T,Dims...>::template equip_with<pow_div_operation<T,Dims...>>;
 
 template<field_type ... T>
 struct sum_div_operation
 {
     PUBLISH_OPERATION_PROPERTIES(sum_div_operation,div_operation,ddk::mpl::type_pack_intersection<typename T::operators_pack...>);
 
-    typedef sum_set<T...> sum_set_traits_t;
+    typedef typename sum_set<T...>::set_traits sum_set_traits_t;
 
 	struct div_field_operation : public ddk::static_visitor<sum_set_traits_t>
 	{
@@ -50,6 +50,6 @@ struct sum_div_operation
 };
 
 template<field_type ... T>
-using sum_field = typename sum_ring<forget_div<T>...>::template equip_with<sum_div_operation<T...>>;
+using sum_field = typename sum_ring<T...>::template equip_with<sum_div_operation<T...>>;
 
 }

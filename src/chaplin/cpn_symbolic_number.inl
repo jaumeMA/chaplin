@@ -2,17 +2,17 @@
 namespace cpn
 {
 
-TEMPLATE(typename T)
-REQUIRED(IS_BASE_OF(symbolic_number_interface,T))
-symbolic_number::symbolic_number(ddk::inherited_value<T>&& i_impl)
-: m_impl(i_impl)
+TEMPLATE(typename Arg, typename ... Args)
+REQUIRED(IS_CONSTRUCTIBLE(nested_number_t,Arg,Args...))
+symbolic_number::symbolic_number(Arg&& i_arg, Args&& ... i_args)
+: m_number(std::forward<Arg>(i_arg),std::forward<Args>(i_args)...)
 {
 }
 TEMPLATE(typename T)
-REQUIRED(IS_BASE_OF(symbolic_number_interface,T))
-symbolic_number& symbolic_number::operator=(ddk::inherited_value<T>&& i_impl)
+REQUIRED(IS_ASSIGNABLE(nested_number_t,T))
+symbolic_number& symbolic_number::operator=(T&& i_number)
 {
-    m_impl = i_impl;
+    m_number = std::forward<T>(i_number);
 
     return *this;
 }

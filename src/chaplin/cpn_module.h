@@ -8,8 +8,8 @@
 namespace cpn
 {
 
-template<set_type T, typename AddOperation, typename ModuleOperation>
-using module = algebraic_structure<T,AddOperation,ModuleOperation>;
+template<group_type T, typename ModuleOperation>
+using module = typename T::template equip_with<ModuleOperation>;
 
 template<module_type T>
 using module_ring = typename T::ring_t;
@@ -29,14 +29,14 @@ struct ring_module_operation
 };
 
 template<ring_type T>
-using ring_as_module = typename algebraic_structure<T>::template equip_with<ring_module_operation<T>>;
+using ring_as_module = typename T::template equip_with<ring_module_operation<T>>;
 
 template<module_type T,size_t ... Dims>
 struct pow_mod_operation
 {
     PUBLISH_OPERATION_PROPERTIES(pow_mod_operation,mod_operation,typename T::operators_pack);
 
-	typedef pow_set<T,Dims...> pow_set_traits_t;
+	typedef typename pow_set<T,Dims...>::set_traits pow_set_traits_t;
     typedef typename T::ring_t ring_t;
 
 	static const ring_t identity;
@@ -60,14 +60,14 @@ struct pow_mod_operation
 };
 
 template<module_type T, size_t ... Dims>
-using pow_module = typename pow_group<forget_mod<T>,Dims...>::template equip_with<pow_mod_operation<T,Dims...>>;
+using pow_module = typename pow_group<T,Dims...>::template equip_with<pow_mod_operation<T,Dims...>>;
 
 template<module_type ... T>
 struct sum_mod_operation
 {
     PUBLISH_OPERATION_PROPERTIES(sum_mod_operation,mod_operation,ddk::mpl::type_pack_intersection<typename T::operators_pack...>);
 
-	typedef sum_set<T...> sum_set_traits_t;
+	typedef typename sum_set<T...>::set_traits sum_set_traits_t;
     typedef sum_ring<typename T::ring_t ...> ring_t;
 
 	struct module_prod_operation : public ddk::static_visitor<sum_set_traits_t>
@@ -90,7 +90,7 @@ struct sum_mod_operation
 };
 
 template<module_type ... T>
-using sum_module = typename sum_group<forget_mod<T>...>::template equip_with<sum_mod_operation<T...>>;
+using sum_module = typename sum_group<T...>::template equip_with<sum_mod_operation<T...>>;
 
 }
 

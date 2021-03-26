@@ -10,8 +10,14 @@ namespace cpn
 class comparison_symbolic_number_visitor : public ddk::dynamic_visitor<symbolic_number_interface>
 {
 public:
+	enum Type
+	{
+		Equality,
+		LessThan
+	};
 	typedef bool return_type;
 
+	comparison_symbolic_number_visitor(Type i_type);
 	bool operator()(const integer_symbolic_number& i_lhs, const integer_symbolic_number& i_rhs) const;
 	bool operator()(const rational_symbolic_number& i_lhs, const rational_symbolic_number& i_rhs) const;
 	bool operator()(const log_symbolic_number& i_lhs,const log_symbolic_number& i_rhs) const;
@@ -21,6 +27,9 @@ public:
     TEMPLATE(typename T, typename TT)
 	REQUIRES(IS_BASE_OF(symbolic_number_interface,T),IS_BASE_OF(symbolic_number_interface,TT))
     bool operator()(const T& i_lhs, const TT& i_rhs,...) const;
+
+private:
+	Type m_type;
 };
 
 class neg_symbolic_number_visitor : public ddk::dynamic_visitor<symbolic_number_interface>

@@ -35,7 +35,6 @@ protected:
     using function_base_t::function_base_t;
 
 public:
-    using function_base_t::m_functionImpl;
     function_impl(const function_impl& other);
     function_impl(function_impl&& other);
 

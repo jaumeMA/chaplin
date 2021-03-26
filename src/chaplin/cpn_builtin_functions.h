@@ -4,6 +4,7 @@
 #include "cpn_math_functions.h"
 #include "cpn_function_concepts.h"
 #include "cpn_algebraic_defs.h"
+#include "cpn_function_template_helper.h"
 #include "ddk_rtti.h"
 #include "ddk_concepts.h"
 #include "ddk_projection_callable.h"
@@ -149,15 +150,21 @@ namespace detail \
 { \
  \
 template<typename,typename> \
-struct _NAME##__builtin_function; \
+struct _NAME##___builtin_function; \
 template<typename ImSet, typename ... Dom> \
-struct _NAME##__builtin_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...> \
+struct _NAME##___builtin_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...> \
 { \
-    constexpr _NAME##__builtin_function() = default; \
+    constexpr _NAME##___builtin_function() = default; \
     ImSet operator()(Dom... i_args) const final override \
     { \
         return _FUNC(std::forward<Dom>(i_args)...); \
     } \
+}; \
+template<typename,typename> \
+struct _NAME##__builtin_function; \
+template<typename ImSet, typename ... Dom> \
+struct _NAME##__builtin_function<ImSet,mpl::type_pack<Dom...>> : mpl::static_if<std::is_constructible<ImSet,decltype(_FUNC(std::declval<Dom>()...))>::value,_NAME##___builtin_function<ImSet,mpl::type_pack<Dom...>>,void_t>::type \
+{ \
 }; \
 template<typename ImSet, _CONSTRAINT T> \
 struct _NAME##_builtin_function : _NAME##__builtin_function<ImSet,T> \
@@ -312,10 +319,10 @@ constexpr builtin_numeric_template_function<T> resolve_template_function(const T
 
 //arithmetic operations
 DEFINE_ARITHMETIC_UNARY_OPERATION(neg,-,cpn::inverse_additive_type);
-DEFINE_ARITHMETIC_BINARY_OPERATION(add,+,cpn::additive_type);
-DEFINE_ARITHMETIC_BINARY_OPERATION(subs,-,cpn::substractive_type);
-DEFINE_ARITHMETIC_BINARY_OPERATION(prod,*,cpn::multiplicative_type);
-DEFINE_ARITHMETIC_BINARY_OPERATION(div,/,cpn::divisible_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(add,+,cpn::closed_additive_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(subs,-,cpn::closed_substractive_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(prod,*,cpn::closed_multiplicative_type);
+DEFINE_ARITHMETIC_BINARY_OPERATION(div,/,cpn::closed_divisible_type);
 
 //predefined math functions
 DEFINE_BUILTIN_FUNCTION(sin,cpn::detail::sin,cpn::type_pack_args_equal_to_1);

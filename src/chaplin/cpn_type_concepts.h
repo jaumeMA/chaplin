@@ -26,19 +26,34 @@ namespace cpn
 {
 
 template<typename T>
+concept equally_comparable_type = requires (T i_lhs, T i_rhs) { i_lhs == i_rhs; };
+
+template<typename T>
 concept inverse_additive_type = requires (T i_lhs) { -i_lhs; };
 
 template<typename T>
 concept additive_type = requires (T i_lhs, T i_rhs) { i_lhs + i_rhs; };
 
 template<typename T>
-concept substractive_type = inverse_additive_type<T> && additive_type<T>;
+concept closed_additive_type = requires (T i_lhs,T i_rhs, T& res) { res = i_lhs + i_rhs; };
+
+template<typename T>
+concept substractive_type = requires (T i_lhs,T i_rhs) { i_lhs - i_rhs; };
+
+template<typename T>
+concept closed_substractive_type = requires (T i_lhs,T i_rhs, T& res) { res = i_lhs - i_rhs; };
 
 template<typename T>
 concept multiplicative_type = requires (T i_lhs,T i_rhs) { i_lhs * i_rhs; };
 
 template<typename T>
+concept closed_multiplicative_type = requires (T i_lhs,T i_rhs, T& res) { res = i_lhs * i_rhs; };
+
+template<typename T>
 concept divisible_type = requires (T i_lhs,T i_rhs) { i_lhs / i_rhs; };
+
+template<typename T>
+concept closed_divisible_type = requires (T i_lhs,T i_rhs, T& res) { res = i_lhs / i_rhs; };
 
 template<typename T>
 concept coordinate_type = requires { { T::place_type }; { T::num_places }; };
@@ -55,15 +70,15 @@ FULFILLS_CONCEPT_COMPONENT_WISE(divisible_type)
 }
 
 template<typename T>
-concept additive_component_wise_type = concepts::fulfills_concept_additive_type_component_wise<T>::value;
+concept additive_component_wise_type = concepts::fulfills_concept_additive_type_component_wise<typename T::set_traits>::value;
 template<typename T>
-concept inverse_additive_component_wise_type = additive_component_wise_type<T> && concepts::fulfills_concept_inverse_additive_type_component_wise<T>::value;
+concept inverse_additive_component_wise_type = additive_component_wise_type<T> && concepts::fulfills_concept_inverse_additive_type_component_wise<typename T::set_traits>::value;
 template<typename T>
-concept substractive_component_wise_type = additive_component_wise_type<T> && inverse_additive_component_wise_type<T>;
+concept substractive_component_wise_type = additive_component_wise_type<T> && inverse_additive_component_wise_type<typename T::set_traits>;
 template<typename T>
-concept multiplicative_component_wise_type = inverse_additive_component_wise_type<T> && concepts::fulfills_concept_multiplicative_type_component_wise<T>::value;
+concept multiplicative_component_wise_type = inverse_additive_component_wise_type<T> && concepts::fulfills_concept_multiplicative_type_component_wise<typename T::set_traits>::value;
 template<typename T>
-concept divisible_component_wise_type = multiplicative_component_wise_type<T> && concepts::fulfills_concept_divisible_type_component_wise<T>::value;
+concept divisible_component_wise_type = multiplicative_component_wise_type<T> && concepts::fulfills_concept_divisible_type_component_wise<typename T::set_traits>::value;
 
 EXPAND_TYPE_PACK_ARGS_CONCEPTS(1)
 EXPAND_TYPE_PACK_ARGS_CONCEPTS(2)

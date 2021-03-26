@@ -3,7 +3,7 @@
 namespace cpn
 {
 
-const real_set real_multiplication::identity = integer(1);
-const real_set real_multiplication::annihilator = integer(0);
+const real_number real_multiplication::identity = real_number(1);
+const real_number real_multiplication::annihilator = real_number(0);
 
 }

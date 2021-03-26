@@ -3,9 +3,13 @@
 namespace cpn
 {
 
+comparison_symbolic_number_visitor::comparison_symbolic_number_visitor(Type i_type)
+: m_type(i_type)
+{
+}
 bool comparison_symbolic_number_visitor::operator()(const integer_symbolic_number& i_lhs, const integer_symbolic_number& i_rhs) const
 {
-    return i_lhs.number() == i_rhs.number();
+    return (m_type == Equality) ? i_lhs.number() == i_rhs.number() : i_lhs.number() < i_rhs.number();
 }
 bool comparison_symbolic_number_visitor::operator()(const rational_symbolic_number& i_lhs, const rational_symbolic_number& i_rhs) const
 {
@@ -108,7 +112,7 @@ inherited_symbolic_number add_symbolic_number_visitor::operator()(const log_symb
 	const inherited_symbolic_number lhsBase = i_lhs.base();
 	const inherited_symbolic_number rhsBase = i_rhs.base();
 
-    const comparison_symbolic_number_visitor compVisitor;
+    const comparison_symbolic_number_visitor compVisitor(comparison_symbolic_number_visitor::Equality);
 	if(ddk::visit(compVisitor,lhsBase,rhsBase))
 	{
         const prod_symbolic_number_visitor prodVisitor;
@@ -145,7 +149,7 @@ inherited_symbolic_number prod_symbolic_number_visitor::operator()(const root_sy
 	const inherited_symbolic_number lhsNumber = i_lhs.number();
 	const inherited_symbolic_number rhsNumber = i_rhs.number();
 
-    const comparison_symbolic_number_visitor compVisitor;
+    const comparison_symbolic_number_visitor compVisitor(comparison_symbolic_number_visitor::Equality);
 	if(ddk::visit(compVisitor,lhsNumber,rhsNumber))
 	{
         const add_symbolic_number_visitor addVisitor;

@@ -1,63 +1,114 @@
 #pragma once
 
 #include "cpn_algebraic_structure.h"
-#include "cpn_set.h"
 #include "cpn_symbolic_number.h"
+#include "cpn_metric_space.h"
+#include "cpn_builtin_symbolic_number_visitors.h"
+#include "ddk_type_concepts.h"
+#include "ddk_concepts.h"
 #include <utility>
 
 namespace cpn
 {
 
-struct integer_set
+struct integer_number
 {
 public:
-	constexpr integer_set() = default;
-	constexpr integer_set(int i_num);
-	constexpr integer_set(const integer_set&) = default;
+	TEMPLATE(typename ... Args)
+	REQUIRES(IS_CONSTRUCTIBLE(integer_symbolic_literal,Args...))
+	constexpr integer_number(Args&& ... i_args);
 
-	constexpr int number() const;
-	int resolve(unsigned char i_accuracy) const;
-    bool operator==(const integer_set& other) const;
+	constexpr integer_symbolic_literal number() const;
 
 private:
-	int m_value = 0;
+	const integer_symbolic_literal m_number;
 };
 
-struct rational_set
+struct integer_comparison_operation
+{
+	PUBLISH_OPERATION_PROPERTIES(integer_comparison_operation,comp_operation,totally_ordered);
+
+	friend inline bool operator<(const integer_number& i_lhs,const integer_number& i_rhs)
+	{
+		return i_lhs.number() < i_rhs.number();
+	}
+	friend inline bool operator==(const integer_number& i_lhs,const integer_number& i_rhs)
+	{
+		return i_lhs.number() == i_rhs.number();
+	}
+	friend inline bool operator!=(const integer_number& i_lhs,const integer_number& i_rhs)
+	{
+		return (i_lhs.number() == i_rhs.number()) == false;
+	}
+};
+
+using integer_set = typename algebraic_structure<integer_number>::template equip_with<integer_comparison_operation>;
+
+struct rational_number
 {
 public:
-	rational_set() = default;
-	constexpr rational_set(const integer_set& i_value);
-	constexpr rational_set(int i_num, unsigned int i_den = 1);
-	constexpr rational_set(double i_value);
-	constexpr rational_set(const rational_set&) = default;
+	TEMPLATE(typename ... Args)
+	REQUIRES(IS_CONSTRUCTIBLE(rational_symbolic_literal,Args...))
+	constexpr rational_number(Args&& ... i_args);
 
-	int numerator() const;
-	unsigned int denominator() const;
-	double resolve(unsigned char i_accuracy) const;
-    bool operator==(const rational_set& other) const;
+	constexpr rational_symbolic_literal number() const;
 
 private:
-	std::pair<int,unsigned int> m_value = {0,1};
+	const rational_symbolic_literal m_number;
 };
 
-struct real_set
+struct rational_comparison_operation
+{
+	PUBLISH_OPERATION_PROPERTIES(rational_comparison_operation,comp_operation,totally_ordered);
+
+	friend inline bool operator<(const rational_number& i_lhs,const rational_number& i_rhs)
+	{
+		return i_lhs.number() < i_rhs.number();
+	}
+	friend inline bool operator==(const rational_number& i_lhs,const rational_number& i_rhs)
+	{
+		return i_lhs.number() == i_rhs.number();
+	}
+	friend inline bool operator!=(const rational_number& i_lhs,const rational_number& i_rhs)
+	{
+		return (i_lhs.number() == i_rhs.number()) == false;
+	}
+};
+
+using rational_set = typename algebraic_structure<rational_number>::template equip_with<rational_comparison_operation>;
+
+struct real_number
 {
 public:
-    real_set(const rational_set& i_value = rational_set());
-	real_set(const symbolic_number& i_number);
-    TEMPLATE(typename T)
-    REQUIRES(IS_BASE_OF(symbolic_number_interface,T))
-    real_set(const ddk::inherited_value<const T>& i_number);
-    real_set(const real_set&) = default;
+	real_number() = default;
+	real_number(const symbolic_number& i_number);
 
+	real_number& operator=(const real_number& other);
 	symbolic_number number() const;
-	double resolve(unsigned char i_accuracy = 8) const;
-	bool operator==(const real_set& other) const;
 
 private:
-	symbolic_number m_number;
+	const symbolic_number m_number;
 };
+
+struct real_comparison_operation
+{
+	PUBLISH_OPERATION_PROPERTIES(real_comparison_operation,comp_operation,totally_ordered);
+
+	friend inline bool operator<(const real_number& i_lhs,const real_number& i_rhs)
+	{
+		return i_lhs.number() < i_rhs.number();
+	}
+	friend inline bool operator==(const real_number& i_lhs, const real_number& i_rhs)
+	{
+		return i_lhs.number() == i_rhs.number();
+	}
+	friend inline bool operator!=(const real_number& i_lhs,const real_number& i_rhs)
+	{
+		return i_lhs.number() == i_rhs.number();
+	}
+};
+
+using real_set = typename algebraic_structure<real_number>::template equip_with<real_comparison_operation,metric_space_operation<real_number,abs_value_metric<real_number>>>;
 
 }
 

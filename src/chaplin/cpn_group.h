@@ -10,17 +10,17 @@ namespace cpn
 {
 
 template<set_type T,typename AddOperation>
-using semi_group = algebraic_structure<T,AddOperation>;
+using semi_group = typename T::template equip_with<AddOperation>;
 
 template<set_type T,typename AddOperation, typename AddInverseOperation>
-using group = algebraic_structure<T,AddOperation,AddInverseOperation>;
+using group = typename semi_group<T,AddOperation>::template equip_with<AddInverseOperation>;
 
 template<semi_group_type T, size_t ... Dims>
 struct pow_add_operation
 {
     PUBLISH_OPERATION_PROPERTIES(pow_add_operation,add_operation,typename T::operators_pack);
 
-	typedef pow_set<T,Dims...> pow_set_traits_t;
+	typedef typename pow_set<T,Dims...>::set_traits pow_set_traits_t;
 
 	static const pow_set_traits_t identity;
     static inline constexpr ddk::high_order_array<size_t,ddk::mpl::num_ranks<Dims...>> dimension = { Dims... };
@@ -36,13 +36,14 @@ struct pow_add_operation
 };
 
 template<semi_group_type T, size_t ... Dims>
-using pow_semi_group = semi_group<pow_set<forget_add<T>,Dims...>,pow_add_operation<T,Dims...>>;
+using pow_semi_group = semi_group<pow_set<T,Dims...>,pow_add_operation<T,Dims...>>;
 
 template<group_type T, size_t ... Dims>
 struct pow_add_inverse_operation
 {
-	typedef pow_set<T,Dims...> pow_set_traits_t;
-	typedef pow_add_inverse_operation<T,Dims...> add_inverse_operation;
+	PUBLISH_OPERATION_PROPERTIES(pow_add_inverse_operation,add_inverse_operation,typename T::operators_pack);
+
+	typedef typename pow_set<T,Dims...>::set_traits pow_set_traits_t;
 
 	friend inline pow_set_traits_t operator-(const pow_set_traits_t& i_rhs)
 	{
@@ -63,14 +64,14 @@ struct pow_add_inverse_operation
 };
 
 template<group_type T, size_t ... Dims>
-using pow_group = typename pow_semi_group<forget_add_inverse<T>,Dims...>::template equip_with<pow_add_inverse_operation<T,Dims...>>;
+using pow_group = typename pow_semi_group<T,Dims...>::template equip_with<pow_add_inverse_operation<T,Dims...>>;
 
 template<semi_group_type ... T>
 struct sum_add_operation
 {
     PUBLISH_OPERATION_PROPERTIES(sum_add_operation,add_operation,ddk::mpl::type_pack_intersection<typename T::operators_pack...>);
 
-	typedef sum_set<T...> sum_set_traits_t;
+	typedef typename sum_set<T...>::set_traits sum_set_traits_t;
 
 	struct add_operation_visitor : public ddk::static_visitor<sum_set_traits_t>
 	{
@@ -89,13 +90,14 @@ struct sum_add_operation
 };
 
 template<semi_group_type ... T>
-using sum_semi_group = semi_group<sum_set<forget_add<T>...>,sum_add_operation<T...>>;
+using sum_semi_group = semi_group<sum_set<T...>,sum_add_operation<T...>>;
 
 template<group_type ... T>
 struct sum_add_inverse_operation
 {
-	typedef sum_set<T...> sum_set_traits_t;
-	typedef sum_add_inverse_operation<T...> add_inverse_operation;
+	PUBLISH_OPERATION_PROPERTIES(sum_add_inverse_operation,add_inverse_operation,typename T::operators_pack);
+
+	typedef typename sum_set<T...>::set_traits sum_set_traits_t;
 
 	struct inverse_operation_visitor : public ddk::static_visitor<sum_set_traits_t>
 	{
@@ -125,6 +127,6 @@ struct sum_add_inverse_operation
 };
 
 template<group_type ... T>
-using sum_group = typename sum_semi_group<forget_add_inverse<T>...>::template equip_with<sum_add_inverse_operation<T...>>;
+using sum_group = typename sum_semi_group<T...>::template equip_with<sum_add_inverse_operation<T...>>;
 
 }

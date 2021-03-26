@@ -5,10 +5,10 @@
 namespace cpn
 {
 
-template<set_type T, typename Criteria>
+template<typename T, typename Criteria>
 struct point_convergence_operation
 {
-	static_assert(substractive_type<T>, "You can only define complete types upon substractive underlying types.");
+	//static_assert(substractive_type<T>, "You can only define complete types upon substractive underlying types.");
 
 	PUBLISH_OPERATION_PROPERTIES(point_convergence_operation,point_conv_operation);
 
@@ -20,7 +20,7 @@ struct point_convergence_operation
 	}
 };
 
-template<set_type T, typename Criteria>
+template<typename T, typename Criteria>
 using complete_space = typename T::template equip_with<point_convergence_operation<T,Criteria>>;
 
 }

@@ -2,7 +2,6 @@
 
 #include "cpn_number_group.h"
 #include "cpn_ring.h"
-#include "cpn_builtin_symbolic_number_visitors.h"
 
 namespace cpn
 {
@@ -11,16 +10,16 @@ struct integer_multiplication
 {
     PUBLISH_OPERATION_PROPERTIES(integer_multiplication,mult_operation,commutative,associative,distributive);
 
-	static constexpr integer_set identity = integer_set(1);
-	static constexpr integer_set annihilator = integer_set(0);
+	static constexpr integer_number identity = integer_number(1);
+	static constexpr integer_number annihilator = integer_number(0);
 
-	friend inline integer_set operator*(const integer_set& i_lhs,const integer_set& i_rhs)
+	friend inline integer_number operator*(const integer_number& i_lhs,const integer_number& i_rhs)
 	{
-		return integer_set(i_lhs.number() * i_rhs.number());
+		return i_lhs.number() * i_rhs.number();
 	}
 };
 
-using integer_semi_ring = integer_semi_group::template equip_with<integer_multiplication>;
+using integer_semi_ring = typename integer_semi_group::template equip_with<integer_multiplication>;
 
 template<size_t ... Dims>
 using integer_semi_ring_n = pow_semi_ring<integer_semi_ring,Dims...>;
@@ -44,12 +43,12 @@ struct rational_multiplication
 {
     PUBLISH_OPERATION_PROPERTIES(rational_multiplication,mult_operation,commutative,associative,distributive);
 
-	static constexpr rational_set identity = rational_set{1,1};
-	static constexpr rational_set annihilator = rational_set{0,1};
+	static constexpr rational_number identity = rational_number{1,1};
+	static constexpr rational_number annihilator = rational_number{0,1};
 
-	friend inline rational_set operator*(const rational_set& i_lhs,const rational_set& i_rhs)
+	friend inline rational_number operator*(const rational_number& i_lhs,const rational_number& i_rhs)
 	{
-		return rational_set{ i_lhs.numerator() * i_rhs.numerator(), i_lhs.denominator() * i_rhs.denominator() };
+		return i_lhs.number() * i_rhs.number();
 	}
 };
 
@@ -77,16 +76,14 @@ struct real_multiplication
 {
     PUBLISH_OPERATION_PROPERTIES(real_multiplication,mult_operation,commutative,associative,distributive);
 
-	static const real_set identity;
-	static const real_set annihilator;
+	static const real_number identity;
+	static const real_number annihilator;
 
-	friend inline real_set operator*(const real_set& i_lhs,const real_set& i_rhs)
+	friend inline real_number operator*(const real_number& i_lhs,const real_number& i_rhs)
 	{
-		prod_symbolic_number_visitor prodVisitor;
-
-		return real_set(ddk::visit(prodVisitor,share(i_lhs.number()),share(i_rhs.number())));
+		return i_lhs.number() * i_rhs.number();
 	}
-	friend inline real_set operator^(const real_set& i_lhs, size_t i_exp)
+	friend inline real_number operator^(const real_number& i_lhs, size_t i_exp)
 	{
 		return i_lhs;
 	}
@@ -102,7 +99,7 @@ typedef real_semi_ring_n<2> real_semi_ring_2;
 typedef real_semi_ring_n<3> real_semi_ring_3;
 typedef real_semi_ring_n<4> real_semi_ring_4;
 
-using real_ring = real_group::template equip_with<real_multiplication>;
+using real_ring = typename real_group::template equip_with<real_multiplication>;
 
 template<size_t ... Dims>
 using real_ring_n = pow_ring<real_ring,Dims...>;

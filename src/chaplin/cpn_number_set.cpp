@@ -4,53 +4,17 @@
 namespace cpn
 {
 
-int integer_set::resolve(unsigned char i_accuracy) const
-{
-    return m_value;
-}
-bool integer_set::operator==(const integer_set& other) const
-{
-    return m_value == other.m_value;
-}
-
-int rational_set::numerator() const
-{
-	return m_value.first;
-}
-unsigned int rational_set::denominator() const
-{
-	return m_value.second;
-}
-double rational_set::resolve(unsigned char i_accuracy) const
-{
-	return static_cast<float>(m_value.first) / static_cast<float>(m_value.second);
-}
-bool rational_set::operator==(const rational_set& other) const
-{
-    return (m_value.first == other.m_value.first) && (m_value.second == other.m_value.second);
-}
-
-real_set::real_set(const rational_set& i_value)
-: m_number(rational(integer(i_value.numerator()),integer(i_value.denominator())))
-{
-}
-real_set::real_set(const symbolic_number& i_number)
+real_number::real_number(const symbolic_number& i_number)
 : m_number(i_number)
 {
 }
-symbolic_number real_set::number() const
+real_number& real_number::operator=(const real_number& other)
+{
+	return *this;
+}
+symbolic_number real_number::number() const
 {
 	return m_number;
-}
-double real_set::resolve(unsigned char i_accuracy) const
-{
-    return m_number.resolve(i_accuracy);
-}
-bool real_set::operator==(const real_set& other) const
-{
-    const comparison_symbolic_number_visitor compVisitor;
-
-    return ddk::visit(compVisitor,share(m_number),share(other.m_number));
 }
 
 }

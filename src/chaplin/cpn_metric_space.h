@@ -19,10 +19,10 @@ struct euclidean_metric
 	}
 };
 
-template<set_type T>
+template<typename T>
 struct abs_value_metric
 {
-	static_assert(substractive_type<T>,"You shall define metric operation over substractive types.");
+	//static_assert(substractive_type<T>,"You shall define metric operation over substractive types.");
 
 	inline double operator()(const T& i_lhs,const T& i_rhs) const
 	{
@@ -30,7 +30,7 @@ struct abs_value_metric
 	}
 };
 
-template<set_type T, typename Metric>
+template<typename T, typename Metric>
 struct point_convergence_from_metric
 {
 public:
@@ -49,7 +49,7 @@ private:
 	const double m_epsilon;
 };
 
-template<set_type T, typename Metric>
+template<typename T, typename Metric>
 struct metric_space_operation : point_convergence_operation<T,point_convergence_from_metric<T,Metric>>
 {
 	PUBLISH_OPERATION_PROPERTIES(metric_space_operation,metric_operation);
@@ -62,7 +62,7 @@ struct metric_space_operation : point_convergence_operation<T,point_convergence_
 	}
 };
 
-template<set_type T, typename Metric>
+template<typename T, typename Metric>
 using metric_space = typename T::template equip_with<metric_space_operation<T,Metric>>;
 
 }

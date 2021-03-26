@@ -12,11 +12,9 @@ struct function_addition
 {
 	PUBLISH_OPERATION_PROPERTIES(function_addition,add_operation,commutative,associative,distributive);
 
-	static constexpr integer_set identity = integer_set(0);
-
-	friend inline function_set<Im,Dom> operator+(const function_set<Im,Dom>& i_lhs,const function_set<Im,Dom>& i_rhs)
+	friend inline function<Im(Dom)> operator+(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs)
 	{
-		return function_set<Im,Dom>{ ddk::detail::add_binary_functor(i_lhs,i_rhs) };
+		return { ddk::detail::add_binary_functor(i_lhs,i_rhs) };
 	}
 };
 
@@ -28,13 +26,13 @@ struct function_addition_inverse
 {
 	PUBLISH_OPERATION_PROPERTIES(function_addition_inverse,add_inverse_operation);
 
-	friend inline function_set<Im,Dom> operator-(const function_set<Im,Dom>& i_rhs)
+	friend inline function<Im(Dom)> operator-(const function<Im(Dom)>& i_rhs)
 	{
-		return function_set<Im,Dom>{ ddk::detail::neg_unary_functor(i_rhs) };
+		return { ddk::detail::neg_unary_functor(i_rhs) };
 	}
-	friend inline function_set<Im,Dom> operator-(const function_set<Im,Dom>& i_lhs, const function_set<Im,Dom>& i_rhs)
+	friend inline function<Im(Dom)> operator-(const function<Im(Dom)>& i_lhs, const function<Im(Dom)>& i_rhs)
 	{
-		return function_set<Im,Dom>{ ddk::detail::subs_binary_functor(i_lhs,i_rhs) };
+		return { ddk::detail::subs_binary_functor(i_lhs,i_rhs) };
 	}
 };
 

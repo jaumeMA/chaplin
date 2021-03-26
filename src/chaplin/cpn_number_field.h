@@ -2,7 +2,6 @@
 
 #include "cpn_number_ring.h"
 #include "cpn_field.h"
-#include "cpn_builtin_symbolic_number_visitors.h"
 
 namespace cpn
 {
@@ -11,13 +10,13 @@ struct rational_division
 {
     PUBLISH_OPERATION_PROPERTIES(rational_division,div_operation,commutative,associative,distributive);
 
-	friend inline rational_set operator/(const rational_set& i_lhs,const rational_set& i_rhs)
+	friend inline rational_number operator/(const rational_number& i_lhs,const rational_number& i_rhs)
 	{
-		return rational_set{ static_cast<int>(i_lhs.numerator() * i_rhs.denominator()), i_lhs.denominator() * i_rhs.numerator() };
+		return i_lhs.number() / i_rhs.number();
 	}
 };
 
-using rational_field = rational_ring::equip_with<rational_division>;
+using rational_field = typename rational_ring::template equip_with<rational_division>;
 
 template<size_t ... Dims>
 using rational_field_n = pow_field<rational_field,Dims...>;
@@ -31,15 +30,13 @@ struct real_division
 {
     PUBLISH_OPERATION_PROPERTIES(real_division,div_operation,commutative,associative,distributive);
 
-	friend inline real_set operator/(const real_set& i_lhs,const real_set& i_rhs)
+	friend inline real_number operator/(const real_number& i_lhs,const real_number& i_rhs)
 	{
-		const div_symbolic_number_visitor divVisitor;
-
-		return real_set(ddk::visit(divVisitor,share(i_lhs.number()),share(i_rhs.number())));
+		return i_lhs.number() / i_rhs.number();
 	}
 };
 
-using real_field = real_ring::equip_with<real_division>;
+using real_field = typename real_ring::template equip_with<real_division>;
 
 template<size_t ... Dims>
 using real_field_n = pow_field<real_field,Dims...>;

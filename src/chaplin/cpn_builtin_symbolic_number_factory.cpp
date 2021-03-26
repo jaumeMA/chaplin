@@ -4,11 +4,7 @@
 namespace cpn
 {
 
-ddk::inherited_value<const integer_symbolic_number> integer(int i_number)
-{
-	return ddk::make_inherited_value<const integer_symbolic_number>(i_number);
-}
-ddk::inherited_value<const rational_symbolic_number> rational(inherited_symbolic_number i_numerator,inherited_symbolic_number i_denominator, bool i_sign)
+ddk::inherited_value<const rational_symbolic_number> frac(inherited_symbolic_number i_numerator,inherited_symbolic_number i_denominator, bool i_sign)
 {
 	return ddk::make_inherited_value<const rational_symbolic_number>(i_numerator,i_denominator,i_sign);
 }

@@ -6,6 +6,8 @@
 #endif
 
 #include <gtest/gtest.h>
+#include "cpn_set.h"
+#include "cpn_number_set.h"
 #include "cpn_number_group.h"
 #include "cpn_number_ring.h"
 #include "cpn_number_module.h"
@@ -29,10 +31,23 @@ class CPNSymbolicNumberTest : public Test
 {
 };
 
+template<cpn::set_type T>
+void foo(const T& value)
+{
+}
+
+TEST(CPNSymbolicNumberTest,defaultRationalSetConstruction)
+{
+	cpn::rational_group fooReal1 = cpn::frac(10,7);
+	cpn::rational_group fooReal2 = cpn::frac(7,10);
+
+	cpn::rational_group fooReal3 = fooReal1 + fooReal2;
+}
+
 TEST(CPNSymbolicNumberTest, defaultRationalGroupConstruction)
 {
-	cpn::rational_group fooReal1 = cpn::rational_set(10,7);
-	cpn::rational_group fooReal2 = cpn::rational_set(7,10);
+	cpn::rational_group fooReal1 = cpn::frac(10,7);
+	cpn::rational_group fooReal2 = cpn::frac(7,10);
 
 	cpn::rational_group fooReal3 = fooReal1 + fooReal2;
 }
@@ -40,8 +55,8 @@ TEST(CPNSymbolicNumberTest, defaultRationalGroupConstruction)
 TEST(CPNSymbolicNumberTest, defaultGroupConstruction)
 {
 	cpn::symbolic_number foo = cpn::integer(10);
-	cpn::real_group fooReal1 = cpn::real_set(cpn::integer(10));
-	cpn::real_group fooReal2 = cpn::real_set(cpn::integer(20));
+	cpn::real_group fooReal1 = cpn::integer(10);
+	cpn::real_group fooReal2 = cpn::integer(20);
 
 	cpn::real_group fooReal3(fooReal1 + fooReal2);
 }
@@ -49,22 +64,22 @@ TEST(CPNSymbolicNumberTest, defaultGroupConstruction)
 TEST(CPNSymbolicNumberTest, defaultRingConstruction)
 {
 	cpn::symbolic_number foo = cpn::integer(10);
-	cpn::real_ring fooReal1 = cpn::real_set(cpn::integer(10));
-	cpn::real_ring fooReal2 = cpn::real_set(cpn::integer(20));
+	cpn::real_ring fooReal1 = cpn::integer(10);
+	cpn::real_ring fooReal2 = cpn::integer(20);
 
 	cpn::real_ring fooReal3(fooReal1 + fooReal2);
 	cpn::real_ring fooReal4(fooReal1 * fooReal2);
 
-	cpn::real_ring kk2;
+	cpn::real_ring kk2(0);
 	cpn::real_group kk1 = kk2;
 }
 
 TEST(CPNSymbolicNumberTest, defaultModuleConstruction)
 {
 	cpn::symbolic_number foo = cpn::integer(10);
-	cpn::real_field fooReal0 = cpn::real_set(cpn::integer(10));
-	cpn::real_module fooReal1 = cpn::real_set(cpn::integer(10));
-	cpn::real_module fooReal2 = cpn::real_set(cpn::integer(20));
+	cpn::real_field fooReal0 = cpn::integer(10);
+	cpn::real_module fooReal1 = cpn::integer(10);
+	cpn::real_module fooReal2 = cpn::integer(20);
 
 	cpn::real_module fooReal3(fooReal1 + fooReal2);
 	cpn::real_module fooReal4(fooReal0 ^ fooReal2);
@@ -73,8 +88,8 @@ TEST(CPNSymbolicNumberTest, defaultModuleConstruction)
 TEST(CPNSymbolicNumberTest, defaultFieldConstruction)
 {
 	cpn::symbolic_number foo = cpn::integer(10);
-	cpn::real fooReal0 = cpn::real_set(cpn::integer(10));
-	cpn::real fooReal1 = cpn::real_set(cpn::integer(10));
+	cpn::real fooReal0 = cpn::integer(10);
+	cpn::real fooReal1 = cpn::integer(10);
 
 	cpn::real_module fooReal3 = fooReal0 + fooReal1;
 	cpn::real_module fooReal4 = fooReal0 * fooReal1;
@@ -84,8 +99,8 @@ TEST(CPNSymbolicNumberTest, defaultFieldConstruction)
 TEST(CPNSymbolicNumberTest, defaultPowGroupConstruction)
 {
 	cpn::symbolic_number foo = cpn::integer(10);
-	cpn::real_group_3 fooReal1;//(cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)));
-	cpn::real_group_3 fooReal2;//(cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)));
+	cpn::real_group_3 fooReal1(0,0,0);//(cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)));
+	cpn::real_group_3 fooReal2(0,0,0);//(cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)));
 
 //	cpn::real_ring_3 fooReal4 = fooReal2;
 	cpn::real_group_3 fooReal3 = fooReal1 + fooReal2;
@@ -94,8 +109,8 @@ TEST(CPNSymbolicNumberTest, defaultPowGroupConstruction)
 TEST(CPNSymbolicNumberTest, defaultPowRingConstruction)
 {
 	cpn::symbolic_number foo = cpn::integer(10);
-	cpn::real_ring_3 fooReal1;//(cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)));
-	cpn::real_ring_3 fooReal2;//(cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)));
+	cpn::real_ring_3 fooReal1(0,0,0);//(cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)));
+	cpn::real_ring_3 fooReal2(0,0,0);//(cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)));
 
 	cpn::real_ring_3 fooReal3 = fooReal1 + fooReal2;
 	cpn::real_ring_3 fooReal4 = fooReal1 * fooReal2;
@@ -112,9 +127,9 @@ struct my_class<ImSet,ddk::mpl::type_pack<Dom...>> : public ddk::detail::inherit
 TEST(CPNSymbolicNumberTest, defaultPowModuleConstruction)
 {
 	cpn::symbolic_number foo = cpn::integer(10);
-	cpn::real_ring fooReal0 = cpn::rational_set(10,5);
-	cpn::real_field fooReal1;//(cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)));
-	cpn::real_module_3 fooReal2;//(cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)));
+	cpn::real_ring fooReal0 = cpn::frac(10,5);
+	cpn::real_field fooReal1(0);//(cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)),cpn::symbolic_number(cpn::integer(10)));
+	cpn::real_module_3 fooReal2(0,0,0);//(cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)),cpn::symbolic_number(cpn::integer(20)));
 
 	auto my_var = cpn::x_0 * cpn::x_1 + cpn::x_1 * 2;// + cpn::sin(cpn::cos(cpn::x_0) + cpn::x_2 * 5);
 	try
@@ -123,13 +138,13 @@ TEST(CPNSymbolicNumberTest, defaultPowModuleConstruction)
 
 		cpn::F<cpn::R2,cpn::R3> prova_1 = prova_0 + prova_0;
 
-		cpn::FR<1,3> prova1 = my_var;
+		prova_0 == prova_1;
 
-		cpn::FR<1,3> prova2 = prova1 + my_var;
+		cpn::F<cpn::R1,cpn::R3> prova1 = my_var;
 
-		static_assert(cpn::get_rank<cpn::R1>()==1,"wtf");
+		prova1 = prova1 + prova1;
 
-		cpn::derivative(prova2);
+		//cpn::derivative(prova_0);
 	}
 	catch(...)
 	{
@@ -137,18 +152,18 @@ TEST(CPNSymbolicNumberTest, defaultPowModuleConstruction)
 
 
 
-	cpn::real_ring_3 fooReal3 = fooReal1 ^ fooReal2;
+	cpn::real_module_3 fooReal3 = fooReal1 ^ fooReal2;
     cpn::real_group_3 fooReal4 = fooReal2 + fooReal2;
 
-    cpn::real_free_module_3 fooReal5 = fooReal2;
+    cpn::real_module_3 fooReal5 = fooReal2;
 
 }
 
 TEST(CPNSymbolicNumberTest, defaultPowFieldConstruction)
 {
 	cpn::symbolic_number foo = cpn::integer(10);
-	cpn::real_field_3 fooReal0;// = cpn::symbolic_number(cpn::integer(10));
-	cpn::real_field_3 fooReal1;// = cpn::symbolic_number(cpn::integer(10));
+	cpn::real_field_3 fooReal0(0,0,0);// = cpn::symbolic_number(cpn::integer(10));
+	cpn::real_field_3 fooReal1(0,0,0);// = cpn::symbolic_number(cpn::integer(10));
 
 	cpn::real_field_3 fooReal3 = fooReal0 + fooReal1;
 	cpn::real_field_3 fooReal4 = fooReal0 * fooReal1;
@@ -157,7 +172,7 @@ TEST(CPNSymbolicNumberTest, defaultPowFieldConstruction)
 
 TEST(CPNSymbolicNumberTest, defaultVectorSpaceConstruction)
 {
-	cpn::R3 fooRes1;
-	cpn::R3 fooRes2;
+	cpn::R3 fooRes1(0,0,0);
+	cpn::R3 fooRes2(0,0,0);
 	cpn::real_ring res = fooRes1 * fooRes2;
 }

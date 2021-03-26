@@ -32,7 +32,7 @@ struct sub_basis_operation
 };
 
 template<module_type T, typename BasisOperation>
-using free_module = typename algebraic_structure<pow_set<ring_as_module<module_ring<T>>,BasisOperation::rank>>::template equip_with<BasisOperation,pow_add_operation<forget_add_inverse<forget_mult<ring_as_module<module_ring<T>>>>,BasisOperation::rank>,pow_add_inverse_operation<forget_mult<ring_as_module<module_ring<T>>>,BasisOperation::rank>,pow_mod_operation<ring_as_module<module_ring<T>>,BasisOperation::rank>>;
+using free_module = typename pow_set<ring_as_module<module_ring<T>>,BasisOperation::rank>::template equip_with<BasisOperation,pow_add_operation<ring_as_module<module_ring<T>>,BasisOperation::rank>,pow_add_inverse_operation<ring_as_module<module_ring<T>>,BasisOperation::rank>,pow_mod_operation<ring_as_module<module_ring<T>>,BasisOperation::rank>>;
 
 template<free_module_type T, size_t ... SpecializedComponents>
 using free_sub_module = typename forget_basis<T>::template equip_with<sub_basis_operation<typename T::basis_operation,SpecializedComponents...>>;

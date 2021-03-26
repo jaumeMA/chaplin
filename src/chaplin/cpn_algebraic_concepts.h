@@ -87,6 +87,7 @@ struct contains_algebraic_structure_resolver<Structure<Set,Operations...>,Struct
 template<typename Type,template<typename,typename...>typename Structure>
 inline constexpr bool contains_algebraic_structure = contains_algebraic_structure_resolver<Type,Structure>::value;
 
+CONTAINS_SYMBOL(comp_operation)
 CONTAINS_SYMBOL(add_operation)
 CONTAINS_SYMBOL(add_inverse_operation)
 CONTAINS_SYMBOL(mult_operation)
@@ -99,11 +100,15 @@ CONTAINS_SYMBOL(metric_operation)
 }
 
 template<typename T>
-concept set_type = requires (const T& i_lhs, const T& i_rhs){ { i_lhs == i_rhs}; };
+concept set_type = equally_comparable_type<T> && concepts::contains_symbol_comp_operation<T>::value;
+template<typename T>
+concept complete_space_type = set_type<T> && concepts::contains_symbol_point_conv_operation<T>::value;
+template<typename T>
+concept metric_space_type = set_type<T> && concepts::contains_symbol_metric_operation<T>::value;
 template<typename T>
 concept semi_group_type = set_type<T> && additive_type<T> && concepts::contains_symbol_add_operation<T>::value;
 template<typename T>
-concept group_type = semi_group_type<T> && substractive_type<T> && concepts::contains_symbol_add_inverse_operation<T>::value;
+concept group_type = semi_group_type<T> && inverse_additive_type<T> && concepts::contains_symbol_add_inverse_operation<T>::value;
 template<typename T>
 concept semi_ring_type = semi_group_type<T> && multiplicative_type<T> && concepts::contains_symbol_mult_operation<T>::value;
 template<typename T>
@@ -116,10 +121,6 @@ template<typename T>
 concept free_module_type = module_type<T> && concepts::contains_symbol_basis_operation<T>::value;
 template<typename T>
 concept vector_space_type = free_module_type<T> && concepts::contains_symbol_mult_operation<T>::value;
-template<typename T>
-concept complete_space_type = set_type<T> && concepts::contains_symbol_point_conv_operation<T>::value;
-template<typename T>
-concept metric_space_type = set_type<T> && concepts::contains_symbol_metric_operation<T>::value;
 template<typename T>
 concept function_type = IS_CALLABLE_COND(T) && module_type<T>;
 

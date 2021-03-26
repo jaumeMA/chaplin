@@ -2,7 +2,6 @@
 
 #include "cpn_number_set.h"
 #include "cpn_group.h"
-#include "cpn_builtin_symbolic_number_visitors.h"
 
 namespace cpn
 {
@@ -11,11 +10,11 @@ struct integer_addition
 {
     PUBLISH_OPERATION_PROPERTIES(integer_addition,add_operation,commutative,associative,distributive);
 
-	static constexpr integer_set identity = integer_set(0);
+	static constexpr integer_number identity = integer_number(0);
 
-	friend inline integer_set operator+(const integer_set& i_lhs,const integer_set& i_rhs)
+	friend inline integer_number operator+(const integer_number& i_lhs,const integer_number& i_rhs)
 	{
-		return integer_set(i_lhs.number() + i_rhs.number());
+		return i_lhs.number() + i_rhs.number();
 	}
 };
 
@@ -33,13 +32,13 @@ struct integer_addition_inverse
 {
     PUBLISH_OPERATION_PROPERTIES(integer_addition_inverse,add_inverse_operation);
 
-	friend inline integer_set operator-(const integer_set& i_rhs)
+	friend inline integer_number operator-(const integer_number& i_rhs)
 	{
-		return integer_set(-i_rhs.number());
+		return -i_rhs.number();
 	}
-	friend inline integer_set operator-(const integer_set& i_lhs,const integer_set& i_rhs)
+	friend inline integer_number operator-(const integer_number& i_lhs,const integer_number& i_rhs)
 	{
-		return integer_set(i_lhs.number() - i_rhs.number());
+		return i_lhs.number() - i_rhs.number();
 	}
 };
 
@@ -57,11 +56,11 @@ struct rational_addition
 {
     PUBLISH_OPERATION_PROPERTIES(rational_addition,add_operation,commutative,associative,distributive);
 
-	static constexpr rational_set identity = rational_set{0,1};
+	static constexpr rational_number identity = {0,1};
 
-	friend inline rational_set operator+(const rational_set& i_lhs,const rational_set& i_rhs)
+	friend inline rational_number operator+(const rational_number& i_lhs,const rational_number& i_rhs)
 	{
-		return rational_set{ static_cast<int>(i_lhs.numerator() * i_rhs.denominator() + i_rhs.numerator() * i_lhs.denominator()),i_lhs.denominator() * i_rhs.denominator() };
+		return i_lhs.number() + i_rhs.number();
 	}
 };
 
@@ -79,13 +78,13 @@ struct rational_addition_inverse
 {
 	typedef rational_addition_inverse add_inverse_operation;
 
-	friend inline rational_set operator-(const rational_set& i_rhs)
+	friend inline rational_number operator-(const rational_number& i_rhs)
 	{
-		return rational_set{ -i_rhs.numerator(), i_rhs.denominator() };
+		return -i_rhs.number();
 	}
-	friend inline rational_set operator-(const rational_set& i_lhs,const rational_set& i_rhs)
+	friend inline rational_number operator-(const rational_number& i_lhs,const rational_number& i_rhs)
 	{
-		return rational_set{ static_cast<int>(i_lhs.numerator() * i_rhs.denominator() - i_rhs.numerator() * i_lhs.denominator()),i_lhs.denominator() * i_rhs.denominator() };
+		return i_lhs.number() - i_rhs.number();
 	}
 };
 
@@ -103,11 +102,9 @@ struct real_addition
 {
     PUBLISH_OPERATION_PROPERTIES(real_addition,add_operation,commutative,associative,distributive);
 
-	friend inline real_set operator+(const real_set& i_lhs,const real_set& i_rhs)
+	friend inline real_number operator+(const real_number& i_lhs,const real_number& i_rhs)
 	{
-		add_symbolic_number_visitor addVisitor;
-
-		return real_set(ddk::visit(addVisitor,share(i_lhs.number()),share(i_rhs.number())));
+		return i_lhs.number() + i_rhs.number();
 	}
 };
 
@@ -125,17 +122,13 @@ struct real_addition_inverse
 {
     PUBLISH_OPERATION_PROPERTIES(real_addition_inverse,add_inverse_operation);
 
-	friend inline real_set operator-(const real_set& i_lhs)
+	friend inline real_number operator-(const real_number& i_lhs)
 	{
-		neg_symbolic_number_visitor negVisitor;
-
-		return real_set(ddk::visit(negVisitor,share(i_lhs.number())));
+		return -i_lhs.number();
 	}
-	friend inline real_set operator-(const real_set& i_lhs,const real_set& i_rhs)
+	friend inline real_number operator-(const real_number& i_lhs,const real_number& i_rhs)
 	{
-		add_symbolic_number_visitor addVisitor;
-
-		return real_set(ddk::visit(addVisitor,share(i_lhs.number()),share(i_rhs.number())));
+		return i_lhs.number() - i_rhs.number();
 	}
 };
 

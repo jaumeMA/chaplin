@@ -8,7 +8,7 @@ TEMPLATE(typename T, typename TT)
 REQUIRED(IS_BASE_OF(symbolic_number_interface,T),IS_BASE_OF(symbolic_number_interface,TT))
 bool comparison_symbolic_number_visitor::operator()(const T& i_lhs, const TT& i_rhs,...) const
 {
-    return false;
+    return (m_type == Equality) ? false : static_cast<const symbolic_number_interface&>(i_lhs).resolve() < static_cast<const symbolic_number_interface&>(i_rhs).resolve();
 }
 
 TEMPLATE(typename T)

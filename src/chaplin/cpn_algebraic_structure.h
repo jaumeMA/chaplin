@@ -11,10 +11,10 @@ namespace cpn
 namespace detail
 {
 
-template<set_type,typename>
+template<typename,typename>
 class algebraic_structure_impl;
 
-template<set_type T,typename ... Operators>
+template<typename T,typename ... Operators>
 class algebraic_structure_impl<T,ddk::mpl::type_pack<Operators...>> : public T, public Operators ...
 {
 public:
@@ -23,33 +23,32 @@ public:
 
     template<typename ... Operations>
     using equip_with = algebraic_structure_impl<T,typename ddk::mpl::type_pack<Operators...>::template add<Operations...>::type>;
-    using T::operator==;
-
     using T::T;
+
     algebraic_structure_impl() = default;
     algebraic_structure_impl(const algebraic_structure_impl&) = default;
-    TEMPLATE(set_type TT)
+    TEMPLATE(typename TT)
     REQUIRES_COND((IS_SAME_CLASS_COND(T,TT) || IS_NOT_BASE_OF_COND(T,TT)) && IS_CONSTRUCTIBLE_COND(T,TT))
     constexpr algebraic_structure_impl(const TT& other);
-    TEMPLATE(set_type TT, typename ... OOperators)
+    TEMPLATE(typename TT, typename ... OOperators)
     REQUIRES(IS_CONSTRUCTIBLE(T,TT),IS_SUPERSTRUCTURE_OF(ddk::mpl::type_pack<OOperators...>,operators_pack))
     constexpr algebraic_structure_impl(const algebraic_structure_impl<TT,ddk::mpl::type_pack<OOperators...>>& other);
-    TEMPLATE(set_type TT)
+    TEMPLATE(typename TT)
     REQUIRES(IS_CONSTRUCTIBLE(T,TT))
     constexpr algebraic_structure_impl(const algebraic_structure_impl<TT,ddk::mpl::type_pack<>>& other);
 
     algebraic_structure_impl& operator=(const algebraic_structure_impl&) = default;
-    TEMPLATE(set_type TT, typename ... OOperators)
+    TEMPLATE(typename TT, typename ... OOperators)
     REQUIRES(IS_ASSIGNABLE(T,TT),IS_SUPERSTRUCTURE_OF(ddk::mpl::type_pack<OOperators...>,operators_pack))
     constexpr algebraic_structure_impl& operator=(const algebraic_structure_impl<TT,ddk::mpl::type_pack<OOperators...>>& other);
-    TEMPLATE(set_type TT)
+    TEMPLATE(typename TT)
     REQUIRES(IS_ASSIGNABLE(T,TT))
     constexpr algebraic_structure_impl& operator=(const algebraic_structure_impl<TT,ddk::mpl::type_pack<>>& other);
 };
 
 }
 
-template<set_type Set, typename ... Operators>
+template<typename Set, typename ... Operators>
 using algebraic_structure = detail::algebraic_structure_impl<Set,ddk::mpl::type_pack<Operators...>>;
 
 }

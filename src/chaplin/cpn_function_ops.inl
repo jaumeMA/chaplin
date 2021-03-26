@@ -4,7 +4,7 @@
 namespace cpn
 {
 
-template<set_type Im, set_type Dom, size_t ... RankDomIndexs>
+template<metric_space_type Im,metric_space_type Dom, size_t ... RankDomIndexs>
 inline ddk::high_order_array<function<Im(Dom)>,get_rank<Im>(),get_rank<Dom>()> _derivative(const function<Im(Dom)>& i_function, const ddk::mpl::sequence<RankDomIndexs...>&)
 {
 	auto kk = { visit<cpn::derivative_visitor<Im,Dom,RankDomIndexs>>(i_function) ... };

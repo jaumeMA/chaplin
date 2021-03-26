@@ -15,6 +15,8 @@ struct linear;
 struct conjugate;
 struct positive_definite;
 struct incognita;
+struct partially_ordered;
+struct totally_ordered;
 
 template<typename T>
 std::false_type resolve_operation_property(T&&, ...);

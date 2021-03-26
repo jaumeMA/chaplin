@@ -8,8 +8,7 @@
 namespace cpn
 {
 
-ddk::inherited_value<const integer_symbolic_number> integer(int i_number);
-ddk::inherited_value<const rational_symbolic_number> rational(inherited_symbolic_number i_numerator, inherited_symbolic_number i_denominator, bool i_sign = true);
+ddk::inherited_value<const rational_symbolic_number> frac(inherited_symbolic_number i_numerator, inherited_symbolic_number i_denominator, bool i_sign = true);
 ddk::inherited_value<const root_symbolic_number> root(inherited_symbolic_number i_number, inherited_symbolic_number i_degree, bool i_sign = true);
 ddk::inherited_value<const log_symbolic_number> log(inherited_symbolic_number i_number, inherited_symbolic_number i_base = ddk::make_inherited_value<const integer_symbolic_number>(10), bool i_sign = true);
 template<typename ... Summands>

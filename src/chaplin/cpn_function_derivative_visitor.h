@@ -9,11 +9,11 @@ namespace cpn
 namespace detail
 {
 
-template<set_type,set_type,size_t,typename>
+template<metric_space_type,metric_space_type,size_t,typename>
 struct derivative_visitor_impl;
 	
-template<set_type Im,set_type Dom,size_t Index>
-struct derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<1>>: public ddk::dynamic_visitor<ddk::detail::function_impl_base<Im,mpl::terse_function_dominion<Dom>>>
+template<metric_space_type Im,metric_space_type Dom,size_t Index>
+struct derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>: public ddk::dynamic_visitor<ddk::detail::function_impl_base<Im,mpl::terse_function_dominion<Dom>>>
 {
 	typedef function<Im(Dom)> return_type;
 
@@ -31,7 +31,7 @@ struct derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<1>>: public ddk::
 	inline return_type operator()(const T& i_lhs,...) const;
 };
 
-template<set_type Im, set_type Dom, size_t Index, size_t ... Indexs>
+template<metric_space_type Im,metric_space_type Dom, size_t Index, size_t ... Indexs>
 struct derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<Indexs...>> : public ddk::dynamic_visitor<ddk::detail::function_impl_base<Im,mpl::terse_function_dominion<Dom>>>
 {
 	typedef ddk::high_order_array<function<space_funcdamental_type<Im>(Dom)>,ddk::mpl::num_ranks<Indexs...>> return_type;
@@ -44,7 +44,7 @@ struct derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<Indexs...>> : pub
 
 }
 
-template<set_type Im,set_type Dom,size_t Index>
+template<metric_space_type Im,metric_space_type Dom,size_t Index>
 using derivative_visitor = detail::derivative_visitor_impl<Im,Dom,Index,typename ddk::mpl::make_sequence<0,get_rank<Im>()>::type>;
 
 }

@@ -7,6 +7,8 @@
 namespace cpn
 {
 
+const unsigned char k_defaultNumberPrecision = 10;
+
 class symbolic_number_interface : public ddk::distribute_from_this<symbolic_number_interface>
 {
     friend inline auto share(symbolic_number_interface& i_value)
@@ -21,7 +23,7 @@ class symbolic_number_interface : public ddk::distribute_from_this<symbolic_numb
 public:
 	virtual ~symbolic_number_interface() = default;
 
-	virtual double resolve(unsigned char i_accuracy) const = 0;
+	virtual double resolve(unsigned char i_accuracy = k_defaultNumberPrecision) const = 0;
 };
 
 using inherited_symbolic_number = ddk::inherited_value<const symbolic_number_interface>;
