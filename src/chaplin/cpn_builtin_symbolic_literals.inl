@@ -11,23 +11,17 @@ cpn::SymbolicLiteralType symbolic_literal<Type>::get_type()
 }
 
 template<typename T>
-constexpr bool symbolic_literal_operand<T>::summand_less::operator()(const T& i_lhs,const T& i_rhs) const
-{
-	return hash(i_lhs) < hash(i_rhs);
-}
-
-template<typename T>
 TEMPLATE(typename ... Args)
 REQUIRED(IS_CONSTRUCTIBLE(T,Args...))
 symbolic_literal_operand<T>::symbolic_literal_operand(Args&& ... i_args)
 {
-	m_operand.emplace(std::forward<Args>(i_args)...);
+	m_operand.emplace_back(std::forward<Args>(i_args)...);
 }
 template<typename T>
 template<typename ... Args>
 bool symbolic_literal_operand<T>::emplace(Args&& ... i_args)
 {
-	m_operand.emplace(std::forward<Args>(i_args)...);
+	m_operand.emplace_back(std::forward<Args>(i_args)...);
 
 	return true;
 }
@@ -126,23 +120,23 @@ constexpr bool log_symbolic_literal::positive() const
 }
 
 template<size_t Type,typename ... BuildingBlocks>
-template<typename Callable>
-grouped_symbolic_literal<Type,BuildingBlocks...>::operand_visitor<Callable>::operand_visitor(const Callable& i_callable)
-: m_callable(i_callable)
+template<typename Hasher>
+grouped_symbolic_literal<Type,BuildingBlocks...>::operand_visitor<Hasher>::operand_visitor(const Hasher& i_hasher)
+: m_hasher(i_hasher)
 {
 }
 template<size_t Type,typename ... BuildingBlocks>
-template<typename Callable>
+template<typename Hasher>
 template<typename T,typename>
-bool grouped_symbolic_literal<Type,BuildingBlocks...>::operand_visitor<Callable>::operator()(T&& i_value) const
+bool grouped_symbolic_literal<Type,BuildingBlocks...>::operand_visitor<Hasher>::operator()(T&& i_value) const
 {
-	nested_enumerate(std::forward<T>(i_value),m_callable);
+	nested_enumerate(std::forward<T>(i_value),m_hasher);
 
 	return true;
 }
 template<size_t Type,typename ... BuildingBlocks>
-template<typename Callable>
-bool grouped_symbolic_literal<Type,BuildingBlocks...>::operand_visitor<Callable>::operator()(...) const
+template<typename Hasher>
+bool grouped_symbolic_literal<Type,BuildingBlocks...>::operand_visitor<Hasher>::operator()(...) const
 {
 	//do nothing
 	return true;

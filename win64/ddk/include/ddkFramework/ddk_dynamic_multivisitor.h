@@ -69,13 +69,21 @@ private:
 	Visitor& m_visitor;
 };
 
-TEMPLATE(typename Visitor,typename ... Values)
-REQUIRES(IS_BASE_OF_DYNAMIC_VISITOR(Visitor),IS_INHERITED_VALUE(Values)...)
-inline typename std::remove_reference<Visitor>::type::return_type visit(Visitor&& i_callable,const Values& ... i_values);
+TEMPLATE(typename TypeInterface,typename Callable,typename ... Values)
+REQUIRES(IS_NOT_INHERITED_VALUE(Callable),IS_INHERITED_VALUE(Values)...)
+inline auto visit(Callable&& i_callable,const Values& ... i_values);
 
-TEMPLATE(typename Visitor,typename ... Values)
-REQUIRES(IS_BASE_OF_DYNAMIC_VISITOR(Visitor),IS_INHERITED_VALUE(Values)...)
-inline typename Visitor::return_type visit(const Values& ... i_values);
+TEMPLATE(typename Return,typename TypeInterface,typename Callable,typename ... Values)
+REQUIRES(IS_NOT_INHERITED_VALUE(Callable),IS_INHERITED_VALUE(Values)...)
+inline auto visit(Callable&& i_callable,const Values& ... i_values);
+
+TEMPLATE(typename Callable,typename TypeInterface,typename ... Values)
+REQUIRES(IS_INHERITED_VALUE(Values)...)
+inline auto visit(const Values& ... i_values);
+
+TEMPLATE(typename Return, typename Callable,typename TypeInterface,typename ... Values)
+REQUIRES(IS_INHERITED_VALUE(Values)...)
+inline auto visit(const Values& ... i_values);
 
 }
 

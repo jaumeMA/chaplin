@@ -5,11 +5,15 @@ namespace cpn
 
 bool operator==(const sum_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
 {
-	return hash(i_lhs) == hash(i_rhs);
+	const ddk::commutative_builtin_hasher _hasher;
+
+	return hash(_hasher,i_lhs) == hash(_hasher,i_rhs);
 }
 bool operator==(const prod_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return hash(i_lhs) == hash(i_rhs);
+	const ddk::commutative_builtin_hasher _hasher;
+
+	return hash(_hasher,i_lhs) == hash(_hasher,i_rhs);
 }
 bool operator<(const root_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {

@@ -6,7 +6,7 @@
 #include "ddk_variant_concepts.h"
 #include "ddk_scoped_enum.h"
 #include "ddk_hash.h"
-#include <set>
+#include <vector>
 
 namespace cpn
 {
@@ -36,7 +36,7 @@ struct symbolic_literal_operand
 	template<typename Callable>
 	friend inline void nested_enumerate(const symbolic_literal_operand& i_value,const Callable& i_callable)
 	{
-		typename std::set<T>::const_iterator it = i_value.m_operand.begin();
+		typename std::vector<T>::const_iterator it = i_value.m_operand.begin();
 		for(; it != i_value.m_operand.end(); ++it)
 		{
 			i_callable(*it);
@@ -44,19 +44,16 @@ struct symbolic_literal_operand
 	}
 	friend inline size_t hash(const symbolic_literal_operand& i_number)
 	{
+		ddk::commutative_builtin_hasher _hasher;
 		size_t combinedHash = 0;
 
 		for(const auto& item : i_number.m_operand)
 		{
-			ddk::hash_combine(combinedHash,item.hash());
+			combinedHash = _hasher(hash(item));
 		}
 
 		return combinedHash;
 	}
-	struct summand_less
-	{
-		constexpr bool operator()(const T& i_lhs,const T& i_rhs) const;
-	};
 
 public:
 	typedef typename std::vector<T>::iterator iterator;
@@ -79,7 +76,7 @@ public:
 	const_iterator end() const;
 
 private:
-	std::set<T,summand_less> m_operand;
+	std::vector<T> m_operand;
 };
 
 }
@@ -88,130 +85,111 @@ struct integer_symbolic_literal : public detail::symbolic_literal<SymbolicLitera
 {
 	friend constexpr size_t hash(const integer_symbolic_literal& i_number)
 	{
-		size_t combinedHash = ddk::hash(SymbolicLiteralType::Integer);
-
-		ddk::hash_combine(combinedHash,i_number.m_number);
-
-		return combinedHash;
+		return ddk::hash_combine(SymbolicLiteralType::Integer,i_number.m_number);
 	}
 
 public:
-	constexpr integer_symbolic_literal(int i_number = 0);
+	constexpr integer_symbolic_literal(int i_number);
 	constexpr integer_symbolic_literal(const integer_symbolic_literal& other);
 
 	constexpr int number() const;
 
 private:
-	const int m_number;
+	const int m_number = 0;
 };
 
 struct rational_symbolic_literal : public detail::symbolic_literal<SymbolicLiteralType::Rational>
 {
 	friend constexpr size_t hash(const rational_symbolic_literal& i_number)
 	{
-		size_t combinedHash = ddk::hash(SymbolicLiteralType::Rational);
-
-		ddk::hash_combine(combinedHash,i_number.m_numerator);
-		ddk::hash_combine(combinedHash,i_number.m_denominator);
-
-		return combinedHash;
+		return ddk::hash_combine(SymbolicLiteralType::Rational,i_number.m_numerator,i_number.m_denominator);
 	}
 
 public:
-	constexpr rational_symbolic_literal(int i_numerator = 0, int i_denominator = 1);
+	constexpr rational_symbolic_literal(int i_numerator, int i_denominator);
 
 	constexpr int numerator() const;
 	constexpr int denominator() const;
 
 private:
-	const int m_numerator;
-	const int m_denominator;
+	const int m_numerator = 0;
+	const int m_denominator = 1;
 };
 
 struct root_symbolic_literal : public detail::symbolic_literal<SymbolicLiteralType::Root>
 {
 	friend constexpr size_t hash(const root_symbolic_literal& i_number)
 	{
-		size_t combinedHash = ddk::hash(SymbolicLiteralType::Root);
-
-		ddk::hash_combine(combinedHash,i_number.m_number);
-		ddk::hash_combine(combinedHash,i_number.m_degree);
-
-		return combinedHash;
+		return ddk::hash_combine(SymbolicLiteralType::Root,i_number.m_number,i_number.m_degree);
 	}
 
 public:
-	constexpr root_symbolic_literal(int i_number = 0, int i_degree = 0, bool i_positive = true);
+	constexpr root_symbolic_literal(int i_number, int i_degree, bool i_positive = true);
 
 	constexpr int number() const;
 	constexpr int degree() const;
 	constexpr bool positive() const;
 
 private:
-	const int m_number;
-	const int m_degree;
-	const bool m_sign;
+	const int m_number = 0;
+	const int m_degree = 0;
+	const bool m_sign = true;
 };
 
 struct log_symbolic_literal : public detail::symbolic_literal<SymbolicLiteralType::Log>
 {
 	friend constexpr size_t hash(const log_symbolic_literal& i_number)
 	{
-		size_t combinedHash = ddk::hash(SymbolicLiteralType::Root);
-
-		ddk::hash_combine(combinedHash,i_number.m_number);
-		ddk::hash_combine(combinedHash,i_number.m_number);
-
-		return combinedHash;
+		return ddk::hash_combine(SymbolicLiteralType::Log,i_number.m_number,i_number.m_base);
 	}
 
 public:
-	constexpr log_symbolic_literal(int i_number = 0, int i_logBase = 0, bool i_positive = true);
+	constexpr log_symbolic_literal(int i_number, int i_logBase, bool i_positive = true);
 
 	constexpr int number() const;
 	constexpr int base() const;
 	constexpr bool positive() const;
 
 private:
-	const int m_number;
-	const int m_base;
-	const bool m_sign;
+	const int m_number = 0;
+	const int m_base = 0;
+	const bool m_sign = true;
 };
 
 template<size_t Type, typename ... BuildingBlocks>
 struct grouped_symbolic_literal : public detail::symbolic_literal<Type>
 {
-	template<typename Callable>
+	template<typename Hasher>
 	struct operand_visitor: public ddk::static_visitor<bool>
 	{
-		operand_visitor(const Callable& i_callable);
+		operand_visitor(const Hasher& i_callable);
 		template<typename T,typename = decltype(nested_enumerate(std::declval<T>(),std::declval<Callable>()))>
 		return_type operator()(T&& i_value) const;
 		return_type operator()(...) const;
 
 	private:
-		const Callable m_callable;
+		const Hasher& m_hasher;
 	};
 	template<typename Callable>
 	operand_visitor(const Callable&) -> operand_visitor<Callable>;
 
 	friend inline size_t hash(const grouped_symbolic_literal& i_number)
 	{
-		size_t combinedHash = ddk::hash(Type);
+		ddk::commutative_builtin_hasher _hasher(Type);
 
-		const auto hasher = [&combinedHash](const auto& i_value)
+		const auto hasher = [&_hasher](const auto& i_value)
 		{
-			ddk::hash_combine(combinedHash,hash(i_value));
+			_hasher(i_value);
 		};
 
 		for(const auto& operand : i_number.m_operands)
 		{
-			static const operand_visitor hasherVisitor(hasher);
+			static const operand_visitor hasherVisitor(_hasher);
 
 			ddk::visit(hasherVisitor,operand.second);
 		}
 
-		return combinedHash;
+		return _hasher.get();
 	}
 
 	typedef ddk::variant<BuildingBlocks...> symbolic_literal_t;

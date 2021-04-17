@@ -1,6 +1,16 @@
 
 namespace cpn
 {
+namespace detail
+{
+
+template<typename T>
+size_t symbolic_number_hash_visitor::operator()(const T& i_number) const
+{
+	return hash(i_number);
+}
+
+}
 
 TEMPLATE(typename Arg, typename ... Args)
 REQUIRED(IS_CONSTRUCTIBLE(nested_number_t,Arg,Args...))

@@ -79,6 +79,11 @@ using rational_set = typename algebraic_structure<rational_number>::template equ
 
 struct real_number
 {
+	friend inline size_t hash(const real_number& i_number)
+	{
+		return hash(i_number.m_number);
+	}
+
 public:
 	real_number() = default;
 	real_number(const symbolic_number& i_number);

@@ -2,6 +2,7 @@
 
 #include "ddk_template_helper.h"
 #include "ddk_system_allocator.h"
+#include "ddk_none.h"
 
 #define define_place_arg(_INDEX) \
 static const ddk::mpl::place_holder<_INDEX> arg_##_INDEX;
@@ -112,6 +113,7 @@ private:
     static typename aqcuire_callable_return_type<TT>::type resolve(T&);
     template<typename T>
     static typename T::return_type resolve(const T&, ...);
+    static detail::none_t resolve(...);
 
 public:
     typedef decltype(resolve(std::declval<Functor&>())) type;
@@ -143,7 +145,7 @@ private:
     static typename aqcuire_callable_args_type<TT>::type resolve(T&);
     template<typename T>
     static typename T::args_type resolve(const T&,...);
-    static void resolve(...);
+    static detail::none_t resolve(...);
 
 public:
     typedef decltype(resolve(std::declval<Functor&>())) type;
@@ -151,7 +153,7 @@ public:
 
 std::false_type _is_function(...);
 template<typename T>
-inline constexpr bool is_function = decltype(_is_function(std::declval<T>()))::value;
+inline constexpr bool is_function = decltype(_is_function(std::declval<typename std::remove_reference<T>::type*>()))::value;
 
 template<typename T, typename ... Args>
 struct is_valid_functor

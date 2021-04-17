@@ -46,7 +46,7 @@ class function_impl<Return(Types...),Allocator,FunctionImpl>
     friend class function_impl;
     template<typename RReturn,typename ... TTypes,typename AAllocator, typename FFunctionImpl>
     friend function_view<RReturn(TTypes...)> _lend(const function_impl<RReturn(TTypes...),AAllocator,FFunctionImpl>&);
-    friend std::true_type _is_function(const function_impl&);
+    friend std::true_type _is_function(const function_impl*);
 
 public:
 	struct callable_tag;
@@ -62,7 +62,7 @@ public:
     template<typename AAllocator>
     function_impl(function_impl<Return(Types...),AAllocator,FunctionImpl>&& other);
 	TEMPLATE(typename T)
-	REQUIRES(IS_CALLABLE_NOT_FUNCTION(T))
+	REQUIRES(IS_CALLABLE_NOT_FUNCTION(T,Types...))
 	function_impl(T&& functor, const Allocator& i_allocator = Allocator());
     template<typename T>
     function_impl(T *pRef, Return(T::*call)(Types...), const Allocator& i_allocator = Allocator());
@@ -74,10 +74,12 @@ public:
     function_impl& operator=(std::nullptr_t);
     inline bool operator==(std::nullptr_t) const;
     inline bool operator!=(std::nullptr_t) const;
-	template<typename ... Args>
+	TEMPLATE(typename ... Args)
+    REQUIRES(IS_CONSTRUCTIBLE(Types,Args)...)
 	inline Return inline_eval(Args&& ... args) const;
-	template<typename ... Args>
-	inline Return inline_eval(const function_arguments<Args...>& i_args) const;
+    TEMPLATE(typename ... Args)
+    REQUIRES(IS_CONSTRUCTIBLE(Types,Args)...)
+    inline Return inline_eval(const function_arguments<Args...>& i_args) const;
 	template<typename ... Args>
     inline resolved_function<Return,detail::unresolved_types<mpl::type_pack<Args...>,Types...>,Allocator> operator()(Args&& ... args) const;
 

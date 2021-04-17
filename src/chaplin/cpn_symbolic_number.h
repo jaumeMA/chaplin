@@ -5,6 +5,17 @@
 
 namespace cpn
 {
+namespace detail
+{
+
+struct symbolic_number_hash_visitor : public ddk::static_visitor<size_t>
+{
+    symbolic_number_hash_visitor() = default;
+    template<typename T>
+    inline size_t operator()(const T& i_number) const;
+};
+
+}
 
 class symbolic_number
 {

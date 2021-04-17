@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ddkFramework/ddk_function_impl.h"
-#include "ddkFramework/ddk_inherited_value.h"
-#include "ddk_function.h"
 #include "cpn_function_allocator.h"
+#include "cpn_algebraic_concepts.h"
+#include "ddk_inherited_value.h"
+#include "ddk_function.h"
 #include "ddk_rtti.h"
 
 namespace cpn
@@ -20,19 +20,36 @@ class function_impl<Im(ddk::mpl::type_pack<Dom...>)> : public ddk::detail::funct
 {
     typedef ddk::detail::function_impl<Im(Dom...),function_allocator,inherited_function_base<Im,Dom...>> function_base_t;
 
-    template<typename Visitor>
-    friend inline auto visit(const function_impl& i_function)
+    TEMPLATE(typename Callable,typename ... Functions)
+    REQUIRES(IS_SAME_CLASS(function_impl,Functions)...)
+    friend inline auto visit(Callable&& i_callable,const function_impl& i_function, Functions&& ... i_functions)
     {
-        return ddk::visit<Visitor>(i_function.m_functionImpl);
-    }
-    template<typename Visitor>
-    friend inline auto visit(Visitor&& i_visitor,const function_impl& i_function)
-    {
-        return ddk::visit(i_visitor,i_function.m_functionImpl);
-    }
+        typedef decltype(ddk::visit<ddk::detail::function_impl_base<Im,ddk::mpl::type_pack<Dom...>>>(std::forward<Callable>(i_callable),i_function.m_functionImpl,i_functions.m_functionImpl ...)) return_type;
 
-protected:
-    using function_base_t::function_base_t;
+        if constexpr (std::is_same<return_type,void>::value)
+        {
+            ddk::visit<ddk::detail::function_impl_base<Im,ddk::mpl::type_pack<Dom...>>>(std::forward<Callable>(i_callable),i_function.m_functionImpl,i_functions.m_functionImpl ...);
+        }
+        else
+        {
+            return ddk::visit<ddk::detail::function_impl_base<Im,ddk::mpl::type_pack<Dom...>>>(std::forward<Callable>(i_callable),i_function.m_functionImpl,i_functions.m_functionImpl ...);
+        }
+    }
+    TEMPLATE(typename Callable,typename ... Functions)
+    REQUIRES(IS_SAME_CLASS(function_impl,Functions)...)
+    friend inline auto visit(const function_impl& i_function,Functions&& ... i_functions)
+    {
+        typedef decltype(ddk::visit<ddk::detail::function_impl_base<Im,ddk::mpl::type_pack<Dom...>>>(Callable{},i_function.m_functionImpl,i_functions.m_functionImpl ...)) return_type;
+
+        if constexpr(std::is_same<return_type,void>::value)
+        {
+            ddk::visit<ddk::detail::function_impl_base<Im,ddk::mpl::type_pack<Dom...>>>(Callable{},i_function.m_functionImpl,i_functions.m_functionImpl ...);
+        }
+        else
+        {
+            return ddk::visit<ddk::detail::function_impl_base<Im,ddk::mpl::type_pack<Dom...>>>(Callable{},i_function.m_functionImpl,i_functions.m_functionImpl ...);
+        }
+    }
 
 public:
     function_impl(const function_impl& other);
@@ -40,6 +57,9 @@ public:
 
     function_impl& operator=(const function_impl& other) = default;
     function_impl& operator=(function_impl&& other) = default;
+
+protected:
+    using function_base_t::function_base_t;
 };
 
 }
