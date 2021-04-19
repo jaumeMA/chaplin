@@ -79,4 +79,3 @@ struct aqcuire_callable_return_type<cpn::function_impl<Return(type_pack<Types...
 }
 
 #include "cpn_function.inl"
-#include "cpn_builtin_functions.h"

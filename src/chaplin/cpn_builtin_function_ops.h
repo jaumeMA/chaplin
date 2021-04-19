@@ -1,6 +1,5 @@
 #pragma once
 
-#include "cpn_scalar_function.h"
 #include "cpn_function_concepts.h"
 #include "ddk_concepts.h"
 
@@ -36,6 +35,13 @@ template<typename Im,typename Dom>
 inline function<Im(Dom)> operator*(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs);
 template<typename Im,typename Dom>
 inline function<Im(Dom)> operator/(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs);
+//linear versions
+template<typename Im,typename Dom>
+inline linear_function<Im(Dom)> operator+(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs);
+template<typename Im,typename Dom>
+inline linear_function<Im(Dom)> operator-(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs);
+template<typename Im,typename Dom>
+inline auto operator*(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs);
 
 }
 

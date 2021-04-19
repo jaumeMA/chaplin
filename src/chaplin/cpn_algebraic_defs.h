@@ -11,6 +11,7 @@ namespace cpn
 struct associative;
 struct distributive;
 struct commutative;
+struct cnstant;
 struct linear;
 struct conjugate;
 struct positive_definite;

@@ -4,34 +4,8 @@
 #include "ddk_function_exceptions.h"
 #include "ddk_dynamic_visitor.h"
 
-#define DEFINE_FUNCTION_CONSTRUCTOR(_NAME) \
-template<typename Im,typename Dom> \
-struct _NAME##_nary_function_constructor \
-{ \
-	_NAME##_nary_function_constructor() = default; \
-	template<typename Expression> \
-	inline void operator()(const Expression& i_exp) const \
-	{ \
-		m_operands.push_back(instance_as_function<Im,Dom>(i_exp)); \
-	} \
-	inline ddk::detail::builtin_##_NAME##_nary_functor<Im,Dom> resolve() \
-	{ \
-		return { std::move(m_operands) }; \
-	} \
-	\
-private: \
-	mutable std::vector<function_impl<Im(Dom)>> m_operands; \
-}; 
-
 namespace cpn
 {
-namespace detail
-{
-
-DEFINE_FUNCTION_CONSTRUCTOR(add);
-DEFINE_FUNCTION_CONSTRUCTOR(prod);
-
-}
 
 template<typename Im,typename Dom,typename T>
 ddk::detail::builtin_number_function<Im,Dom> instance_as_function(const builtin_numeric_expression<T>& i_exp)
@@ -51,20 +25,20 @@ ddk::detail::builtin_inverted_function<Im,Dom> instance_as_function(const builti
 template<typename Im,typename Dom,size_t ...Indexs,typename ... Expressions>
 ddk::detail::builtin_add_nary_functor<Im,Dom> instance_as_function(const add_nary_expression<ddk::mpl::sequence<Indexs...>,Expressions...>& i_exp)
 {
-	detail::add_nary_function_constructor<Im,Dom> addVisitor;
+	std::vector<function_impl<Im(Dom)>> operands;
 
-	i_exp.enumerate(addVisitor);
+	i_exp.enumerate([&operands](auto&& i_exp){ operands.push_back(instance_as_function<Im,Dom>(i_exp)); });
 
-	return addVisitor.resolve();
+	return { operands };
 }
 template<typename Im,typename Dom,size_t ...Indexs,typename ... Expressions>
 ddk::detail::builtin_prod_nary_functor<Im,Dom> instance_as_function(const prod_nary_expression<ddk::mpl::sequence<Indexs...>,Expressions...>& i_exp)
 {
-	detail::prod_nary_function_constructor<Im,Dom> prodVisitor;
+	std::vector<function_impl<Im(Dom)>> operands;
 
-	i_exp.enumerate(prodVisitor);
+	i_exp.enumerate([&operands](auto&& i_exp){ operands.push_back(instance_as_function<Im,Dom>(i_exp)); });
 
-	return prodVisitor.resolve();
+	return { operands };
 }
 TEMPLATE(typename Im,typename Dom,typename LhsExpression,typename RhsExpression)
 REQUIRED(IS_INSTANTIABLE(LhsExpression),IS_INSTANTIABLE(RhsExpression))
@@ -108,6 +82,26 @@ template<typename Im,typename Dom>
 function<Im(Dom)> operator/(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs)
 {
 	return visit([](auto&& ii_lhs,auto&& ii_rhs) { return ii_lhs / ii_rhs; },i_lhs,i_rhs);
+}
+template<typename Im,typename Dom>
+linear_function<Im(Dom)> operator+(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs)
+{
+	return visit([](auto&& ii_lhs,auto&& ii_rhs) { return ii_lhs + ii_rhs; },i_lhs,i_rhs);
+}
+template<typename Im,typename Dom>
+linear_function<Im(Dom)> operator-(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs)
+{
+	return visit([](auto&& ii_lhs,auto&& ii_rhs) { return ii_lhs - ii_rhs; },i_lhs,i_rhs);
+}
+template<typename Im,typename Dom>
+auto operator*(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs)
+{
+	return visit([](auto&& ii_lhs,auto&& ii_rhs) 
+	{
+		typedef typename ddk::mpl::static_if<cpn::inspect_linearity<decltype(ii_lhs + ii_rhs)>,linear_function<Im(Dom)>,function<Im(Dom)>>::type ret_type;
+
+		return ret_type{ ii_lhs + ii_rhs };
+	},i_lhs,i_rhs);
 }
 
 }

@@ -7,7 +7,7 @@ constexpr  auto operator-(const builtin_numeric_expression<T>& i_exp)
 {
 	if constexpr (inverse_additive_type<T>)
 	{
-		return builtin_numeric_expression(-i_exp.get_number());
+		return builtin_numeric_expression(-i_exp.get());
 	}
 	else
 	{
@@ -235,6 +235,11 @@ template<size_t Comp,size_t ... Indexs,typename ... Expressions>
 constexpr  auto operator+(const prod_nary_expression<ddk::mpl::sequence<Indexs...>,Expressions...>& i_lhs,const component_builtin_expression<Comp>& i_rhs)
 {
 	return i_lhs.combine(i_rhs);
+}
+template<size_t ... Indexs,typename ... Expressions,size_t ... IIndexs,typename ... EExpressions>
+constexpr  auto operator+(const prod_nary_expression<ddk::mpl::sequence<Indexs...>,Expressions...>& i_lhs,const prod_nary_expression<ddk::mpl::sequence<IIndexs...>,EExpressions...>& i_rhs)
+{
+	return add_nary_expression{ i_lhs,i_rhs };
 }
 template<typename Expression,typename EExpression>
 constexpr  auto operator+(const Expression& i_lhs,const builtin_inverted_expression<EExpression>& i_rhs)

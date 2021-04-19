@@ -2,6 +2,7 @@
 
 #include "cpn_algebraic_defs.h"
 #include "cpn_type_concepts.h"
+#include "ddk_function_concepts.h"
 
 #define IS_ALGEBRAIC_STRUCTURE(_TYPE) \
     typename _TYPE::operators_pack
@@ -35,7 +36,6 @@
 
 #define IS_VECTOR_SPACE(_TYPE) \
     IS_FREE_MODULE(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,mult_operation)
-
 
 #define IS_COORDINATE_SPACE(_TYPE) \
     IS_FREE_MODULE(_TYPE),CONTAINS_ALGEBRAIC_STRUCTURE(_TYPE,coordinate_transform_operation)

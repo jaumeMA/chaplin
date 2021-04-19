@@ -81,7 +81,7 @@ function_impl<Im(ddk::mpl::type_pack<Dom...>)> function_factor<Im,Dom...>::resol
 
 		if(functionPair.first > 0)
 		{
-			res.add(ddk::detail::builtin_prod_nary_functor<Im,ddk::mpl::type_pack<Dom...>>{ ddk::detail::builtin_number_function<Im,ddk::mpl::type_pack<Dom...>>{ functionPair.first },functionPair.second });
+			res.add(ddk::detail::builtin_prod_nary_functor<Im,ddk::mpl::type_pack<Dom...>>{ ddk::detail::builtin_number_function<Im,ddk::mpl::type_pack<Dom...>>{ static_cast<int>(functionPair.first) },functionPair.second });
 		}
 	}
 

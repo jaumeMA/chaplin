@@ -15,10 +15,19 @@ function_group<Im,Dom> resolve_function_category(const Im&,const Dom&);
 template<multiplicative_component_wise_type Im,set_type Dom>
 function_module<Im,Dom> resolve_function_category(const Im&,const Dom&);
 
+template<typename Im,typename Dom>
+linear_function_set<Im,Dom> resolve_linear_function_category(const Im&,const Dom&);
+template<additive_component_wise_type Im,set_type Dom>
+linear_function_group<Im,Dom> resolve_linear_function_category(const Im&,const Dom&);
+template<multiplicative_component_wise_type Im,set_type Dom>
+linear_function_module<Im,Dom> resolve_linear_function_category(const Im&,const Dom&);
+
 }
 
 template<set_type Im,set_type Dom>
 using F = decltype(detail::resolve_function_category(std::declval<Im>(),std::declval<Dom>()));
+template<set_type Im,set_type Dom>
+using LF = decltype(detail::resolve_linear_function_category(std::declval<Im>(),std::declval<Dom>()));
 
 template<set_type T>
 using Endo = F<T,T>;
@@ -26,5 +35,12 @@ template<size_t Dim>
 using EndoR = F<R_n<Dim>,R_n<Dim>>;
 template<size_t Dim, size_t DDim>
 using FR = F<R_n<Dim>,R_n<DDim>>;
+
+template<set_type T>
+using LEndo = LF<T,T>;
+template<size_t Dim>
+using LEndoR = LF<R_n<Dim>,R_n<Dim>>;
+template<size_t Dim,size_t DDim>
+using LFR = LF<R_n<Dim>,R_n<DDim>>;
 
 }

@@ -23,7 +23,8 @@ struct _NAME##_nary_expression<ddk::mpl::sequence<Indexs...>,Expressions...> \
     template<typename,typename ...> \
     friend struct _NAME##_nary_expression; \
     typedef void __instantiable_tag; \
-    typedef ddk::mpl::type_pack<> __instantiable_properties; \
+    typedef ddk::mpl::type_pack<> __expression_properties; \
+    constexpr _NAME##_nary_expression() = default; \
     constexpr _NAME##_nary_expression(const ddk::tuple<Expressions...>& i_exps) \
     : m_expressions(i_exps) \
     { \
@@ -42,7 +43,7 @@ struct _NAME##_nary_expression<ddk::mpl::sequence<Indexs...>,Expressions...> \
         return m_expressions.template get<Index>(); \
     } \
     template<typename Callable> \
-    void enumerate(Callable&& i_callable) const \
+    constexpr void enumerate(Callable&& i_callable) const \
     { \
         ddk::deduce_callable(i_callable) <<= m_expressions; \
     } \
@@ -92,10 +93,11 @@ _NAME##_nary_expression(const T& ... i_args) -> _NAME##_nary_expression<typename
 template<typename ... T> \
 _NAME##_nary_expression(const ddk::tuple<T...>&)->_NAME##_nary_expression<typename ddk::mpl::make_sequence<0,ddk::mpl::num_types<T...>>::type,T...>;
 
-#define DEFINE_BUILTIN_EXPRESSION(_NAME) \
+#define DEFINE_BUILTIN_EXPRESSION(_NAME,...) \
 struct _NAME##_builtin_expression \
 { \
     typedef void __instantiable_tag; \
+    typedef ddk::mpl::type_pack<__VA_ARGS__> __expression_properties; \
     constexpr _NAME##_builtin_expression() = default; \
     template<typename T> \
     constexpr builtin_composed_expression<_NAME##_builtin_expression,T> operator()(const T& other) const \
@@ -112,8 +114,8 @@ template<typename Expression>
 struct builtin_inverted_expression
 {
     typedef void __instantiable_tag;
-    typedef ddk::mpl::type_pack<cpn::linear> __instantiable_properties;
 
+    constexpr builtin_inverted_expression() = default;
     constexpr builtin_inverted_expression(const Expression& i_exp);
 
     constexpr const Expression& get() const;
@@ -128,11 +130,11 @@ template<typename LhsFunction,typename RhsFunction>
 struct builtin_composed_expression
 {
     typedef void __instantiable_tag;
-    typedef ddk::mpl::type_pack<cpn::linear> __instantiable_properties;
+    constexpr builtin_composed_expression() = default;
     constexpr builtin_composed_expression(const LhsFunction& i_lhs,const RhsFunction& i_rhs);
 
-    const LhsFunction& get_lhs() const;
-    const RhsFunction& get_rhs() const;
+    constexpr const LhsFunction& get_lhs() const;
+    constexpr const RhsFunction& get_rhs() const;
 
 private:
     const LhsFunction m_lhs;
@@ -145,20 +147,21 @@ struct builtin_numeric_expression
     static_assert(std::is_arithmetic_v<T>,"You shall use numeric types for this kind of template function");
 
     typedef void __instantiable_tag;
-    typedef ddk::mpl::type_pack<cpn::linear> __instantiable_properties;
+    typedef ddk::mpl::type_pack<linear,cnstant> __expression_properties;
 
+    constexpr builtin_numeric_expression() = default;
     constexpr builtin_numeric_expression(const T& i_number);
     constexpr const T& get() const;
 
 private:
-    const T m_number;
+    const T m_number = 0;
 };
 
 template<size_t Comp>
 struct component_builtin_expression
 {
     typedef void __instantiable_tag;
-    typedef ddk::mpl::type_pack<cpn::incognita,cpn::linear> __instantiable_properties;
+    typedef ddk::mpl::type_pack<cpn::incognita,cpn::linear> __expression_properties;
     constexpr component_builtin_expression() = default;
     constexpr component_builtin_expression(const component_builtin_expression&) = default;
     constexpr component_builtin_expression(component_builtin_expression&&) = default;
@@ -195,3 +198,4 @@ constexpr component_builtin_expression<9> x_9 = component_builtin_expression<9>(
 
 #include "cpn_builtin_expressions.inl"
 #include "cpn_builtin_expression_ops.h"
+#include "cpn_expression_inspector.h"

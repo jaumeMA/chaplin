@@ -20,12 +20,12 @@ constexpr builtin_composed_expression<LhsFunction,RhsFunction>::builtin_composed
 {
 }
 template<typename LhsFunction,typename RhsFunction>
-const LhsFunction& builtin_composed_expression<LhsFunction,RhsFunction>::get_lhs() const
+constexpr const LhsFunction& builtin_composed_expression<LhsFunction,RhsFunction>::get_lhs() const
 {
     return m_lhs;
 }
 template<typename LhsFunction,typename RhsFunction>
-const RhsFunction& builtin_composed_expression<LhsFunction,RhsFunction>::get_rhs() const
+constexpr const RhsFunction& builtin_composed_expression<LhsFunction,RhsFunction>::get_rhs() const
 {
     return m_rhs;
 }

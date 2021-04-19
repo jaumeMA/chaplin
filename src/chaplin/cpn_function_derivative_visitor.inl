@@ -32,17 +32,12 @@ namespace detail
 {
 
 template<metric_space_type Im,metric_space_type Dom, size_t Index>
-typename derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>::return_type derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>::operator()(const ddk::detail::add_binary_functor<Im,mpl::terse_function_dominion<Dom>>& i_function) const
+typename derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>::return_type derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>::operator()(const ddk::detail::builtin_add_nary_functor<Im,mpl::terse_function_dominion<Dom>>& i_function) const
 {
 	return ddk::visit(*this,i_function.get_lhs()) + ddk::visit(*this,i_function.get_rhs());
 }
 template<metric_space_type Im,metric_space_type Dom,size_t Index>
-typename derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>::return_type derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>::operator()(const ddk::detail::subs_binary_functor<Im,mpl::terse_function_dominion<Dom>>& i_function) const
-{
-	return ddk::visit(*this,i_function.get_lhs()) - ddk::visit(*this,i_function.get_rhs());
-}
-template<metric_space_type Im,metric_space_type Dom,size_t Index>
-typename derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>::return_type derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>::operator()(const ddk::detail::prod_binary_functor<Im,mpl::terse_function_dominion<Dom>>& i_function) const
+typename derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>::return_type derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>::operator()(const ddk::detail::builtin_prod_nary_functor<Im,mpl::terse_function_dominion<Dom>>& i_function) const
 {
 	return ddk::visit(*this,i_function.get_lhs()) * i_function.get_rhs() + i_function.get_lhs() * ddk::visit(*this,i_function.get_rhs());
 }
@@ -59,9 +54,7 @@ typename derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>::return_typ
 template<metric_space_type Im,metric_space_type Dom,size_t Index>
 typename derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>::return_type derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>::operator()(const ddk::detail::builtin_composed_function<Im,mpl::terse_function_dominion<Dom>>& i_function) const
 {
-	static const derivative_visitor_impl<Im,Im,Index> leftVisitor;
-
-	return return_type{ddk::detail::builtin_composed_function<Im,mpl::terse_function_dominion<Dom>>{ddk::visit(leftVisitor,i_function.get_dest_function().m_functionImpl),i_function.get_source_function()}} * ddk::visit(*this,i_function.get_source_function().m_functionImpl);
+	return return_type{ddk::detail::builtin_composed_function<Im,mpl::terse_function_dominion<Dom>>{ddk::visit<derivative_visitor_impl<Im,Im,Index>>(i_function.get_dest_function()),i_function.get_source_function()}} * visit(*this,i_function.get_source_function());
 }
 template<metric_space_type Im,metric_space_type Dom,size_t Index>
 TEMPLATE(typename T)

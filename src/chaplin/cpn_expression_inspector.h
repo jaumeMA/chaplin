@@ -1,26 +1,48 @@
 #pragma once
 
-#include "cpn_builtin_functions.h"
-
 namespace cpn
 {
 
-template<typename T>
-std::false_type linearity_inspection(const T&, ...);
+constexpr bool linearity_inspection(...);
 
-template<typename T>
-inline constexpr bool inspect_linearity = decltype(linearity_inspection(std::declval<T>()))::value;
+template<size_t ... Indexs, typename ... Expressions>
+constexpr bool linearity_inspection(const add_nary_expression<ddk::mpl::sequence<Indexs...>,Expressions...>&);
 
-template<typename LhsFunction, typename RhsFunction>
-typename ddk::mpl::static_if<inspect_linearity<LhsFunction> && inspect_linearity<RhsFunction>,std::true_type,std::false_type>::type linearity_inspection(const ddk::detail::add_binary_template_functor<LhsFunction,RhsFunction>&);
-
-template<typename LhsFunction,typename RhsFunction>
-typename ddk::mpl::static_if<inspect_linearity<LhsFunction> && inspect_linearity<RhsFunction>,std::true_type,std::false_type>::type linearity_inspection(const ddk::detail::prod_binary_template_functor<LhsFunction,RhsFunction>&);
+template<size_t ... Indexs,typename ... Expressions>
+constexpr bool linearity_inspection(const prod_nary_expression<ddk::mpl::sequence<Indexs...>,Expressions...>&);
 
 template<typename LhsFunction,typename RhsFunction>
-typename ddk::mpl::static_if<inspect_linearity<LhsFunction>&& inspect_linearity<RhsFunction>,std::true_type,std::false_type>::type linearity_inspection(const ddk::detail::builtin_composed_template_function<LhsFunction,RhsFunction>&);
+constexpr bool linearity_inspection(const builtin_composed_expression<LhsFunction,RhsFunction>&);
 
-template<typename T, typename TT = typename T::__instantiable_properties>
-typename ddk::mpl::static_if<T::__instantiable_properties::template contains(ddk::mpl::type_pack<linear>{}),std::true_type,std::false_type> linearity_inspection(const T&, ...);
+template<typename Expression>
+constexpr bool linearity_inspection(const builtin_inverted_expression<Expression>&);
+
+template<typename T, typename TT = typename T::__expression_properties>
+constexpr bool linearity_inspection(const T&);
+
+template<typename T>
+constexpr bool inspect_linearity = linearity_inspection(T{});
+
+constexpr bool linearity_inspection(...);
+
+template<size_t ... Indexs,typename ... Expressions>
+constexpr bool constant_inspection(const add_nary_expression<ddk::mpl::sequence<Indexs...>,Expressions...>&);
+
+template<size_t ... Indexs,typename ... Expressions>
+constexpr bool constant_inspection(const prod_nary_expression<ddk::mpl::sequence<Indexs...>,Expressions...>&);
+
+template<typename LhsFunction,typename RhsFunction>
+constexpr bool constant_inspection(const builtin_composed_expression<LhsFunction,RhsFunction>&);
+
+template<typename Expression>
+constexpr bool constant_inspection(const builtin_inverted_expression<Expression>&);
+
+template<typename T,typename TT = typename T::__expression_properties>
+constexpr bool constant_inspection(const T&);
+
+template<typename T>
+constexpr bool inspect_constant = constant_inspection(T{});
 
 }
+
+#include "cpn_expression_inspector.inl"
