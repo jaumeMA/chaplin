@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cpn_linear_function.h"
+#include "cpn_function.h"
 #include "cpn_algebraic_structure.h"
 
 namespace cpn

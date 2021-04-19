@@ -5,11 +5,11 @@
 #define IS_INSTANTIABLE_BY(_TYPE,_IM,_DOM) \
 	typename std::enable_if<IS_INSTANTIABLE_BY_COND(_TYPE,_IM,_DOM)>::type
 #define IS_LINEAR_INSTANTIABLE_COND(_TYPE) \
-	cpn::inspect_linearity<_TYPE> && IS_INSTANTIABLE_COND(_TYPE)
+	IS_INSTANTIABLE_COND(_TYPE)
 #define IS_LINEAR_INSTANTIABLE(_TYPE) \
 	typename std::enable_if<IS_LINEAR_INSTANTIABLE_COND(_TYPE)>::type
 #define IS_LINEAR_INSTANTIABLE_BY_COND(_TYPE,_IM,_DOM) \
-	cpn::inspect_linearity<_TYPE> && IS_INSTANTIABLE_BY_COND(_TYPE,_IM,_DOM)
+	IS_INSTANTIABLE_BY_COND(_TYPE,_IM,_DOM) && cpn::inspect_linearity<_TYPE>
 #define IS_LINEAR_INSTANTIABLE_BY(_TYPE,_IM,_DOM) \
 	typename std::enable_if<IS_LINEAR_INSTANTIABLE_BY_COND(_TYPE,_IM,_DOM)>::type
 #define IS_BUILTIN_FUNCTION(_TYPE) \

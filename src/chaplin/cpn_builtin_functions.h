@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cpn_function.h"
+#include "cpn_function_impl.h"
 #include "cpn_math_functions.h"
 #include "cpn_function_concepts.h"
 #include "cpn_algebraic_defs.h"
@@ -162,20 +162,20 @@ struct _NAME##___builtin_function<Im,mpl::type_pack<Dom...>> : public inherited_
         return _FUNC(std::forward<Dom>(i_args)...); \
     } \
 }; \
-template<typename,typename> \
+template<cpn::fundamental_type,typename> \
 struct _NAME##__builtin_function; \
-template<typename Im, typename ... Dom> \
+template<cpn::fundamental_type Im, typename ... Dom> \
 struct _NAME##__builtin_function<Im,mpl::type_pack<Dom...>> : mpl::static_if<std::is_constructible<Im,decltype(_FUNC(std::declval<Dom>()...))>::value,_NAME##___builtin_function<Im,mpl::type_pack<Dom...>>,ddk::constant_callable<Im>>::type \
 { \
     typedef typename mpl::static_if<std::is_constructible<Im,decltype(_FUNC(std::declval<Dom>()...))>::value,_NAME##___builtin_function<Im,mpl::type_pack<Dom...>>,ddk::constant_callable<Im>>::type base_t; \
     using base_t::operator(); \
 }; \
-template<typename Im, _CONSTRAINT Dom> \
+template<cpn::fundamental_type Im, _CONSTRAINT Dom> \
 struct _NAME##_builtin_function : _NAME##__builtin_function<Im,Dom> \
 { \
     using _NAME##__builtin_function<Im,Dom>::operator(); \
 } PUBLISH_RTTI_INHERITANCE(_NAME##_builtin_function,function_impl_base); \
-template<typename Im, typename Dom> \
+template<cpn::fundamental_type Im, typename Dom> \
 struct builtin_expression_function<cpn::_NAME##_builtin_expression,Im,Dom> : _NAME##_builtin_function<Im,Dom> \
 { \
 	struct callable_tag; \
@@ -224,11 +224,11 @@ private:
     inline ImSet execute(const mpl::sequence<Indexs...>&, Dom ... i_args) const;
 
     const fusioned_components<typename mpl::make_sequence<0,ImSet::num_places>::type> m_callables;
-} PUBLISH_RTTI_INHERITANCE(builtin_fusioned_function,ddk::detail::function_impl_base);
+}PUBLISH_RTTI_INHERITANCE(builtin_fusioned_function,function_impl_base);
 
-template<typename,typename>
+template<cpn::fundamental_type,typename>
 struct builtin_composed_function;
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 struct builtin_composed_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...>
 {
     typedef cpn::function_impl<ImSet(mpl::type_pack<ImSet>)> function_lhs_t;
@@ -259,9 +259,9 @@ private:
     const function_rhs_t m_rhs;
 } PUBLISH_RTTI_INHERITANCE(builtin_composed_function,function_impl_base);
 
-template<typename,typename>
+template<cpn::fundamental_type,typename>
 struct builtin_component_function;
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 struct builtin_component_function<ImSet,mpl::type_pack<Dom...>>: public inherited_functor_impl<ImSet,Dom...>
 {
     typedef cpn::function_impl<ImSet(mpl::type_pack<Dom...>)> function_t;
@@ -286,9 +286,9 @@ private:
 
 } PUBLISH_RTTI_INHERITANCE(builtin_component_function,function_impl_base);
 
-template<typename,typename>
+template<cpn::fundamental_type,typename>
 struct builtin_number_function;
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 struct builtin_number_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...>
 {
     typedef cpn::function_impl<ImSet(mpl::type_pack<Dom...>)> function_t;
@@ -311,9 +311,9 @@ private:
     const ImSet m_number;
 } PUBLISH_RTTI_INHERITANCE(builtin_number_function,function_impl_base);
 
-template<typename,typename>
+template<cpn::fundamental_type,typename>
 struct builtin_inverted_function;
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 struct builtin_inverted_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...>
 {
     typedef cpn::function_impl<ImSet(mpl::type_pack<Dom...>)> function_t;
@@ -338,15 +338,15 @@ private:
     const function_t m_function;
 } PUBLISH_RTTI_INHERITANCE(builtin_inverted_function,function_impl_base);
 
-template<typename,typename,typename>
+template<typename,cpn::fundamental_type,typename>
 struct builtin_expression_function;
 
 }
 }
 
 ////arithmetic operations
-DEFINE_ARITHMETIC_NARY_OPERATION(add,+,cpn::closed_additive_type);
-DEFINE_ARITHMETIC_NARY_OPERATION(prod,*,cpn::closed_multiplicative_type);
+DEFINE_ARITHMETIC_NARY_OPERATION(add,+,cpn::fundamental_type);
+DEFINE_ARITHMETIC_NARY_OPERATION(prod,*,cpn::fundamental_type);
 //DEFINE_ARITHMETIC_NARY_OPERATION(div,/,cpn::closed_divisible_type);
 
 //predefined math functions
@@ -356,4 +356,3 @@ DEFINE_BUILTIN_FUNCTION(tan,cpn::detail::tan,cpn::type_pack_args_equal_to_1);
 
 
 #include "cpn_builtin_functions.inl"
-#include "cpn_builtin_function_ops.h"

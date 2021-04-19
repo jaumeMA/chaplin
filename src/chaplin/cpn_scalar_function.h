@@ -3,7 +3,7 @@
 #include "cpn_algebraic_concepts.h"
 #include "cpn_function_concepts.h"
 #include "cpn_set.h"
-#include "cpn_function.h"
+#include "cpn_function_impl.h"
 #include "cpn_function_template_helper.h"
 #include "cpn_space_ops.h"
 #include "ddk_concepts.h"
@@ -39,7 +39,7 @@ public:
     vector_function() = default;
     vector_function(const function_base_t& i_function);
     TEMPLATE(typename ... Callables)
-    REQUIRES(IS_INSTANTIABLE_BY(Callables,Im,ddk::mpl::type_pack<Dom...>)...)
+    REQUIRES(IS_INSTANTIABLE_BY(Callables,typename Im::place_type,ddk::mpl::type_pack<Dom...>)...)
     vector_function(const Callables& ... i_callables);
 };
 
@@ -79,4 +79,3 @@ public:
 
 #include "cpn_builtin_functions.h"
 #include "cpn_scalar_function.inl"
-#include "cpn_function_ops.h"

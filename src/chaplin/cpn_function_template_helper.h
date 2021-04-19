@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cpn_vector_space.h"
-#include "cpn_function.h"
+#include "cpn_function_impl.h"
 #include "cpn_space_ops.h"
 #include "ddk_template_helper.h"
 

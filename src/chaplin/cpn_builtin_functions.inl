@@ -43,7 +43,7 @@ ImSet builtin_fusioned_function<ImSet,mpl::type_pack<Dom...>>::execute(const mpl
     return ImSet(eval(m_callables.m_fusionedFunction.template get_callable<Indexs>(),i_args...) ...);
 }
 
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 TEMPLATE(typename Function,typename FFunction)
 REQUIRED(IS_CONSTRUCTIBLE(function_lhs_t,Function),IS_CONSTRUCTIBLE(function_rhs_t,FFunction))
 builtin_composed_function<ImSet,ddk::mpl::type_pack<Dom...>>::builtin_composed_function(Function&& i_lhs, FFunction&& i_rhs)
@@ -51,68 +51,68 @@ builtin_composed_function<ImSet,ddk::mpl::type_pack<Dom...>>::builtin_composed_f
 , m_rhs(std::forward<FFunction>(i_rhs))
 {
 }
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 ImSet builtin_composed_function<ImSet,mpl::type_pack<Dom...>>::operator()(Dom... i_args) const
 {
     return ddk::eval(m_lhs,ddk::eval(m_rhs,std::forward<Dom>(i_args) ...));
 }
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 const typename builtin_composed_function<ImSet,mpl::type_pack<Dom...>>::function_lhs_t& builtin_composed_function<ImSet,mpl::type_pack<Dom...>>::get_dest_function() const
 {
     return m_lhs;
 }
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 const typename builtin_composed_function<ImSet,mpl::type_pack<Dom...>>::function_rhs_t& builtin_composed_function<ImSet,mpl::type_pack<Dom...>>::get_source_function() const
 {
     return m_rhs;
 }
 
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 template<size_t Comp>
 builtin_component_function<ImSet,ddk::mpl::type_pack<Dom...>>::builtin_component_function(const ddk::mpl::static_number<Comp>&)
 : m_projection(ddk::projection<Comp>)
 , m_component(Comp)
 {
 }
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 ImSet builtin_component_function<ImSet,ddk::mpl::type_pack<Dom...>>::operator()(Dom... i_args) const
 {
     return ddk::eval(m_projection,std::forward<Dom>(i_args)...);
 }
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 size_t builtin_component_function<ImSet,ddk::mpl::type_pack<Dom...>>::get_component() const
 {
     return m_component;
 }
 
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 builtin_number_function<ImSet,ddk::mpl::type_pack<Dom...>>::builtin_number_function(const ImSet& i_number)
 : m_number(i_number)
 {
 }
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 inline ImSet builtin_number_function<ImSet,mpl::type_pack<Dom...>>::operator()(Dom... i_args) const
 {
     return m_number;
 }
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 const ImSet& builtin_number_function<ImSet,mpl::type_pack<Dom...>>::get_number() const
 {
     return m_number;
 }
 
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 template<typename Expression>
 builtin_inverted_function<ImSet,mpl::type_pack<Dom...>>::builtin_inverted_function(Expression&& i_expression)
 : m_function(std::forward<Expression>(i_expression))
 {
 }
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 const typename builtin_inverted_function<ImSet,mpl::type_pack<Dom...>>::function_t& builtin_inverted_function<ImSet,mpl::type_pack<Dom...>>::get_expresion() const
 {
     return m_function;
 }
-template<typename ImSet,typename ... Dom>
+template<cpn::fundamental_type ImSet,typename ... Dom>
 ImSet builtin_inverted_function<ImSet,mpl::type_pack<Dom...>>::operator()(Dom... i_args) const
 {
     return -ddk::eval(m_function,std::forward<Dom>(i_args)...);

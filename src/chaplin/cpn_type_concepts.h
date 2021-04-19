@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ddk_high_order_array.h"
+#include "ddk_container_concepts.h"
 
 #define FULFILLS_CONCEPT_COMPONENT_WISE(_CONCEPT) \
 template<typename T> \
@@ -54,6 +55,9 @@ concept divisible_type = requires (T i_lhs,T i_rhs) { i_lhs / i_rhs; };
 
 template<typename T>
 concept closed_divisible_type = requires (T i_lhs,T i_rhs, T& res) { res = i_lhs / i_rhs; };
+
+template<typename T>
+concept fundamental_type = IS_INDEXED_COND(T) == false;
 
 template<typename T>
 concept coordinate_type = requires { { T::place_type }; { T::num_places }; };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cpn_function_concepts.h"
+#include "cpn_type_concepts.h"
 #include "ddk_concepts.h"
 
 namespace cpn
@@ -27,21 +28,14 @@ template<typename Im,typename Dom>
 inline bool operator==(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs);
 template<typename Im,typename Dom>
 inline bool operator!=(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs);
-template<typename Im,typename Dom>
-inline function<Im(Dom)> operator+(const function<Im(Dom)>& i_lhs, const function<Im(Dom)>& i_rhs);
-template<typename Im,typename Dom>
-inline function<Im(Dom)> operator-(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs);
-template<typename Im,typename Dom>
-inline function<Im(Dom)> operator*(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs);
-template<typename Im,typename Dom>
-inline function<Im(Dom)> operator/(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs);
-//linear versions
-template<typename Im,typename Dom>
-inline linear_function<Im(Dom)> operator+(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs);
-template<typename Im,typename Dom>
-inline linear_function<Im(Dom)> operator-(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs);
-template<typename Im,typename Dom>
-inline auto operator*(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs);
+template<closed_additive_type Im,typename ... Dom>
+inline function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator+(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs, const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
+template<closed_substractive_type Im,typename ... Dom>
+inline function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator-(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
+template<closed_multiplicative_type Im,typename ... Dom>
+inline function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator*(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
+template<closed_divisible_type Im,typename ... Dom>
+inline function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator/(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
 
 }
 
@@ -58,17 +52,19 @@ REQUIRES(IS_BUILTIN_FUNCTION(T),IS_BUILTIN_FUNCTION(TT))
 inline bool operator!=(const T& i_lhs,const TT& i_rhs);
 
 template<cpn::closed_additive_type Im,typename ... Dom>
-inline auto operator+(const ddk::detail::builtin_number_function<Im,Dom...>& i_lhs, const ddk::detail::builtin_number_function<Im,Dom...>& i_rhs);
+inline auto operator+(const builtin_number_function<Im,mpl::type_pack<Dom...>>& i_lhs, const builtin_number_function<Im,mpl::type_pack<Dom...>>& i_rhs);
 template<typename Im,typename ... Dom>
-inline auto operator+(const ddk::detail::builtin_number_function<Im,Dom...>& i_lhs,const ddk::detail::builtin_add_nary_functor<Im,Dom...>& i_rhs);
+inline auto operator+(const builtin_number_function<Im,mpl::type_pack<Dom...>>& i_lhs,const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_rhs);
 template<typename Im,typename ... Dom>
-inline auto operator+(const ddk::detail::builtin_add_nary_functor<Im,Dom...>& i_lhs,const ddk::detail::builtin_number_function<Im,Dom...>& i_rhs);
+inline auto operator+(const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_lhs,const builtin_number_function<Im,mpl::type_pack<Dom...>>& i_rhs);
 template<typename T, typename Im, typename ... Dom>
-inline auto operator+(const T& i_lhs, const ddk::detail::builtin_add_nary_functor<Im,Dom...>& i_rhs);
+inline auto operator+(const T& i_lhs, const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_rhs);
 template<typename T,typename Im,typename ... Dom>
-inline auto operator+(const ddk::detail::builtin_add_nary_functor<Im,Dom...>& i_lhs, const T& i_rhs);
+inline auto operator+(const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_lhs, const T& i_rhs);
 template<typename Im,typename ... Dom>
-inline auto operator+(const ddk::detail::builtin_add_nary_functor<Im,Dom...>& i_lhs,const ddk::detail::builtin_add_nary_functor<Im,Dom...>& i_rhs);
+inline auto operator+(const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_lhs,const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_rhs);
+template<typename Im,typename ... Dom>
+inline auto operator+(const builtin_fusioned_function<Im,mpl::type_pack<Dom...>>& i_lhs,const builtin_fusioned_function<Im,mpl::type_pack<Dom...>>& i_rhs);
 TEMPLATE(typename T, typename TT)
 REQUIRES(IS_BUILTIN_FUNCTION(T),IS_BUILTIN_FUNCTION(TT))
 inline auto operator+(const T& i_lhs, const TT& i_rhs);

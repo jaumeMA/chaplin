@@ -20,9 +20,8 @@ class function_impl<Im(ddk::mpl::type_pack<Dom...>)> : public ddk::detail::funct
 {
     typedef ddk::detail::function_impl<Im(Dom...),function_allocator,inherited_function_base<Im,Dom...>> function_base_t;
 
-    TEMPLATE(typename Callable,typename ... Functions)
-    REQUIRES(IS_SAME_CLASS(function_impl,Functions)...)
-    friend inline auto visit(Callable&& i_callable,const function_impl& i_function, Functions&& ... i_functions)
+    template<typename Callable,typename ... Functions>
+    friend inline auto visit(Callable&& i_callable,const function_impl& i_function, const Functions& ... i_functions)
     {
         typedef decltype(ddk::visit<ddk::detail::function_impl_base<Im,ddk::mpl::type_pack<Dom...>>>(std::forward<Callable>(i_callable),i_function.m_functionImpl,i_functions.m_functionImpl ...)) return_type;
 
@@ -37,7 +36,7 @@ class function_impl<Im(ddk::mpl::type_pack<Dom...>)> : public ddk::detail::funct
     }
     TEMPLATE(typename Callable,typename ... Functions)
     REQUIRES(IS_SAME_CLASS(function_impl,Functions)...)
-    friend inline auto visit(const function_impl& i_function,Functions&& ... i_functions)
+    friend inline auto visit(const function_impl& i_function, const Functions& ... i_functions)
     {
         typedef decltype(ddk::visit<ddk::detail::function_impl_base<Im,ddk::mpl::type_pack<Dom...>>>(Callable{},i_function.m_functionImpl,i_functions.m_functionImpl ...)) return_type;
 
@@ -54,6 +53,9 @@ class function_impl<Im(ddk::mpl::type_pack<Dom...>)> : public ddk::detail::funct
 public:
     function_impl(const function_impl& other);
     function_impl(function_impl&& other);
+    //TEMPLATE(typename Callable)
+    //REQUIRES(IS_BUILTIN_FUNCTION(Callable))
+    //explicit function_impl(const Callable& i_callable);
 
     function_impl& operator=(const function_impl& other) = default;
     function_impl& operator=(function_impl&& other) = default;
@@ -78,4 +80,4 @@ struct aqcuire_callable_return_type<cpn::function_impl<Return(type_pack<Types...
 }
 }
 
-#include "cpn_function.inl"
+#include "cpn_function_impl.inl"

@@ -11,6 +11,11 @@ linear_function_impl<Im,Dom,ddk::mpl::sequence<Indexs...>>::linear_function_impl
 : function_base_t(std::forward<Callables>(i_callables)...)
 {
 }
+template<free_module_type Im,free_module_type Dom,size_t ... Indexs>
+linear_function_impl<Im,Dom,ddk::mpl::sequence<Indexs...>>::linear_function_impl(const function_impl<Im(mpl::terse_function_dominion<Dom>)>& i_callable)
+: function_base_t(i_callable)
+{
+}
 template<free_module_type Im,free_module_type Dom, size_t ... Indexs>
 auto linear_function_impl<Im,Dom,ddk::mpl::sequence<Indexs...>>::inline_eval(const Dom& i_value) const
 {
