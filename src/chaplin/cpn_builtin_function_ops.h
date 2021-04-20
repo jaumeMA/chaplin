@@ -25,10 +25,10 @@ TEMPLATE(typename Im,typename Dom,typename T)
 REQUIRES(IS_INSTANTIABLE(T))
 inline auto instance_as_function(const T& i_exp);
 
-template<typename Im,typename Dom>
-inline bool operator==(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs);
-template<typename Im,typename Dom>
-inline bool operator!=(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs);
+template<set_type Im,set_type ... Dom>
+inline bool operator==(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
+template<set_type Im,set_type ... Dom>
+inline bool operator!=(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
 template<set_type Im,set_type ... Dom>
 inline function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator+(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs, const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
 template<set_type Im,set_type ... Dom>
@@ -52,19 +52,19 @@ TEMPLATE(typename T,typename TT)
 REQUIRES(IS_BUILTIN_FUNCTION(T),IS_BUILTIN_FUNCTION(TT))
 inline bool operator!=(const T& i_lhs,const TT& i_rhs);
 
-template<cpn::closed_additive_type Im,typename ... Dom>
+template<cpn::closed_additive_type Im,cpn::set_type ... Dom>
 inline auto operator+(const builtin_number_function<Im,mpl::type_pack<Dom...>>& i_lhs, const builtin_number_function<Im,mpl::type_pack<Dom...>>& i_rhs);
-template<typename Im,typename ... Dom>
+template<cpn::closed_additive_type Im,cpn::set_type ... Dom>
 inline auto operator+(const builtin_number_function<Im,mpl::type_pack<Dom...>>& i_lhs,const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_rhs);
-template<typename Im,typename ... Dom>
+template<cpn::closed_additive_type Im,cpn::set_type ... Dom>
 inline auto operator+(const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_lhs,const builtin_number_function<Im,mpl::type_pack<Dom...>>& i_rhs);
-template<typename T, typename Im, typename ... Dom>
+template<typename T,cpn::closed_additive_type Im,cpn::set_type ... Dom>
 inline auto operator+(const T& i_lhs, const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_rhs);
-template<typename T,typename Im,typename ... Dom>
+template<typename T,cpn::closed_additive_type Im,cpn::set_type ... Dom>
 inline auto operator+(const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_lhs, const T& i_rhs);
-template<typename Im,typename ... Dom>
+template<cpn::closed_additive_type Im,cpn::set_type ... Dom>
 inline auto operator+(const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_lhs,const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_rhs);
-template<typename Im,typename ... Dom>
+template<cpn::set_type Im,cpn::set_type ... Dom>
 inline auto operator+(const builtin_fusioned_function<Im,mpl::type_pack<Dom...>>& i_lhs,const builtin_fusioned_function<Im,mpl::type_pack<Dom...>>& i_rhs);
 TEMPLATE(typename T, typename TT)
 REQUIRES(IS_BUILTIN_FUNCTION(T),IS_BUILTIN_FUNCTION(TT))

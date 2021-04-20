@@ -52,13 +52,13 @@ auto instance_as_function(const T& i_exp)
 	return ddk::detail::builtin_expression_function<T,Im,Dom>{ };
 }
 
-template<typename Im,typename Dom>
-bool operator==(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs)
+template<set_type Im,set_type ... Dom>
+bool operator==(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs)
 {
 	return visit([](auto&& i_lhs,auto&& i_rhs) { return hash(i_lhs) == hash(i_rhs); },i_lhs,i_rhs);
 }
-template<typename Im,typename Dom>
-bool operator!=(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs)
+template<set_type Im,set_type ... Dom>
+bool operator!=(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs)
 {
 	return visit([](auto&& i_lhs,auto&& i_rhs) { return hash(i_lhs) != hash(i_rhs); },i_lhs,i_rhs);
 }
@@ -113,12 +113,12 @@ bool operator!=(const T& i_lhs,const TT& i_rhs)
 	return hash(i_lhs) != hash(i_rhs);
 }
 
-template<cpn::closed_additive_type Im,typename ... Dom>
+template<cpn::closed_additive_type Im,cpn::set_type ... Dom>
 auto operator+(const builtin_number_function<Im,mpl::type_pack<Dom...>>& i_lhs,const builtin_number_function<Im,mpl::type_pack<Dom...>>& i_rhs)
 {
 	return ddk::detail::builtin_number_function<Im,mpl::type_pack<Dom...>>{ i_lhs.get_number() + i_rhs.get_number() };
 }
-template<typename Im,typename ... Dom>
+template<cpn::closed_additive_type Im,cpn::set_type ... Dom>
 auto operator+(const builtin_number_function<Im,mpl::type_pack<Dom...>>& i_lhs,const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_rhs)
 {
 	builtin_add_nary_functor<Im,mpl::type_pack<Dom...>> res;
@@ -157,7 +157,7 @@ auto operator+(const builtin_number_function<Im,mpl::type_pack<Dom...>>& i_lhs,c
 
 	return res;
 }
-template<typename Im,typename ... Dom>
+template<cpn::closed_additive_type Im,cpn::set_type ... Dom>
 auto operator+(const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_lhs,const ddk::detail::builtin_number_function<Im,mpl::type_pack<Dom...>>& i_rhs)
 {
 	builtin_add_nary_functor<Im,mpl::type_pack<Dom...>> res;
@@ -196,17 +196,17 @@ auto operator+(const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_lhs,
 
 	return res;
 }
-template<typename T, typename Im,typename ... Dom>
+template<typename T,cpn::closed_additive_type Im,cpn::set_type ... Dom>
 auto operator+(const T& i_lhs,const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_rhs)
 {
 	return cpn::factor(i_rhs.combine(i_lhs));
 }
-template<typename T,typename Im,typename ... Dom>
+template<typename T,cpn::closed_additive_type Im,cpn::set_type ... Dom>
 auto operator+(const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_lhs, const T& i_rhs)
 {
 	return cpn::factor(i_lhs.combine(i_rhs));
 }
-template<typename Im,typename ... Dom>
+template<cpn::closed_additive_type Im,cpn::set_type ... Dom>
 auto operator+(const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_lhs,const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_rhs)
 {
 	builtin_add_nary_functor<Im,mpl::type_pack<Dom...>> res;
@@ -218,12 +218,12 @@ auto operator+(const builtin_add_nary_functor<Im,mpl::type_pack<Dom...>>& i_lhs,
 
 	return cpn::factor(res);
 }
-template<size_t ... Indexs, typename Im,typename ... Dom>
+template<size_t ... Indexs,cpn::set_type Im,cpn::set_type ... Dom>
 inline auto fusioned_sum(const mpl::sequence<Indexs...>&, const builtin_fusioned_function<Im,mpl::type_pack<Dom...>>& i_lhs,const builtin_fusioned_function<Im,mpl::type_pack<Dom...>>& i_rhs)
 {
 	return builtin_fusioned_function<Im,mpl::type_pack<Dom...>>{ ddk::fusion((i_lhs.template get_callable<Indexs>() + i_rhs.template get_callable<Indexs>())...) };
 }
-template<typename Im,typename ... Dom>
+template<cpn::set_type Im,cpn::set_type ... Dom>
 auto operator+(const builtin_fusioned_function<Im,mpl::type_pack<Dom...>>& i_lhs,const builtin_fusioned_function<Im,mpl::type_pack<Dom...>>& i_rhs)
 {
 	typedef typename mpl::make_sequence<0,Im::num_places>::type range_seq;

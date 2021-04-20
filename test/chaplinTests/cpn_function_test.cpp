@@ -14,7 +14,6 @@ TEST(CPNFunctionTest,defaultLinearFunction)
 {
 	constexpr  auto exp0 = -cpn::sin(cpn::x + 3);
 	constexpr  auto exp1 = cpn::sin(cpn::x + 3) + exp0;
-	//exp1.kk();
 	constexpr  auto exp2 = -(cpn::x_0 + cpn::x_1 + cpn::x_2) + exp1;
 	const cpn::F<cpn::R1,cpn::R3> expFunc1 = cpn::x_0 + cpn::x_1 + cpn::x_2;
 	const cpn::LF<cpn::R2,cpn::R3> expFunc2 = { cpn::x_0 + cpn::x_1 + cpn::x_2, cpn::x_0 + cpn::x_1 };
