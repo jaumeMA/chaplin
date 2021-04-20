@@ -16,7 +16,7 @@ struct function_addition
 
 	friend inline Function operator+(const Function& i_lhs,const Function& i_rhs)
 	{
-		return { ddk::detail::builtin_add_nary_functor(i_lhs,i_rhs) };
+		return static_cast<const typename Function::set_traits&>(i_lhs) + static_cast<const typename Function::set_traits&>(i_rhs);
 	}
 };
 
@@ -35,11 +35,11 @@ struct function_addition_inverse
 
 	friend inline Function operator-(const Function& i_rhs)
 	{
-		return { -i_rhs };
+		return -i_rhs;
 	}
 	friend inline Function operator-(const Function& i_lhs, const Function& i_rhs)
 	{
-		return { ddk::detail::builtin_add_nary_functor(i_lhs,-i_rhs) };
+		return i_lhs + (-i_rhs);
 	}
 };
 

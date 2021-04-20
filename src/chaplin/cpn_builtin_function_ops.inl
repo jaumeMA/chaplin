@@ -55,32 +55,42 @@ auto instance_as_function(const T& i_exp)
 template<typename Im,typename Dom>
 bool operator==(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs)
 {
-	return visit([](auto&& i_lhs, auto&& i_rhs) { return hash(i_lhs) == hash(i_rhs); },i_lhs,i_rhs);
+	return visit([](auto&& i_lhs,auto&& i_rhs) { return hash(i_lhs) == hash(i_rhs); },i_lhs,i_rhs);
 }
 template<typename Im,typename Dom>
 bool operator!=(const function<Im(Dom)>& i_lhs,const function<Im(Dom)>& i_rhs)
 {
-	return (visit([](auto&& i_lhs,auto&& i_rhs) { return hash(i_lhs) == hash(i_rhs); },i_lhs,i_rhs) == false);
+	return visit([](auto&& i_lhs,auto&& i_rhs) { return hash(i_lhs) != hash(i_rhs); },i_lhs,i_rhs);
 }
-template<closed_additive_type Im,typename ... Dom>
+template<set_type Im,set_type ... Dom>
 function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator+(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs)
 {
 	return visit([](auto&& ii_lhs,auto&& ii_rhs) -> function_impl<Im(ddk::mpl::type_pack<Dom...>)> { return ii_lhs + ii_rhs; },i_lhs,i_rhs);
 }
-template<closed_substractive_type Im,typename ... Dom>
+template<set_type Im,set_type ... Dom>
 function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator-(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs)
 {
 	return visit([](auto&& ii_lhs,auto&& ii_rhs) -> function_impl<Im(ddk::mpl::type_pack<Dom...>)> { return ddk::detail::operator-(ii_lhs,ii_rhs); },i_lhs,i_rhs);
 }
-template<closed_multiplicative_type Im,typename ... Dom>
+template<set_type Im,set_type ... Dom>
 function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator*(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs)
 {
 	return visit([](auto&& ii_lhs,auto&& ii_rhs) -> function_impl<Im(ddk::mpl::type_pack<Dom...>)> { return ddk::detail::operator*(ii_lhs,ii_rhs); },i_lhs,i_rhs);
 }
-template<closed_divisible_type Im,typename ... Dom>
+template<set_type Im,set_type ... Dom>
 function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator/(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs)
 {
 	return visit([](auto&& ii_lhs,auto&& ii_rhs) -> function_impl<Im(ddk::mpl::type_pack<Dom...>)> { return ddk::detail::operator/(ii_lhs,ii_rhs); },i_lhs,i_rhs);
+}
+template<set_type Im,set_type Dom>
+linear_function<Im(Dom)> operator+(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs)
+{
+	return static_cast<const function_impl<Im(mpl::terse_function_dominion<Dom>)>&>(i_lhs) + static_cast<const function_impl<Im(mpl::terse_function_dominion<Dom>)>&>(i_rhs);
+}
+template<set_type Im,set_type Dom>
+linear_function<Im(Dom)> operator-(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs)
+{
+	return static_cast<const function_impl<Im(mpl::terse_function_dominion<Dom>)>&>(i_lhs) - static_cast<const function_impl<Im(mpl::terse_function_dominion<Dom>)>&>(i_rhs);
 }
 
 }

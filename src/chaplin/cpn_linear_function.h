@@ -25,15 +25,6 @@ class linear_function_impl<Im,Dom,ddk::mpl::sequence<Indexs...>> : public functi
 {
     typedef function<Im(Dom)> function_base_t;
 
-    friend inline linear_function_impl operator+(const linear_function_impl& i_lhs,const linear_function_impl& i_rhs)
-    {
-        return static_cast<const function_base_t&>(i_lhs) + static_cast<const function_base_t&>(i_rhs);
-    }
-    friend inline linear_function_impl operator-(const linear_function_impl& i_lhs,const linear_function_impl& i_rhs)
-    {
-        return static_cast<const function_base_t&>(i_lhs) - static_cast<const function_base_t&>(i_rhs);
-    }
-
 public:
     using function_base_t::operator();
 
@@ -44,6 +35,7 @@ public:
 	inline auto inline_eval(const Dom& i_value) const;
     inline auto operator()(const Dom& i_value) const;
 
+protected:
     linear_function_impl(const function_impl<Im(mpl::terse_function_dominion<Dom>)>& i_callable);
 };
 
@@ -55,6 +47,11 @@ template<free_module_type Im, free_module_type Dom>
 class linear_function<Im(Dom)> : public detail::linear_function_impl<Im,Dom,typename ddk::mpl::make_sequence<0,Dom::rank>::type>
 {
     typedef detail::linear_function_impl<Im,Dom,typename ddk::mpl::make_sequence<0,Dom::rank>::type> base_t;
+
+    template<set_type IIm,typename DDom>
+    friend inline linear_function<IIm(DDom)> operator+(const linear_function<IIm(DDom)>& i_lhs,const linear_function<IIm(DDom)>& i_rhs);
+    template<set_type IIm,typename DDom>
+    friend inline linear_function<IIm(DDom)> operator-(const linear_function<IIm(DDom)>& i_lhs,const linear_function<IIm(DDom)>& i_rhs);
 
 public:
     using base_t::base_t;

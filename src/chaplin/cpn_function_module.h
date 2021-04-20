@@ -16,7 +16,7 @@ struct function_module_operation
 
 	friend inline Function operator^(const ring_t& i_lhs,const Function& i_rhs)
 	{
-		return ddk::detail::builtin_prod_nary_functor(ddk::detail::builtin_number_function<Im,Dom>(i_lhs),i_rhs);
+		return ddk::detail::builtin_number_function<Im,Dom>(i_lhs) * i_rhs;
 	}
 };
 

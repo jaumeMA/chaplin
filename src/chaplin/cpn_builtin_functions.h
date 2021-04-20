@@ -203,10 +203,21 @@ struct builtin_fusioned_function<ImSet,mpl::type_pack<Dom...>> : public inherite
     template<size_t ... Components>
     struct fusioned_components<ddk::mpl::sequence<Components...>>
     {
+        friend inline size_t hash(const fusioned_components& i_function)
+        {
+            static const auto nestedHasher = dynamic_callable<size_t,function_impl_base<typename ImSet::place_type,mpl::type_pack<Dom...>>>([](auto&& i_function) -> size_t { return hash(i_function); });
+
+            return ddk::hash_combine(visit(nestedHasher,i_function.m_fusionedFunction.template get_callable<Components>())...);
+        }
+
         fusioned_components(const ddk::detail::intersection_function<cpn::function_impl<ddk::mpl::index_to_type<Components,typename ImSet::place_type>(mpl::type_pack<Dom...>)>...>& i_callable);
 
         const intersection_function<cpn::function_impl<ddk::mpl::index_to_type<Components,typename ImSet::place_type>(mpl::type_pack<Dom...>)>...> m_fusionedFunction;
     };
+    friend inline size_t hash(const builtin_fusioned_function& i_function)
+    {
+        return hash(i_function.m_callables);
+    }
 
 public:
     struct __builtin_function_tag;

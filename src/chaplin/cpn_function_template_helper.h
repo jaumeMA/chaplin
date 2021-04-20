@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cpn_vector_space.h"
-#include "cpn_function_impl.h"
 #include "cpn_space_ops.h"
+#include "cpn_type_concepts.h"
 #include "ddk_template_helper.h"
 
 namespace cpn

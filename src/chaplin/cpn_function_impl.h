@@ -2,6 +2,7 @@
 
 #include "cpn_function_allocator.h"
 #include "cpn_algebraic_concepts.h"
+#include "cpn_function_template_helper.h"
 #include "ddk_inherited_value.h"
 #include "ddk_function.h"
 #include "ddk_rtti.h"
@@ -53,9 +54,6 @@ class function_impl<Im(ddk::mpl::type_pack<Dom...>)> : public ddk::detail::funct
 public:
     function_impl(const function_impl& other);
     function_impl(function_impl&& other);
-    //TEMPLATE(typename Callable)
-    //REQUIRES(IS_BUILTIN_FUNCTION(Callable))
-    //explicit function_impl(const Callable& i_callable);
 
     function_impl& operator=(const function_impl& other) = default;
     function_impl& operator=(function_impl&& other) = default;
