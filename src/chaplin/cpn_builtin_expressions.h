@@ -2,6 +2,7 @@
 
 #include "cpn_type_concepts.h"
 #include "cpn_algebraic_defs.h"
+#include "cpn_expression_concepts.h"
 #include "ddk_concepts.h"
 #include "ddk_type_concepts.h"
 #include "ddk_tuple.h"

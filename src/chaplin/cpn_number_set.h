@@ -3,7 +3,6 @@
 #include "cpn_algebraic_structure.h"
 #include "cpn_symbolic_number.h"
 #include "cpn_metric_space.h"
-#include "cpn_builtin_symbolic_number_visitors.h"
 #include "ddk_type_concepts.h"
 #include "ddk_concepts.h"
 #include <utility>
@@ -89,6 +88,7 @@ public:
 	real_number(const symbolic_number& i_number);
 
 	real_number& operator=(const real_number& other);
+	double resolve(unsigned char i_accuracy = 10) const;
 	symbolic_number number() const;
 
 private:

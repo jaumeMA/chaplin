@@ -67,31 +67,31 @@ function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator+(const function_impl<Im(
 {
 	return visit([](auto&& ii_lhs,auto&& ii_rhs) -> function_impl<Im(ddk::mpl::type_pack<Dom...>)> { return ii_lhs + ii_rhs; },i_lhs,i_rhs);
 }
-template<set_type Im,set_type ... Dom>
-function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator-(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs)
-{
-	return visit([](auto&& ii_lhs,auto&& ii_rhs) -> function_impl<Im(ddk::mpl::type_pack<Dom...>)> { return ddk::detail::operator-(ii_lhs,ii_rhs); },i_lhs,i_rhs);
-}
+//template<set_type Im,set_type ... Dom>
+//function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator-(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs)
+//{
+//	return visit([](auto&& ii_lhs,auto&& ii_rhs) -> function_impl<Im(ddk::mpl::type_pack<Dom...>)> { return ii_lhs + -ii_rhs; },i_lhs,i_rhs);
+//}
 template<set_type Im,set_type ... Dom>
 function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator*(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs)
 {
-	return visit([](auto&& ii_lhs,auto&& ii_rhs) -> function_impl<Im(ddk::mpl::type_pack<Dom...>)> { return ddk::detail::operator*(ii_lhs,ii_rhs); },i_lhs,i_rhs);
+	return visit([](auto&& ii_lhs,auto&& ii_rhs) -> function_impl<Im(ddk::mpl::type_pack<Dom...>)> { return ii_lhs * ii_rhs; },i_lhs,i_rhs);
 }
-template<set_type Im,set_type ... Dom>
-function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator/(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs)
-{
-	return visit([](auto&& ii_lhs,auto&& ii_rhs) -> function_impl<Im(ddk::mpl::type_pack<Dom...>)> { return ddk::detail::operator/(ii_lhs,ii_rhs); },i_lhs,i_rhs);
-}
+//template<set_type Im,set_type ... Dom>
+//function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator/(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs)
+//{
+//	return visit([](auto&& ii_lhs,auto&& ii_rhs) -> function_impl<Im(ddk::mpl::type_pack<Dom...>)> { return ii_lhs / ii_rhs; },i_lhs,i_rhs);
+//}
 template<set_type Im,set_type Dom>
 linear_function<Im(Dom)> operator+(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs)
 {
 	return static_cast<const function_impl<Im(mpl::terse_function_dominion<Dom>)>&>(i_lhs) + static_cast<const function_impl<Im(mpl::terse_function_dominion<Dom>)>&>(i_rhs);
 }
-template<set_type Im,set_type Dom>
-linear_function<Im(Dom)> operator-(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs)
-{
-	return static_cast<const function_impl<Im(mpl::terse_function_dominion<Dom>)>&>(i_lhs) - static_cast<const function_impl<Im(mpl::terse_function_dominion<Dom>)>&>(i_rhs);
-}
+//template<set_type Im,set_type Dom>
+//linear_function<Im(Dom)> operator-(const linear_function<Im(Dom)>& i_lhs,const linear_function<Im(Dom)>& i_rhs)
+//{
+//	return static_cast<const function_impl<Im(mpl::terse_function_dominion<Dom>)>&>(i_lhs) - static_cast<const function_impl<Im(mpl::terse_function_dominion<Dom>)>&>(i_rhs);
+//}
 
 }
 
@@ -283,7 +283,7 @@ auto operator*(const ddk::detail::builtin_add_nary_functor<Im,Dom...>& i_lhs,con
 
 	i_rhs.enumerate([&res,&i_lhs](auto&& i_operand)
 	{
-		res.add(i_operand * i_rhs);
+		res.add(i_operand * i_lhs);
 	});
 
 	return cpn::factor(res);

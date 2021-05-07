@@ -8,10 +8,10 @@ template<typename T> \
 struct fulfills_concept_##_CONCEPT##_component_wise \
 { \
 private: \
-    template<typename T, typename TT = typename T::place_type> \
-    static typename ddk::mpl::static_if<_CONCEPT<TT>,std::true_type,std::false_type>::type resolve(T&); \
-    template<typename T> \
-    static typename ddk::mpl::static_if<_CONCEPT<T>,std::true_type,std::false_type>::type resolve(const T& ...); \
+    template<typename TT, typename TTT = typename TT::place_type> \
+    static typename ddk::mpl::static_if<_CONCEPT<TTT>,std::true_type,std::false_type>::type resolve(TT&); \
+    template<typename TT> \
+    static typename ddk::mpl::static_if<_CONCEPT<TT>,std::true_type,std::false_type>::type resolve(const TT& ...); \
  \
 public: \
     static const bool value = decltype(resolve(std::declval<T&>()))::value; \
@@ -60,7 +60,7 @@ template<typename T>
 concept fundamental_type = IS_INDEXED_COND(T) == false;
 
 template<typename T>
-concept coordinate_type = requires { { T::place_type }; { T::num_places }; };
+concept coordinate_type = IS_INDEXED_COND(T);
 
 namespace concepts
 {

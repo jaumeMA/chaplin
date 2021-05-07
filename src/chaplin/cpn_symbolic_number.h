@@ -20,7 +20,7 @@ struct symbolic_number_hash_visitor : public ddk::static_visitor<size_t>
 class symbolic_number
 {
     typedef ddk::variant<integer_symbolic_literal,rational_symbolic_literal,root_symbolic_literal,log_symbolic_literal,sum_symbolic_literal,prod_symbolic_literal,div_symbolic_literal> nested_number_t;
-    
+
     friend inline size_t hash(const symbolic_number& i_number);
     friend bool operator<(const symbolic_number& i_lhs,const symbolic_number& i_rhs);
     friend bool operator==(const symbolic_number& i_lhs,const symbolic_number& i_rhs);
@@ -52,4 +52,3 @@ private:
 }
 
 #include "cpn_symbolic_number.inl"
-#include "cpn_symbolic_number_ops.h"

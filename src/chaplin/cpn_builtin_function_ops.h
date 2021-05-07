@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cpn_algebraic_concepts.h"
+#include "cpn_expression_concepts.h"
 #include "cpn_function_concepts.h"
 #include "cpn_type_concepts.h"
 #include "ddk_concepts.h"
@@ -31,12 +32,12 @@ template<set_type Im,set_type ... Dom>
 inline bool operator!=(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
 template<set_type Im,set_type ... Dom>
 inline function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator+(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs, const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
-template<set_type Im,set_type ... Dom>
-inline function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator-(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
+//template<set_type Im,set_type ... Dom>
+//inline function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator-(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
 template<set_type Im,set_type ... Dom>
 inline function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator*(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
-template<set_type Im,set_type ... Dom>
-inline function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator/(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
+//template<set_type Im,set_type ... Dom>
+//inline function_impl<Im(ddk::mpl::type_pack<Dom...>)> operator/(const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_lhs,const function_impl<Im(ddk::mpl::type_pack<Dom...>)>& i_rhs);
 
 }
 

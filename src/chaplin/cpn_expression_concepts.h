@@ -10,10 +10,9 @@ namespace cpn
 namespace concepts
 {
 
-template<typename T>
-std::false_type is_instantiable_resolver(const T&,...);
-template<typename T>
-std::true_type is_instantiable_resolver(T&,const typename T::__instantiable_tag* = nullptr);
+std::false_type is_instantiable_resolver(...);
+template<typename T, typename = typename T::__instantiable_tag>
+std::true_type is_instantiable_resolver(T&);
 
 template<typename T>
 inline constexpr bool is_instantiable = decltype(is_instantiable_resolver(std::declval<T&>()))::value;

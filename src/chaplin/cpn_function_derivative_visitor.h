@@ -9,42 +9,42 @@ namespace cpn
 namespace detail
 {
 
-template<metric_space_type,metric_space_type,size_t,typename>
+template<typename,metric_space_type,metric_space_type,size_t,typename>
 struct derivative_visitor_impl;
-	
-template<metric_space_type Im,metric_space_type Dom,size_t Index>
-struct derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<0>>
+
+template<typename Function,metric_space_type Im,set_type ... Dom,size_t Index>
+struct derivative_visitor_impl<Function,Im,ddk::mpl::type_pack<Dom...>,Index,ddk::mpl::sequence<0>>
 {
-	typedef function<Im(Dom)> return_type;
+    typedef ddk::mpl::type_pack<Dom...> dom_t;
+	typedef Function return_type;
 
 	derivative_visitor_impl() = default;
-	inline return_type operator()(const ddk::detail::builtin_add_nary_functor<Im,mpl::terse_function_dominion<Dom>>& i_function) const;
-	inline return_type operator()(const ddk::detail::builtin_prod_nary_functor<Im,mpl::terse_function_dominion<Dom>>& i_function) const;
-	inline return_type operator()(const ddk::detail::builtin_number_function<Im,mpl::terse_function_dominion<Dom>>& i_function) const;
-	inline return_type operator()(const ddk::detail::builtin_composed_function<Im,mpl::terse_function_dominion<Dom>>& i_function) const;
-	TEMPLATE(typename T)
-	REQUIRES(IS_BUILTIN_FUNCTION(T))
-	inline return_type operator()(const T& i_function) const;
+	inline return_type operator()(const ddk::detail::builtin_add_nary_functor<Im,dom_t>& i_function) const;
+	inline return_type operator()(const ddk::detail::builtin_prod_nary_functor<Im,dom_t>& i_function) const;
+	inline return_type operator()(const ddk::detail::builtin_component_function<Im,dom_t>& i_function) const;
+	inline return_type operator()(const ddk::detail::builtin_number_function<Im,dom_t>& i_function) const;
+	inline return_type operator()(const ddk::detail::builtin_composed_function<Im,dom_t>& i_function) const;
 	//inline return_type operator()(const ddk::detail::div_binary_functor<Im,Dom>& i_function);
 	template<typename T>
 	inline return_type operator()(const T& i_lhs,...) const;
 };
 
-template<metric_space_type Im,metric_space_type Dom, size_t Index, size_t ... Indexs>
-struct derivative_visitor_impl<Im,Dom,Index,ddk::mpl::sequence<Indexs...>>
+template<typename Function,metric_space_type Im,set_type ... Dom, size_t Index, size_t ... Indexs>
+struct derivative_visitor_impl<Function,Im,ddk::mpl::type_pack<Dom...>,Index,ddk::mpl::sequence<Indexs...>>
 {
-	typedef ddk::high_order_array<function<space_funcdamental_type<Im>(Dom)>,ddk::mpl::num_ranks<Indexs...>> return_type;
+    typedef ddk::mpl::type_pack<Dom...> dom_t;
+	typedef ddk::high_order_array<Function,ddk::mpl::num_ranks<Indexs...>> return_type;
 
 	derivative_visitor_impl() = default;
-	inline return_type operator()(const ddk::detail::builtin_fusioned_function<Im,mpl::terse_function_dominion<Dom>>& i_function) const;
+	inline return_type operator()(const ddk::detail::builtin_fusioned_function<Im,dom_t>& i_function) const;
 	template<typename T>
 	inline return_type operator()(const T& i_lhs, ...) const;
 };
 
 }
 
-template<metric_space_type Im,metric_space_type Dom,size_t Index>
-using derivative_visitor = detail::derivative_visitor_impl<Im,Dom,Index,typename ddk::mpl::make_sequence<0,get_rank<Im>()>::type>;
+template<template<typename> typename Function,metric_space_type Im,metric_space_type Dom,size_t Index>
+using derivative_visitor = detail::derivative_visitor_impl<Function<space_fundamental_type<Im>(Dom)>,Im,mpl::terse_function_dominion<Dom>,Index,typename ddk::mpl::make_sequence<0,get_rank<Im>()>::type>;
 
 }
 

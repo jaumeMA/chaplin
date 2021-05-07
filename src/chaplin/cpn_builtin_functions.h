@@ -25,15 +25,15 @@ namespace detail \
  \
 template<_CONCEPT,typename> \
 struct builtin_##_NAME##_nary_functor; \
-template<_CONCEPT ImSet, typename ... Dom> \
-struct builtin_##_NAME##_nary_functor<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom ...> \
+template<_CONCEPT Im, typename ... Dom> \
+struct builtin_##_NAME##_nary_functor<Im,mpl::type_pack<Dom...>> : public inherited_functor_impl<Im,Dom ...> \
 { \
-    typedef cpn::function_impl<ImSet(mpl::type_pack<Dom...>)> function_t; \
+    typedef cpn::function_impl<Im(mpl::type_pack<Dom...>)> function_t; \
     friend inline size_t hash(const builtin_##_NAME##_nary_functor& i_function) \
     { \
-        static const rtti::TypeInfo s_typeHash = rtti::type_info<builtin_##_NAME##_nary_functor<ImSet,mpl::type_pack<Dom...>>,function_impl_base<ImSet,mpl::type_pack<Dom...>>>(); \
+        static const rtti::TypeInfo s_typeHash = rtti::type_info<builtin_##_NAME##_nary_functor<Im,mpl::type_pack<Dom...>>,function_impl_base<Im,mpl::type_pack<Dom...>>>(); \
         commutative_builtin_hasher _hasher(s_typeHash); \
-        const auto nestedHasher = dynamic_callable<size_t,function_impl_base<ImSet,mpl::type_pack<Dom...>>>([&_hasher](auto&& i_nestedFunction) -> size_t { return _hasher(i_nestedFunction); }); \
+        const auto nestedHasher = dynamic_callable<size_t,function_impl_base<Im,mpl::type_pack<Dom...>>>([&_hasher](auto&& i_nestedFunction) -> size_t { return _hasher(i_nestedFunction); }); \
         \
         for(auto operand : i_function.m_functions) \
         { \
@@ -66,14 +66,14 @@ public: \
         \
         return *this; \
     } \
-    ImSet operator()(Dom ... i_args) const final override \
+    Im operator()(Dom ... i_args) const final override \
     { \
         if(m_functions.empty()) \
         { \
             throw ddk::call_function_exception{"Trying to call empty function"}; \
         } \
         \
-        ImSet res = ddk::eval(m_functions[0],std::forward<Dom>(i_args)...); \
+        Im res = ddk::eval(m_functions[0],std::forward<Dom>(i_args)...); \
         \
         for(size_t index=1;index<m_functions.size();++index) \
         { \
@@ -195,8 +195,8 @@ constexpr inline cpn::function_impl<Im(mpl::type_pack<Dom...>)> instantiate_temp
 
 template<cpn::coordinate_type,typename>
 struct builtin_fusioned_function;
-template<cpn::coordinate_type ImSet,typename ... Dom>
-struct builtin_fusioned_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...>
+template<cpn::coordinate_type Im,typename ... Dom>
+struct builtin_fusioned_function<Im,mpl::type_pack<Dom...>> : public inherited_functor_impl<Im,Dom...>
 {
     template<typename>
     struct fusioned_components;
@@ -205,18 +205,20 @@ struct builtin_fusioned_function<ImSet,mpl::type_pack<Dom...>> : public inherite
     {
         friend inline size_t hash(const fusioned_components& i_function)
         {
-            static const auto nestedHasher = dynamic_callable<size_t,function_impl_base<typename ImSet::place_type,mpl::type_pack<Dom...>>>([](auto&& i_function) -> size_t { return hash(i_function); });
+            static const auto nestedHasher = dynamic_callable<size_t,function_impl_base<typename Im::place_type,mpl::type_pack<Dom...>>>([](auto&& i_function) -> size_t { return hash(i_function); });
 
             return ddk::hash_combine(visit(nestedHasher,i_function.m_fusionedFunction.template get_callable<Components>())...);
         }
 
-        fusioned_components(const ddk::detail::intersection_function<cpn::function_impl<ddk::mpl::index_to_type<Components,typename ImSet::place_type>(mpl::type_pack<Dom...>)>...>& i_callable);
+        fusioned_components(const ddk::detail::intersection_function<cpn::function_impl<ddk::mpl::index_to_type<Components,typename Im::place_type>(mpl::type_pack<Dom...>)>...>& i_callable);
 
-        const intersection_function<cpn::function_impl<ddk::mpl::index_to_type<Components,typename ImSet::place_type>(mpl::type_pack<Dom...>)>...> m_fusionedFunction;
+        const intersection_function<cpn::function_impl<ddk::mpl::index_to_type<Components,typename Im::place_type>(mpl::type_pack<Dom...>)>...> m_fusionedFunction;
     };
     friend inline size_t hash(const builtin_fusioned_function& i_function)
     {
-        return hash(i_function.m_callables);
+        static const rtti::TypeInfo s_typeHash = rtti::type_info<builtin_fusioned_function<Im,mpl::type_pack<Dom...>>,function_impl_base<Im,mpl::type_pack<Dom...>>>();
+
+        return ddk::hash_combine(s_typeHash,i_function.m_callables);
     }
 
 public:
@@ -226,29 +228,29 @@ public:
     builtin_fusioned_function(const intersection_function<cpn::function_impl<T(mpl::type_pack<Dom...>)>...>& i_args);
 
     template<size_t Index>
-    inline const cpn::function_impl<typename ImSet::place_type(mpl::type_pack<Dom...>)>& get_callable() const;
+    inline auto get_callable() const;
 
-    ImSet operator()(Dom... i_args) const final override;
+    Im operator()(Dom... i_args) const final override;
 
 private:
     template<size_t ... Indexs>
-    inline ImSet execute(const mpl::sequence<Indexs...>&, Dom ... i_args) const;
+    inline Im execute(const mpl::sequence<Indexs...>&, Dom ... i_args) const;
 
-    const fusioned_components<typename mpl::make_sequence<0,ImSet::num_places>::type> m_callables;
+    const fusioned_components<typename mpl::make_sequence<0,Im::num_places>::type> m_callables;
 }PUBLISH_RTTI_INHERITANCE(builtin_fusioned_function,function_impl_base);
 
 template<cpn::fundamental_type,typename>
 struct builtin_composed_function;
-template<cpn::fundamental_type ImSet,typename ... Dom>
-struct builtin_composed_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...>
+template<cpn::fundamental_type Im,typename ... Dom>
+struct builtin_composed_function<Im,mpl::type_pack<Dom...>> : public inherited_functor_impl<Im,Dom...>
 {
-    typedef cpn::function_impl<ImSet(mpl::type_pack<ImSet>)> function_lhs_t;
-    typedef cpn::function_impl<ImSet(mpl::type_pack<Dom...>)> function_rhs_t;
+    typedef cpn::function_impl<Im(mpl::type_pack<Im>)> function_lhs_t;
+    typedef cpn::function_impl<Im(mpl::type_pack<Dom...>)> function_rhs_t;
     friend inline size_t hash(const builtin_composed_function& i_function)
     {
-        static const rtti::TypeInfo s_typeHash = rtti::type_info<builtin_composed_function<ImSet,mpl::type_pack<Dom...>>,function_impl_base<ImSet,mpl::type_pack<Dom...>>>();
-        static const auto nestedSrcHasher = ddk::dynamic_callable<size_t,function_impl_base<ImSet,mpl::type_pack<Dom...>>>([](auto&& i_function) -> size_t { return hash(i_function); });
-        static const auto nestedDestHasher = ddk::dynamic_callable<size_t,function_impl_base<ImSet,mpl::type_pack<ImSet>>>([](auto&& i_function) -> size_t { return hash(i_function); });
+        static const rtti::TypeInfo s_typeHash = rtti::type_info<builtin_composed_function<Im,mpl::type_pack<Dom...>>,function_impl_base<Im,mpl::type_pack<Dom...>>>();
+        static const auto nestedSrcHasher = ddk::dynamic_callable<size_t,function_impl_base<Im,mpl::type_pack<Dom...>>>([](auto&& i_function) -> size_t { return hash(i_function); });
+        static const auto nestedDestHasher = ddk::dynamic_callable<size_t,function_impl_base<Im,mpl::type_pack<Im>>>([](auto&& i_function) -> size_t { return hash(i_function); });
 
         return hash_combine(s_typeHash,visit(nestedDestHasher,i_function.m_lhs),visit(nestedSrcHasher,i_function.m_rhs));
     }
@@ -263,7 +265,7 @@ public:
     const function_lhs_t& get_dest_function() const;
     const function_rhs_t& get_source_function() const;
 
-    ImSet operator()(Dom... i_args) const final override;
+    Im operator()(Dom... i_args) const final override;
 
 private:
     const function_lhs_t m_lhs;
@@ -272,13 +274,13 @@ private:
 
 template<cpn::fundamental_type,typename>
 struct builtin_component_function;
-template<cpn::fundamental_type ImSet,typename ... Dom>
-struct builtin_component_function<ImSet,mpl::type_pack<Dom...>>: public inherited_functor_impl<ImSet,Dom...>
+template<cpn::fundamental_type Im,typename ... Dom>
+struct builtin_component_function<Im,mpl::type_pack<Dom...>>: public inherited_functor_impl<Im,Dom...>
 {
-    typedef cpn::function_impl<ImSet(mpl::type_pack<Dom...>)> function_t;
+    typedef cpn::function_impl<Im(mpl::type_pack<Dom...>)> function_t;
     friend inline size_t hash(const builtin_component_function& i_function)
     {
-        static const rtti::TypeInfo s_typeHash = rtti::type_info<builtin_component_function<ImSet,mpl::type_pack<Dom...>>,function_impl_base<ImSet,mpl::type_pack<Dom...>>>();
+        static const rtti::TypeInfo s_typeHash = rtti::type_info<builtin_component_function<Im,mpl::type_pack<Dom...>>,function_impl_base<Im,mpl::type_pack<Dom...>>>();
         return hash_combine(s_typeHash,i_function.m_component);
     }
 
@@ -288,50 +290,50 @@ public:
     template<size_t Comp>
     builtin_component_function(const ddk::mpl::static_number<Comp>&);
 
-    ImSet operator()(Dom... i_args) const final override;
+    Im operator()(Dom... i_args) const final override;
     size_t get_component() const;
 
 private:
-    const cpn::function_impl<ImSet(mpl::type_pack<Dom...>)> m_projection;
+    const cpn::function_impl<Im(mpl::type_pack<Dom...>)> m_projection;
     const size_t m_component;
 
 } PUBLISH_RTTI_INHERITANCE(builtin_component_function,function_impl_base);
 
 template<cpn::fundamental_type,typename>
 struct builtin_number_function;
-template<cpn::fundamental_type ImSet,typename ... Dom>
-struct builtin_number_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...>
+template<cpn::fundamental_type Im,typename ... Dom>
+struct builtin_number_function<Im,mpl::type_pack<Dom...>> : public inherited_functor_impl<Im,Dom...>
 {
-    typedef cpn::function_impl<ImSet(mpl::type_pack<Dom...>)> function_t;
+    typedef cpn::function_impl<Im(mpl::type_pack<Dom...>)> function_t;
     friend inline size_t hash(const builtin_number_function& i_function)
     {
-        static const rtti::TypeInfo s_typeHash = rtti::type_info<builtin_number_function<ImSet,mpl::type_pack<Dom...>>,function_impl_base<ImSet,mpl::type_pack<Dom...>>>();
+        static const rtti::TypeInfo s_typeHash = rtti::type_info<builtin_number_function<Im,mpl::type_pack<Dom...>>,function_impl_base<Im,mpl::type_pack<Dom...>>>();
         return hash_combine(s_typeHash,i_function.m_number);
     }
 
 public:
     struct __builtin_function_tag;
 
-    builtin_number_function(const ImSet& i_number);
+    builtin_number_function(const Im& i_number);
 
-    const ImSet& get_number() const;
+    const Im& get_number() const;
 
-    ImSet operator()(Dom... i_args) const final override;
+    Im operator()(Dom... i_args) const final override;
 
 private:
-    const ImSet m_number;
+    const Im m_number;
 } PUBLISH_RTTI_INHERITANCE(builtin_number_function,function_impl_base);
 
 template<cpn::fundamental_type,typename>
 struct builtin_inverted_function;
-template<cpn::fundamental_type ImSet,typename ... Dom>
-struct builtin_inverted_function<ImSet,mpl::type_pack<Dom...>> : public inherited_functor_impl<ImSet,Dom...>
+template<cpn::fundamental_type Im,typename ... Dom>
+struct builtin_inverted_function<Im,mpl::type_pack<Dom...>> : public inherited_functor_impl<Im,Dom...>
 {
-    typedef cpn::function_impl<ImSet(mpl::type_pack<Dom...>)> function_t;
+    typedef cpn::function_impl<Im(mpl::type_pack<Dom...>)> function_t;
     friend inline size_t hash(const builtin_inverted_function& i_function)
     {
-        static const rtti::TypeInfo s_typeHash = rtti::type_info<builtin_inverted_function<ImSet,mpl::type_pack<Dom...>>,function_impl_base<ImSet,mpl::type_pack<Dom...>>>();
-        static const auto nestedHasher = dynamic_callable<size_t,function_impl_base<ImSet,mpl::type_pack<Dom...>>>([](auto&& i_function) -> size_t { return hash(i_function); });
+        static const rtti::TypeInfo s_typeHash = rtti::type_info<builtin_inverted_function<Im,mpl::type_pack<Dom...>>,function_impl_base<Im,mpl::type_pack<Dom...>>>();
+        static const auto nestedHasher = dynamic_callable<size_t,function_impl_base<Im,mpl::type_pack<Dom...>>>([](auto&& i_function) -> size_t { return hash(i_function); });
         return ~hash_combine(s_typeHash,visit(nestedHasher,i_function.m_function));
     }
 
@@ -343,7 +345,7 @@ public:
 
     const function_t& get_expresion() const;
 
-    ImSet operator()(Dom... i_args) const final override;
+    Im operator()(Dom... i_args) const final override;
 
 private:
     const function_t m_function;

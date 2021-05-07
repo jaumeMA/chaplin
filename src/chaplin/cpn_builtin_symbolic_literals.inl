@@ -195,8 +195,6 @@ void grouped_symbolic_literal<Type,BuildingBlocks...>::enumerate(const Callable&
 			i_callable(itOperand->second.template get<T>());
 		}
 	}
-
-	return false;
 }
 template<size_t Type, typename ... BuildingBlocks>
 TEMPLATE(typename Callable)

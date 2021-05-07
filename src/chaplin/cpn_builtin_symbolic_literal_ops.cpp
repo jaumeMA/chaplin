@@ -5,15 +5,11 @@ namespace cpn
 
 bool operator==(const sum_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
 {
-	const ddk::commutative_builtin_hasher _hasher;
-
-	return hash(_hasher,i_lhs) == hash(_hasher,i_rhs);
+	return hash(i_lhs) == hash(i_rhs);
 }
 bool operator==(const prod_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	const ddk::commutative_builtin_hasher _hasher;
-
-	return hash(_hasher,i_lhs) == hash(_hasher,i_rhs);
+	return hash(i_lhs) == hash(i_rhs);
 }
 bool operator<(const root_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
@@ -36,57 +32,57 @@ bool operator<(const prod_symbolic_literal& i_lhs,const prod_symbolic_literal& i
 
 sum_symbolic_literal operator+(const integer_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs, i_rhs };
+	return sum_symbolic_literal{ i_lhs, i_rhs };
 }
 sum_symbolic_literal operator+(const root_symbolic_literal& i_lhs,const integer_symbolic_literal& i_rhs)
 {
-	return { i_lhs, i_rhs };
+	return sum_symbolic_literal{ i_lhs, i_rhs };
 }
 sum_symbolic_literal operator+(const integer_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs, i_rhs };
+	return sum_symbolic_literal{ i_lhs, i_rhs };
 }
 sum_symbolic_literal operator+(const log_symbolic_literal& i_lhs,const integer_symbolic_literal& i_rhs)
 {
-	return { i_lhs, i_rhs };
+	return sum_symbolic_literal{ i_lhs, i_rhs };
 }
 sum_symbolic_literal operator+(const rational_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs, i_rhs };
+	return sum_symbolic_literal{ i_lhs, i_rhs };
 }
 sum_symbolic_literal operator+(const root_symbolic_literal& i_lhs,const rational_symbolic_literal& i_rhs)
 {
-	return { i_lhs, i_rhs };
+	return sum_symbolic_literal{ i_lhs, i_rhs };
 }
 sum_symbolic_literal operator+(const rational_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs, i_rhs };
+	return sum_symbolic_literal{ i_lhs, i_rhs };
 }
 sum_symbolic_literal operator+(const log_symbolic_literal& i_lhs,const rational_symbolic_literal& i_rhs)
 {
-	return { i_lhs, i_rhs };
+	return sum_symbolic_literal{ i_lhs, i_rhs };
 }
 sum_symbolic_literal operator+(const root_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs, i_rhs };
+	return sum_symbolic_literal{ i_lhs, i_rhs };
 }
 sum_symbolic_literal operator+(const root_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs, i_rhs };
+	return sum_symbolic_literal{ i_lhs, i_rhs };
 }
 sum_symbolic_literal operator+(const log_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs, i_rhs };
+	return sum_symbolic_literal{ i_lhs, i_rhs };
 }
 sum_symbolic_literal operator+(const log_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
 	if(i_lhs.base() == i_rhs.base())
 	{
-		return { log_symbolic_literal(i_lhs.number() * i_rhs.number(),i_lhs.base()) };
+		return sum_symbolic_literal{ log_symbolic_literal(i_lhs.number() * i_rhs.number(),i_lhs.base()) };
 	}
 	else
 	{
-		return { i_lhs,i_rhs };
+		return sum_symbolic_literal{ i_lhs,i_rhs };
 	}
 }
 sum_symbolic_literal operator+(const integer_symbolic_literal& i_lhs, const sum_symbolic_literal& i_rhs)
@@ -145,11 +141,11 @@ sum_symbolic_literal operator+(const sum_symbolic_literal& i_lhs, const integer_
 }
 sum_symbolic_literal operator+(const integer_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return sum_symbolic_literal{ i_lhs,i_rhs };
 }
 sum_symbolic_literal operator+(const prod_symbolic_literal& i_lhs,const integer_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return sum_symbolic_literal{ i_lhs,i_rhs };
 }
 sum_symbolic_literal operator+(const rational_symbolic_literal& i_lhs, const sum_symbolic_literal& i_rhs)
 {
@@ -207,11 +203,11 @@ sum_symbolic_literal operator+(const sum_symbolic_literal& i_lhs,const rational_
 }
 sum_symbolic_literal operator+(const rational_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return {i_lhs,i_rhs};
+	return sum_symbolic_literal{i_lhs,i_rhs};
 }
 sum_symbolic_literal operator+(const prod_symbolic_literal& i_lhs,const rational_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return sum_symbolic_literal{ i_lhs,i_rhs };
 }
 sum_symbolic_literal operator+(const root_symbolic_literal& i_lhs, const sum_symbolic_literal& i_rhs)
 {
@@ -241,11 +237,11 @@ sum_symbolic_literal operator+(const sum_symbolic_literal& i_lhs,const root_symb
 }
 sum_symbolic_literal operator+(const root_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return {i_lhs,i_rhs};
+	return sum_symbolic_literal{i_lhs,i_rhs};
 }
 sum_symbolic_literal operator+(const prod_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return sum_symbolic_literal{ i_lhs,i_rhs };
 }
 sum_symbolic_literal operator+(const log_symbolic_literal& i_lhs, const sum_symbolic_literal& i_rhs)
 {
@@ -317,11 +313,11 @@ sum_symbolic_literal operator+(const sum_symbolic_literal& i_lhs,const log_symbo
 }
 sum_symbolic_literal operator+(const log_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return {i_lhs,i_rhs};
+	return sum_symbolic_literal{i_lhs,i_rhs};
 }
 sum_symbolic_literal operator+(const prod_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return sum_symbolic_literal{ i_lhs,i_rhs };
 }
 sum_symbolic_literal operator+(const sum_symbolic_literal& i_lhs, const sum_symbolic_literal& i_rhs)
 {
@@ -352,62 +348,62 @@ sum_symbolic_literal operator+(const prod_symbolic_literal& i_lhs,const sum_symb
 }
 sum_symbolic_literal operator+(const prod_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return sum_symbolic_literal{ i_lhs,i_rhs };
 }
 
 sum_symbolic_literal operator-(const integer_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs, -i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const root_symbolic_literal& i_lhs,const integer_symbolic_literal& i_rhs)
 {
-	return { i_lhs, -i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const integer_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs, -i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const log_symbolic_literal& i_lhs,const integer_symbolic_literal& i_rhs)
 {
-	return { i_lhs, -i_rhs };
+	return i_lhs +  -i_rhs;
 }
 sum_symbolic_literal operator-(const rational_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs, -i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const root_symbolic_literal& i_lhs,const rational_symbolic_literal& i_rhs)
 {
-	return { i_lhs, -i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const rational_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs, -i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const log_symbolic_literal& i_lhs,const rational_symbolic_literal& i_rhs)
 {
-	return { i_lhs, -i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const root_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs, -i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const root_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs, -i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const log_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs, -i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const log_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
 	if(i_lhs.base() == i_rhs.base())
 	{
-		return { log_symbolic_literal(i_lhs.number() / i_rhs.number(),i_lhs.base()) };
+		return sum_symbolic_literal{ log_symbolic_literal(i_lhs.number() / i_rhs.number(),i_lhs.base()) };
 	}
 	else
 	{
-		return { i_lhs,-i_rhs };
+		return i_lhs + -i_rhs;
 	}
 }
 sum_symbolic_literal operator-(const integer_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
@@ -466,11 +462,11 @@ sum_symbolic_literal operator-(const sum_symbolic_literal& i_lhs,const integer_s
 }
 sum_symbolic_literal operator-(const integer_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return { i_lhs,-i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const prod_symbolic_literal& i_lhs,const integer_symbolic_literal& i_rhs)
 {
-	return { i_lhs,-i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const rational_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
 {
@@ -528,11 +524,11 @@ sum_symbolic_literal operator-(const sum_symbolic_literal& i_lhs,const rational_
 }
 sum_symbolic_literal operator-(const rational_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return { i_lhs,-i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const prod_symbolic_literal& i_lhs,const rational_symbolic_literal& i_rhs)
 {
-	return { i_lhs,-i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const root_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
 {
@@ -562,11 +558,11 @@ sum_symbolic_literal operator-(const sum_symbolic_literal& i_lhs,const root_symb
 }
 sum_symbolic_literal operator-(const root_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return { i_lhs,-i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const prod_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs,-i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const log_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
 {
@@ -638,11 +634,11 @@ sum_symbolic_literal operator-(const sum_symbolic_literal& i_lhs,const log_symbo
 }
 sum_symbolic_literal operator-(const log_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return { i_lhs,-i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const prod_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs,-i_rhs };
+	return i_lhs + -i_rhs;
 }
 sum_symbolic_literal operator-(const sum_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
 {
@@ -673,63 +669,63 @@ sum_symbolic_literal operator-(const prod_symbolic_literal& i_lhs,const sum_symb
 }
 sum_symbolic_literal operator-(const prod_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return { i_lhs,-i_rhs };
+	return i_lhs + -i_rhs;
 }
 
 prod_symbolic_literal operator*(const integer_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return {i_lhs,i_rhs};
+	return prod_symbolic_literal{i_lhs,i_rhs};
 }
 prod_symbolic_literal operator*(const root_symbolic_literal& i_lhs,const integer_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return prod_symbolic_literal{ i_lhs,i_rhs };
 }
 prod_symbolic_literal operator*(const integer_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return prod_symbolic_literal{ i_lhs,i_rhs };
 }
 prod_symbolic_literal operator*(const log_symbolic_literal& i_lhs,const integer_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return prod_symbolic_literal{ i_lhs,i_rhs };
 }
 prod_symbolic_literal operator*(const rational_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return prod_symbolic_literal{ i_lhs,i_rhs };
 }
 prod_symbolic_literal operator*(const root_symbolic_literal& i_lhs,const rational_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return prod_symbolic_literal{ i_lhs,i_rhs };
 }
 prod_symbolic_literal operator*(const rational_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return prod_symbolic_literal{ i_lhs,i_rhs };
 }
 prod_symbolic_literal operator*(const log_symbolic_literal& i_lhs,const rational_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return prod_symbolic_literal{ i_lhs,i_rhs };
 }
 prod_symbolic_literal operator*(const root_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
 	if(i_lhs.number() == i_rhs.number())
 	{
-		return { root_symbolic_literal(i_lhs.number(),i_lhs.degree() + i_rhs.degree()) };
+		return prod_symbolic_literal{ root_symbolic_literal(i_lhs.number(),i_lhs.degree() + i_rhs.degree()) };
 	}
 	else
 	{
-		return { i_lhs,i_rhs };
+		return prod_symbolic_literal{ i_lhs,i_rhs };
 	}
 }
 prod_symbolic_literal operator*(const root_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return prod_symbolic_literal{ i_lhs,i_rhs };
 }
 prod_symbolic_literal operator*(const log_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return prod_symbolic_literal{ i_lhs,i_rhs };
 }
 prod_symbolic_literal operator*(const log_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return prod_symbolic_literal{ i_lhs,i_rhs };
 }
 sum_symbolic_literal operator*(const integer_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
 {
@@ -1082,70 +1078,70 @@ prod_symbolic_literal operator*(const prod_symbolic_literal& i_lhs,const prod_sy
 
 div_symbolic_literal operator/(const integer_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return {i_lhs,i_rhs};
+	return div_symbolic_literal{i_lhs,i_rhs};
 }
 div_symbolic_literal operator/(const root_symbolic_literal& i_lhs,const integer_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const integer_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const log_symbolic_literal& i_lhs,const integer_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const rational_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { integer_symbolic_literal{i_lhs.numerator()},i_lhs.denominator() * i_rhs };
+	return div_symbolic_literal{ integer_symbolic_literal{i_lhs.numerator()},i_lhs.denominator() * i_rhs };
 }
 div_symbolic_literal operator/(const root_symbolic_literal& i_lhs,const rational_symbolic_literal& i_rhs)
 {
-	return { i_rhs.denominator() * i_lhs,integer_symbolic_literal{i_rhs.numerator()} };
+	return div_symbolic_literal{ i_rhs.denominator() * i_lhs,integer_symbolic_literal{i_rhs.numerator()} };
 }
 div_symbolic_literal operator/(const rational_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { integer_symbolic_literal{i_lhs.numerator()},i_lhs.denominator() * i_rhs };
+	return div_symbolic_literal{ integer_symbolic_literal{i_lhs.numerator()},i_lhs.denominator() * i_rhs };
 }
 div_symbolic_literal operator/(const log_symbolic_literal& i_lhs,const rational_symbolic_literal& i_rhs)
 {
-	return { i_rhs.denominator() * i_lhs,integer_symbolic_literal{i_rhs.numerator()} };
+	return div_symbolic_literal{ i_rhs.denominator() * i_lhs,integer_symbolic_literal{i_rhs.numerator()} };
 }
 div_symbolic_literal operator/(const root_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
 	if(i_lhs.number() == i_rhs.number())
 	{
-		return { root_symbolic_literal(i_lhs.number(),i_lhs.degree() - i_rhs.degree()) };
+		return div_symbolic_literal{ root_symbolic_literal(i_lhs.number(),i_lhs.degree() - i_rhs.degree()) };
 	}
 	else
 	{
-		return { i_lhs,i_rhs };
+		return div_symbolic_literal{ i_lhs,i_rhs };
 	}
 }
 div_symbolic_literal operator/(const root_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const log_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const log_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const integer_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const sum_symbolic_literal& i_lhs,const integer_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const integer_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 prod_symbolic_literal operator/(const prod_symbolic_literal& i_lhs,const integer_symbolic_literal& i_rhs)
 {
@@ -1153,7 +1149,7 @@ prod_symbolic_literal operator/(const prod_symbolic_literal& i_lhs,const integer
 }
 div_symbolic_literal operator/(const rational_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
 {
-	return { integer_symbolic_literal{i_lhs.numerator()}, i_lhs.denominator() * i_rhs };
+	return div_symbolic_literal{ integer_symbolic_literal{i_lhs.numerator()}, i_lhs.denominator() * i_rhs };
 }
 sum_symbolic_literal operator/(const sum_symbolic_literal& i_lhs,const rational_symbolic_literal& i_rhs)
 {
@@ -1161,7 +1157,7 @@ sum_symbolic_literal operator/(const sum_symbolic_literal& i_lhs,const rational_
 }
 div_symbolic_literal operator/(const rational_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return { integer_symbolic_literal{i_lhs.numerator()}, i_lhs.denominator() * i_rhs };
+	return div_symbolic_literal{ integer_symbolic_literal{i_lhs.numerator()}, i_lhs.denominator() * i_rhs };
 }
 prod_symbolic_literal operator/(const prod_symbolic_literal& i_lhs,const rational_symbolic_literal& i_rhs)
 {
@@ -1169,51 +1165,51 @@ prod_symbolic_literal operator/(const prod_symbolic_literal& i_lhs,const rationa
 }
 div_symbolic_literal operator/(const root_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const sum_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const root_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const prod_symbolic_literal& i_lhs,const root_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const log_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const sum_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const log_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const prod_symbolic_literal& i_lhs,const log_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const sum_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const sum_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const prod_symbolic_literal& i_lhs,const sum_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 div_symbolic_literal operator/(const prod_symbolic_literal& i_lhs,const prod_symbolic_literal& i_rhs)
 {
-	return { i_lhs,i_rhs };
+	return div_symbolic_literal{ i_lhs,i_rhs };
 }
 
 }

@@ -163,16 +163,13 @@ struct grouped_symbolic_literal : public detail::symbolic_literal<Type>
 	struct operand_visitor: public ddk::static_visitor<bool>
 	{
 		operand_visitor(const Hasher& i_callable);
-		template<typename T,typename = decltype(nested_enumerate(std::declval<T>(),std::declval<Callable>()))>
+		template<typename T,typename = decltype(nested_enumerate(std::declval<T>(),std::declval<Hasher>()))>
 		return_type operator()(T&& i_value) const;
 		return_type operator()(...) const;
 
 	private:
 		const Hasher& m_hasher;
 	};
-	template<typename Callable>
-	operand_visitor(const Callable&) -> operand_visitor<Callable>;
-
 	friend inline size_t hash(const grouped_symbolic_literal& i_number)
 	{
 		ddk::commutative_builtin_hasher _hasher(Type);
@@ -184,7 +181,7 @@ struct grouped_symbolic_literal : public detail::symbolic_literal<Type>
 
 		for(const auto& operand : i_number.m_operands)
 		{
-			static const operand_visitor hasherVisitor(_hasher);
+			static const operand_visitor<ddk::commutative_builtin_hasher> hasherVisitor(_hasher);
 
 			ddk::visit(hasherVisitor,operand.second);
 		}

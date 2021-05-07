@@ -17,12 +17,17 @@
 
 namespace cpn
 {
+
+//this is just a misery way of publishing this symbol
+template<typename Im,typename Dom>
+typename std::enable_if<sizeof(Im)==0>::type instance_as_function(...);
+
 namespace concepts
 {
 
 std::false_type is_instantiable_by_resolver(...);
-template<typename T, typename Im, typename Dom, typename = decltype(instance_as_function<Im,Dom>(std::declval<T>()))>
-std::true_type is_instantiable_by_resolver(T&, const Im&, const Dom&);
+template<typename T, typename Im, typename Dom>
+std::true_type is_instantiable_by_resolver(T&, const Im&, const Dom&, decltype(instance_as_function<Im,Dom>(std::declval<T>()))* = nullptr);
 
 template<typename T, typename Im, typename Dom>
 inline constexpr bool is_instantiable_by = decltype(is_instantiable_by_resolver(std::declval<T&>(),std::declval<Im>(),std::declval<Dom>()))::value;

@@ -1,5 +1,4 @@
 #include "cpn_number_set.h"
-#include "cpn_builtin_symbolic_number_visitors.h"
 
 namespace cpn
 {
@@ -15,6 +14,10 @@ real_number& real_number::operator=(const real_number& other)
 symbolic_number real_number::number() const
 {
 	return m_number;
+}
+double real_number::resolve(unsigned char i_accuracy) const
+{
+    return m_number.resolve(i_accuracy);
 }
 
 }

@@ -23,37 +23,25 @@ struct CylindricalCoordinates;
 template<typename T, size_t Dims>
 struct CartesianCoordinates
 {
-    template<typename Coordinates>
-    ddk::high_order_array<T,Dims> transform(const ddk::high_order_array<T,Dims>&);
-
-    template<>
-    inline ddk::high_order_array<T,Dims> transform<SphericalCoordinates<T,Dims>>(const ddk::high_order_array<T,Dims>& i_vector);
-    template<>
-    inline ddk::high_order_array<T,Dims> transform<CylindricalCoordinates<T,Dims>>(const ddk::high_order_array<T,Dims>& i_vector);
+    inline ddk::high_order_array<T,Dims> transform_to_spherical(const ddk::high_order_array<T,Dims>& i_vector);
+    inline ddk::high_order_array<T,Dims> transform_to_cylindrical(const ddk::high_order_array<T,Dims>& i_vector);
 };
 
 template<typename T,size_t Dims>
 struct SphericalCoordinates
 {
-    template<typename Coordinates>
+    template<typename Coordinates, typename = void>
     ddk::high_order_array<T,Dims> transform(const T&);
 
-    template<>
-    inline ddk::high_order_array<T,Dims> transform<CartesianCoordinates<T,Dims>>(const ddk::high_order_array<T,Dims>& i_vector);
-    template<>
-    inline ddk::high_order_array<T,Dims> transform<CylindricalCoordinates<T,Dims>>(const ddk::high_order_array<T,Dims>& i_vector);
+    inline ddk::high_order_array<T,Dims> transform_to_cartesian(const ddk::high_order_array<T,Dims>& i_vector);
+    inline ddk::high_order_array<T,Dims> transform_to_cylindrical(const ddk::high_order_array<T,Dims>& i_vector);
 };
 
 template<typename T,size_t Dims>
 struct CylindricalCoordinates
 {
-    template<typename Coordinates>
-    ddk::high_order_array<T,Dims> transform(const ddk::high_order_array<T,Dims>&);
-
-    template<>
-    inline ddk::high_order_array<T,Dims> transform<CartesianCoordinates<T,Dims>>(const ddk::high_order_array<T,Dims>& i_vector);
-    template<>
-    inline ddk::high_order_array<T,Dims> transform<SphericalCoordinates<T,Dims>>(const ddk::high_order_array<T,Dims>& i_vector);
+    inline ddk::high_order_array<T,Dims> transform_to_cartesian(const ddk::high_order_array<T,Dims>& i_vector);
+    inline ddk::high_order_array<T,Dims> transform_to_spherical(const ddk::high_order_array<T,Dims>& i_vector);
 };
 
 }

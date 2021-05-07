@@ -95,7 +95,7 @@ using sum_semi_group = semi_group<sum_set<T...>,sum_add_operation<T...>>;
 template<group_type ... T>
 struct sum_add_inverse_operation
 {
-	PUBLISH_OPERATION_PROPERTIES(sum_add_inverse_operation,add_inverse_operation,typename T::operators_pack);
+	PUBLISH_OPERATION_PROPERTIES(sum_add_inverse_operation,add_inverse_operation,typename T::operators_pack...);
 
 	typedef typename sum_set<T...>::set_traits sum_set_traits_t;
 
